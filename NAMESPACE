@@ -1,0 +1,11 @@
+# import packages
+import(lattice)
+import(methods)
+
+# import specific functions from packages
+importFrom(stats, aggregate)
+importFrom(stats4, plot, summary)
+importFrom(utils, head, tail)
+
+# export everything (for testing)
+exportPattern("^[[:alpha:]]+")
