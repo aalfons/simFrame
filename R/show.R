@@ -63,3 +63,38 @@ setMethod("show", "ContControl",
               print(aux)
             }
           })
+
+
+## NA control
+
+setMethod("show", "VirtualNAControl", 
+          function(object) {
+            target <- getTarget(object)
+            if(is.null(target)) cat("All variables are target variables\n")
+            else {
+              if(length(target) == 1) cat("Target variable:\n")
+              else cat("Target variables:\n")
+              print(target)
+            }
+            cat("\nMissing value rates:\n")
+            print(getNArate(object))
+          })
+
+setMethod("show", "NAControl", 
+          function(object) {
+            callNextMethod()
+            group <- getGrouping(object)
+            if(length(group) > 0) {
+              cat("\nGrouping variable for setting clusters to NA:\n")
+              print(group)
+            }
+            aux <- getAux(object)
+            if(length(aux) > 0) {
+              if(length(aux) == 1) {
+                cat("\nVariable giving probability weights for selection:\n")
+              } else {
+                cat("\nVariables giving probability weights for selection:\n")
+              }
+              print(aux)
+            }
+          })

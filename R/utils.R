@@ -3,6 +3,35 @@
 #         KU Leuven
 # ----------------------
 
+## utilities for class "BasicVector"
+
+# get character eqivalent
+getCharacter <- function(x, names) {
+  if(is(x, "character")) x
+  else if((is(x, "logical") || is(x, "numeric")) && length(x)) names[x]
+  else character()  # other classes
+}
+
+# get length of specified selection
+getSelectionLength <- function(x) {
+  if(is(x, "character")) length(x)
+  else if(is(x, "numeric") && all(x >= 0)) length(x[x > 0])
+  else NA  # other classes
+}
+
+# ---------------------------------------
+
+## utilities for class "NumericMatrix"
+
+# check if data is numeric
+checkNumericMatrix <- function(x) {
+  if(is(x, "numeric")) TRUE 
+  else if(is(x, "matrix")) mode(x) == "numeric"
+  else FALSE  # other classes
+}
+
+# ---------------------------------------
+
 ## other utilities
 
 ## call a function by either

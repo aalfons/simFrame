@@ -12,8 +12,8 @@
 ## class "DataControl"
 
 setMethod("getSize", "DataControl", function(x) slot(x, "size"))
-#setMethod("setSize", "DataControl", 
-#    function(x, size) eval.parent(substitute(slot(x, "size") <- size)))
+# setMethod("setSize", "DataControl", 
+#           function(x, size) eval.parent(substitute(slot(x, "size") <- size)))
 setMethod("setSize", "DataControl", 
           function(x, size) {
             eval.parent(substitute(slot(x, "size") <- size, env=parent.frame()), n=2)
@@ -36,8 +36,8 @@ setMethod("setTuning", "DataControl",
           })
 
 setMethod("getDots", "DataControl", function(x) slot(x, "dots"))
-#setMethod("setDots", "DataControl", 
-#    function(x, dots) eval.parent(substitute(slot(x, "dots") <- dots)))
+# setMethod("setDots", "DataControl", 
+#           function(x, dots) eval.parent(substitute(slot(x, "dots") <- dots)))
 setMethod("setDots", "DataControl", 
           function(x, dots) {
             eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
@@ -88,25 +88,61 @@ setMethod("setDistribution", "DCARContControl",
           })
 
 setMethod("getDots", "DCARContControl", function(x) slot(x, "dots"))
-#setMethod("setDots", "DCARContControl", 
-#    function(x, dots) eval.parent(substitute(slot(x, "dots") <- dots)))
+# setMethod("setDots", "DCARContControl", 
+#           function(x, dots) eval.parent(substitute(slot(x, "dots") <- dots)))
 setMethod("setDots", "DCARContControl", 
           function(x, dots) {
             eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
           })
 
 setMethod("getFun", "DARContControl", function(x) slot(x, "fun"))
-#setMethod("setFun", "DARContControl", 
-#    function(x, fun) eval.parent(substitute(slot(x, "fun") <- fun)))
+# setMethod("setFun", "DARContControl", 
+#           function(x, fun) eval.parent(substitute(slot(x, "fun") <- fun)))
 setMethod("setFun", "DARContControl", 
           function(x, fun) {
             eval.parent(substitute(slot(x, "fun") <- fun, env=parent.frame()), n=2)
           })
 
 setMethod("getDots", "DARContControl", function(x) slot(x, "dots"))
-#setMethod("setDots", "DARContControl", 
-#    function(x, dots) eval.parent(substitute(slot(x, "dots") <- dots)))
+# setMethod("setDots", "DARContControl", 
+#           function(x, dots) eval.parent(substitute(slot(x, "dots") <- dots)))
 setMethod("setDots", "DARContControl", 
           function(x, dots) {
             eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
+          })
+
+setGeneric("getIntoContamination", 
+           function(x) standardGeneric("getIntoContamination"))
+setGeneric("setIntoContamination", 
+           function(x, intoContamination) standardGeneric("setIntoContamination"))
+
+setGeneric("getNArate", function(x) standardGeneric("getNArate"))
+setGeneric("setNArate", function(x, NArate) standardGeneric("setNArate"))
+
+
+## class "NAControl"
+
+setMethod("getTarget", "VirtualNAControl", function(x) slot(x, "target"))
+setMethod("setTarget", "VirtualNAControl", 
+          function(x, target) eval.parent(substitute(slot(x, "target") <- target)))
+
+setMethod("getNArate", "VirtualNAControl", function(x) slot(x, "NArate"))
+setMethod("setNArate", "VirtualNAControl", 
+          function(x, NArate) eval.parent(substitute(slot(x, "NArate") <- NArate)))
+
+setMethod("getGrouping", "NAControl", function(x) slot(x, "grouping"))
+setMethod("setGrouping", "NAControl", 
+          function(x, grouping) {
+            eval.parent(substitute(slot(x, "grouping") <- grouping))
+          })
+
+setMethod("getAux", "NAControl", function(x) slot(x, "aux"))
+setMethod("setAux", "NAControl", 
+          function(x, aux) eval.parent(substitute(slot(x, "aux") <- aux)))
+
+setMethod("getIntoContamination", "NAControl", 
+          function(x) slot(x, "intoContamination"))
+setMethod("setIntoContamination", "NAControl", 
+          function(x, intoContamination) {
+            eval.parent(substitute(slot(x, "intoContamination") <- intoContamination))
           })

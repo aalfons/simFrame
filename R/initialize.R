@@ -41,3 +41,14 @@ setMethod("initialize", "DCARContControl",
             if(is.null(args$distribution)) setDistribution(.Object, rnorm)
             callNextMethod()  # call method for superclass (or default)
           })
+
+# # insertion of missing values
+# setMethod("initialize", "NAControl", 
+#           function(.Object, ...) {
+#             args <- list(...)
+#             # make sure logical indicator whether NAs should be insereted 
+#             # into contaminated observations is either TRUE or FALSE
+#             intoContamination <- isTRUE(getIntoContamination(.Object))
+#             setIntoContamination(.Object, intoContamination)
+#             callNextMethod()  # call method for superclass (or default)
+#           })

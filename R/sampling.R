@@ -21,3 +21,15 @@ ups <- function(N, size, prob, replace = FALSE) {
     sample(N, size, replace, prob)
   }
 }
+
+# for internal use (in 'setNA')
+samplex <- function(x, size, prob = NULL) {
+  if(length(x) == 0) x
+  else if(length(x) == 1) {
+    if(!missing(size)) {
+      if(isTRUE(size == 0)) x[FALSE]
+      else if(isTRUE(size == 1)) x
+      else stop("cannot take a sample larger than the population")
+    } else x
+  } else sample(x, size, prob = prob)
+}

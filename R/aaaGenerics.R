@@ -3,12 +3,16 @@
 #         KU Leuven
 # ----------------------
 
+setGeneric("contaminate",
+           function(x, control, ...) standardGeneric("contaminate"),
+           valueClass = "data.frame")
+
 setGeneric("generate",
            function(control, ...) standardGeneric("generate"), 
            valueClass = "data.frame")
 
-setGeneric("contaminate",
-           function(x, control, ...) standardGeneric("contaminate"),
+setGeneric("setNA",
+           function(x, control, ...) standardGeneric("setNA"),
            valueClass = "data.frame")
 
 

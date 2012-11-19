@@ -104,3 +104,66 @@ ContControl <- function(..., type = c("DCAR", "DAR")) {
   class <- paste(type, "ContControl", sep="")
   new(class, ...)
 }
+
+# ---------------------------------------
+
+## NA control
+
+# virtual class
+validVirtualNAControlObject <- function(object) {
+  NArate <- object@NArate
+  nl <- getLength(NArate)
+  ok <- c(length(object@target) > 0 || is.null(object@target), 
+          nl > 0 || is.na(nl), 
+          checkNumericMatrix(NArate), 
+          all(0 <= NArate & NArate <= 1))
+  msg <- c("'target' must be specified", 
+           "'NArate' must be specified", 
+           "non-numeric values in 'NArate'", 
+           "values in 'NArate' must be between 0 and 1")
+  if(all(ok)) TRUE
+  else msg[!ok]
+}
+
+setClass("VirtualNAControl",
+         representation(target = "OptCharacter", NArate = "NumericMatrix"),
+         prototype(target = NULL, NArate = 0.05),
+         contains = "VIRTUAL",
+         validity = validVirtualNAControlObject)
+
+setClassUnion("OptNAControl", c("NULL", "VirtualNAControl"))
+
+
+# select values randomly for each target variable
+validNAControlObject <- function(object) {
+  lengthAux <- length(object@aux)
+  ok <- c(length(object@grouping) <= 1, 
+          #        length(object@aux) <= 1,
+          length(object@intoContamination) == 1)
+  msg <- c("'grouping' must not specify more than one variable", 
+           #        "'aux' must not specify more than one variable", 
+           "'intoContamination' must be a single logical")
+  if(all(ok)) TRUE
+  else msg[!ok]
+}
+
+setClass("NAControl",
+         representation(grouping = "character", aux = "character", 
+                        intoContamination = "logical"),
+         prototype(intoContamination=FALSE),
+         contains = "VirtualNAControl", 
+         validity = validNAControlObject)
+
+NAControl <- function(...) new("NAControl", ...)
+
+# ---------------------------------------
+
+## simulation control
+
+setClass("SimControl",
+         representation(contControl = "OptContControl", NAControl = "OptNAControl",
+                        design = "character", fun = "function", dots = "list", SAE = "logical"),
+         prototype(contControl = NULL, NAControl = NULL, 
+                   design = character(), SAE = FALSE))
+
+SimControl <- function(...) new("SimControl", ...)
