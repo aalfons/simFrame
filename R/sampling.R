@@ -1,7 +1,7 @@
-# ----------------------
+# ------------------------------------
 # Author: Andreas Alfons
-#         KU Leuven
-# ----------------------
+#         Erasmus University Rotterdam
+# ------------------------------------
 
 # simple random sampling
 srs <- function(N, size, replace = FALSE) {

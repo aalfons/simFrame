@@ -1,7 +1,7 @@
 Package: simFrame
 Version: 0.6.0
 Title: Simulation framework
-Date: 2012-11-16
+Date: 2013-07-13
 Depends: R (>= 2.14.0), Rcpp (>= 0.8.6), lattice, parallel
 Suggests: laeken, mvtnorm, robCompositions, sampling
 LinkingTo: Rcpp

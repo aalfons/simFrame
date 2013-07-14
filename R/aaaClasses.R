@@ -1,7 +1,7 @@
-# ----------------------
+# ------------------------------------
 # Author: Andreas Alfons
-#         KU Leuven
-# ----------------------
+#         Erasmus University Rotterdam
+# ------------------------------------
 
 ## class unions of elementary classes (for convenience)
 
@@ -30,12 +30,6 @@ setClass("DataControl",
          validity = validDataControlObject)
 
 # constructor
-# DataControl <- function(size, distribution, tuning = NULL, dots = list(...), 
-#                         colnames = NULL, ...) {
-#   if(is.list(tuning)) tuning <- expand.grid(tuning, stringsAsFactors=FALSE)
-#   new("DataControl", size=size, distribution=distribution, tuning=tuning, 
-#       dots=dots, colnames=colnames, ...)
-# }
 DataControl <- function(...) new("DataControl", ...)
 
 # class union for extending the framework
@@ -43,6 +37,115 @@ setClassUnion("VirtualDataControl", "DataControl")
 
 # class union for optional argument in methods
 setClassUnion("OptDataControl", c("NULL", "VirtualDataControl"))
+
+# ---------------------------------------
+
+## sample control
+
+# virtual class
+validVirtualSampleControlObject <- function(object) {
+  if(length(object@k) == 1 && object@k > 0) TRUE
+  else "'k' must be a single positive integer"
+}
+
+setClass("VirtualSampleControl",
+         representation(k = "numeric"),
+         prototype(k = 1),
+         contains = "VIRTUAL",
+         validity = validVirtualSampleControlObject)
+
+setClassUnion("OptSampleControl", c("NULL", "VirtualSampleControl"))
+
+validSampleControlObject <- function(object) {
+  lengthGrouping <- getSelectionLength(object@grouping)
+  prob <- object@prob
+  if(is(prob, "character") || is(prob, "logical")) {
+    lengthProb <- getSelectionLength(prob)
+    okProb <- is.na(lengthProb) || lengthProb <= 1
+    msgProb <- "'prob' must not specify more than one variable"
+  } else {
+    okProb <- is.null(prob) || length(prob)
+    msgProb <- "'prob' must have positive length"
+  }
+  ok <- c(is.na(lengthGrouping) || lengthGrouping <= 1, 
+          is.null(object@size) || length(object@size), okProb, 
+          length(object@collect) == 1)
+  msg <- c("'grouping' must not specify more than one variable",
+           "'size' must have positive length", msgProb, 
+           "'collect' must be a single logical")
+  if(all(ok)) TRUE
+  else msg[!ok]
+}
+
+setClass("SampleControl",
+         representation(design = "BasicVector", grouping = "BasicVector", 
+                        collect = "logical", fun = "function", 
+                        size = "OptNumeric", prob = "OptBasicVector", 
+                        dots = "list"),
+         prototype(design = character(), grouping = character(), 
+                   collect = FALSE, size = NULL, prob = NULL),
+         contains = "VirtualSampleControl",
+         validity = validSampleControlObject)
+
+SampleControl <- function(...) new("SampleControl", ...)
+
+validTwoStageControlObject <- function(object) {
+  l <- getSelectionLength(object@grouping)
+  fun <- object@fun
+  size <- object@size
+  prob <- object@prob
+  dots <- object@dots
+  ok <- c(is.na(l) || l %in% 1:2, 
+          length(fun) == 2 && all(sapply(fun, is, "function")), 
+          length(size) == 2 && all(sapply(size, is, "OptNumeric")) && 
+            all(sapply(size, function(s) is.null(s) || length(s) > 0)), 
+          length(prob) == 2 && all(sapply(prob, is, "OptBasicVector")) && 
+            all(sapply(prob, function(p) {
+              if(is(p, "character") || is(p, "logical")) {
+                lengthP <- getSelectionLength(p)
+                is.na(lengthP) || lengthP <= 1
+              } else is.null(p) || length(p) > 0
+            })), 
+          length(dots) == 2 && 
+            all(sapply(dots, function(x) is.null(x) || is(x, "list"))))
+  msg <- c("'grouping' must specify either one or two variables",
+           "'fun' must have length 2 and each component should be a function", 
+           "'size' must have length 2 and each component should be NULL or a numeric vector of positive length",
+           "'prob' must have length 2 and each component should be NULL, a numeric vector of positive length, or must not specify more than one variable",
+           "'dots' must have length 2 and each component should again be a list")
+  if(all(ok)) TRUE
+  else msg[!ok]
+}
+
+setClass("TwoStageControl",
+         representation(design = "BasicVector", grouping = "BasicVector", 
+                        fun = "list", size = "list", prob = "list", 
+                        dots = "list"),
+         prototype(design = character(), grouping = character(), 
+                   size = list(NULL, NULL), prob = list(NULL, NULL), 
+                   dots = list(list(), list())),
+         contains = "VirtualSampleControl",
+         validity = validTwoStageControlObject)
+
+TwoStageControl <- function(..., fun1 = srs, fun2 = srs, size1 = NULL, 
+                            size2 = NULL, prob1 = NULL, prob2 = NULL, 
+                            dots1 = list(), dots2 = list()) {
+  # list components for the two stages can be supplied separately
+  args <- list(...)
+  if(is.null(args$fun) && !(missing(fun1) && missing(fun2))) {
+    args$fun <- list(fun1, fun2)
+  }
+  if(is.null(args$size) && !(missing(size1) && missing(size2))) {
+    args$size <- list(size1, size2)
+  }
+  if(is.null(args$prob) && !(missing(prob1) && missing(prob2))) {
+    args$prob <- list(prob1, prob2)
+  }
+  if(is.null(args$dots) && !(missing(dots1) && missing(dots2))) {
+    args$dots <- list(dots1, dots2)
+  }
+  do.call(new, c("TwoStageControl", args))
+}
 
 # ---------------------------------------
 
@@ -69,7 +172,20 @@ setClass("VirtualContControl",
 setClassUnion("OptContControl", c("NULL", "VirtualContControl"))
 
 # internal control class (not expected to be extended by the user)
-validContControlObject <- function(object) {
+setClass("ContControl",
+         representation(tuning = "ListOrDataFrame", indices = "NumericMatrix"),
+         prototype(tuning = data.frame(), indices = matrix(integer(0), ncol=2)), 
+         contains = c("VIRTUAL", "VirtualContControl"))
+
+# simple control class for contaminating the first observations
+setClass("SimpleContControl",
+         representation(fun = "function", dots = "list"),
+         contains = "ContControl")
+
+CARContControl <- function(...) new("CARContControl", ...)
+
+# internal control class (not expected to be extended by the user)
+validRandomContControlObject <- function(object) {
   ok <- c(length(object@grouping) <= 1, length(object@aux) <= 1)
   msg <- c("'grouping' must not specify more than one variable", 
            "'aux' must not specify more than one variable")
@@ -77,29 +193,27 @@ validContControlObject <- function(object) {
   else msg[!ok]
 }
 
-setClass("ContControl",
-         representation(tuning = "ListOrDataFrame", grouping = "character", 
-                        aux = "character"),
-         prototype(tuning = data.frame()), 
-         contains = c("VIRTUAL", "VirtualContControl"),
-         validity = validContControlObject)
+setClass("RandomContControl",
+         representation(grouping = "character", aux = "character"),
+         contains = c("VIRTUAL", "ContControl"),
+         validity = validRandomContControlObject)
 
-# contamination distributed completely at random (DCAR)
-setClass("DCARContControl",
+# contaminated completely at random (CCAR)
+setClass("CCARContControl",
          representation(distribution = "function", dots = "list"),
-         contains = "ContControl")
+         contains = "RandomContControl")
 
-DCARContControl <- function(...) new("DCARContControl", ...)
+CCARContControl <- function(...) new("CCARContControl", ...)
 
-# contamination distributed at random (DAR)
-setClass("DARContControl",
+# contaminated at random (CAR)
+setClass("CARContControl",
          representation(fun = "function", dots = "list"),
-         contains = "ContControl")
+         contains = "RandomContControl")
 
-DARContControl <- function(...) new("DARContControl", ...)
+CARContControl <- function(...) new("CARContControl", ...)
 
 # wrapper (mostly for compatibility)
-ContControl <- function(..., type = c("DCAR", "DAR")) {
+ContControl <- function(..., type = c("Simple", "CCAR", "CAR")) {
   type <- match.arg(type)
   class <- paste(type, "ContControl", sep="")
   new(class, ...)
@@ -111,23 +225,23 @@ ContControl <- function(..., type = c("DCAR", "DAR")) {
 
 # virtual class
 validVirtualNAControlObject <- function(object) {
-  NArate <- object@NArate
-  nl <- getLength(NArate)
+  NARate <- object@NARate
+  nl <- getLength(NARate)
   ok <- c(length(object@target) > 0 || is.null(object@target), 
           nl > 0 || is.na(nl), 
-          checkNumericMatrix(NArate), 
-          all(0 <= NArate & NArate <= 1))
+          checkNumericMatrix(NARate), 
+          all(0 <= NARate & NARate <= 1))
   msg <- c("'target' must be specified", 
-           "'NArate' must be specified", 
-           "non-numeric values in 'NArate'", 
-           "values in 'NArate' must be between 0 and 1")
+           "'NARate' must be specified", 
+           "non-numeric values in 'NARate'", 
+           "values in 'NARate' must be between 0 and 1")
   if(all(ok)) TRUE
   else msg[!ok]
 }
 
 setClass("VirtualNAControl",
-         representation(target = "OptCharacter", NArate = "NumericMatrix"),
-         prototype(target = NULL, NArate = 0.05),
+         representation(target = "OptCharacter", NARate = "NumericMatrix"),
+         prototype(target = NULL, NARate = 0.05),
          contains = "VIRTUAL",
          validity = validVirtualNAControlObject)
 
@@ -138,10 +252,8 @@ setClassUnion("OptNAControl", c("NULL", "VirtualNAControl"))
 validNAControlObject <- function(object) {
   lengthAux <- length(object@aux)
   ok <- c(length(object@grouping) <= 1, 
-          #        length(object@aux) <= 1,
           length(object@intoContamination) == 1)
   msg <- c("'grouping' must not specify more than one variable", 
-           #        "'aux' must not specify more than one variable", 
            "'intoContamination' must be a single logical")
   if(all(ok)) TRUE
   else msg[!ok]
@@ -161,9 +273,28 @@ NAControl <- function(...) new("NAControl", ...)
 ## simulation control
 
 setClass("SimControl",
-         representation(contControl = "OptContControl", NAControl = "OptNAControl",
-                        design = "character", fun = "function", dots = "list", SAE = "logical"),
-         prototype(contControl = NULL, NAControl = NULL, 
-                   design = character(), SAE = FALSE))
+         representation(contControl = "OptContControl", 
+                        NAControl = "OptNAControl",
+                        design = "character", 
+                        fun = "function", 
+                        dots = "list"),
+         prototype(contControl = NULL, NAControl = NULL, design = character()))
 
 SimControl <- function(...) new("SimControl", ...)
+
+# ---------------------------------------
+
+## simulation results
+
+setClass("SimResults",
+         representation(values = "data.frame", design = "character", 
+                        colnames = "character", epsilon = "numeric", 
+                        NARate = "NumericMatrix", 
+                        dataControl = "OptDataControl", 
+                        sampleControl = "OptSampleControl", 
+                        nrep = "numeric", control = "SimControl", 
+                        seed = "list", call = "OptCall"),
+         prototype(NARate = as.matrix(numeric()), call = NULL, 
+                   dataControl = NULL, sampleControl = NULL))
+
+SimResults <- function(...) new("SimResults", ...)

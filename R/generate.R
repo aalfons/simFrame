@@ -1,7 +1,7 @@
-# ----------------------
+# ------------------------------------
 # Author: Andreas Alfons
-#         KU Leuven
-# ----------------------
+#         Erasmus University Rotterdam
+# ------------------------------------
 
 ## internal S3 function 
 # this is used in 'runSimulation' and 'clusterRunSimulation': there the 
@@ -14,8 +14,8 @@ generateS3 <- function(control, i = 1) {
   dots <- getDots(control)
   nam <- getColnames(control)
   # generate data
-  if(nrow(tuning) > 0) tuning <- tuning[i,]
-  values <- doCallTuning(distribution, size, tuning, dots)
+  if(nrow(tuning) > 0) tuning <- tuning[i, , drop=FALSE]
+  values <- doCall(distribution, size, tuning, dots)
   # set column names
   if(is.null(dim(values)) && is.null(nam)) nam <- "V1" 
   values <- as.data.frame(values)
