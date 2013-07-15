@@ -21,15 +21,11 @@ setGeneric(
 setGeneric(
   "runSimulation",
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ...) {
-    # make sure that .Random.seed exists
-    if(!exists(".Random.seed", envir=.GlobalEnv, inherits = FALSE)) runif(1)
-    # call method and store seed before and after
-    firstSeed <- .Random.seed
-    res <- standardGeneric("runSimulation")
-    lastSeed <- .Random.seed
-    setSeed(res, list(firstSeed, lastSeed))
+           design = character(), fun, ..., seed = NULL) {
+    # initializations
     call <- match.call()
+    # call method and store call
+    res <- standardGeneric("runSimulation")
     setCall(res, call)
     res
   },

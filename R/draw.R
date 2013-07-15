@@ -38,8 +38,8 @@ setMethod(
 
 
 ## internal S3 function 
-# this is used in 'runSimulation' and 'clusterRunSimulation': there the 
-# objects are already checked for validity and this speeds things up slightly
+# this is used in 'runSimulation': there the objects are already checked for 
+# validity and this speeds things up slightly
 drawS3 <- function(x, setup, i) {
   ind <- getIndices(setup)[[i]]  # indices for i-th sample
   res <- x[ind, , drop=FALSE]

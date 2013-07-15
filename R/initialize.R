@@ -90,3 +90,13 @@ setMethod(
     if(is.null(args$fun)) setFun(.Object, function(...) "+"(...))
     callNextMethod()  # call method for superclass (or default)
   })
+
+# simulation control
+setMethod(
+  "initialize", "SimControl", 
+  function(.Object, ...) {
+    args <- list(...)
+    # use simple random sampling as default
+    if(is.null(args$seed)) setSeed(.Object, as.numeric(Sys.time()))
+    callNextMethod()  # call method for superclass (or default)
+  })

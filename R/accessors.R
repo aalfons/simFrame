@@ -432,6 +432,10 @@ setMethod("getDots", "SimControl", function(x) slot(x, "dots"))
 #             eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
 #           })
 
+setMethod("getSeed", "SimControl", function(x) slot(x, "seed"))
+setMethod("setSeed", "SimControl", 
+          function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
+
 
 ## class "SimResults"
 
@@ -455,13 +459,10 @@ setMethod(
     which <- if(which == "sim") "control" else paste(which, "Control", sep="")
     slot(x, which)
   })
-setMethod("getSeed", "SimResults", function(x) slot(x, "seed"))
 setMethod("getCall", "SimResults", function(x) slot(x, "call"))
 
 # private mutators (setters)
 setMethod("setValues", "SimResults", 
           function(x, values) eval.parent(substitute(slot(x, "values") <- values)))
-setMethod("setSeed", "SimResults", 
-          function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
 setMethod("setCall", "SimResults", 
           function(x, call) eval.parent(substitute(slot(x, "call") <- call)))

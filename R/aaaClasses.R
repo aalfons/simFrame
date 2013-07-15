@@ -296,7 +296,8 @@ setClass("SimControl",
                         NAControl = "OptNAControl",
                         design = "character", 
                         fun = "function", 
-                        dots = "list"),
+                        dots = "list", 
+                        seed = "numeric"),
          prototype(contControl = NULL, NAControl = NULL, design = character()))
 
 SimControl <- function(...) new("SimControl", ...)

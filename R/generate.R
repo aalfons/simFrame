@@ -4,8 +4,8 @@
 # ------------------------------------
 
 ## internal S3 function 
-# this is used in 'runSimulation' and 'clusterRunSimulation': there the 
-# objects are already checked for validity and this speeds things up slightly
+# this is used in 'runSimulation': there the objects are already checked for 
+# validity and this speeds things up slightly
 generateS3 <- function(control, i = 1) {
   # initializations
   size <- getSize(control)
