@@ -28,6 +28,117 @@ setMethod(
   })
 
 
+## sample control
+
+setMethod(
+  "show", "VirtualSampleControl", 
+  function(object) {
+    cat("Number of samples to be set up:\n")
+    print(getK(object))
+  })
+
+# single-stage sampling
+setMethod(
+  "show", "SampleControl", 
+  function(object) {
+    callNextMethod()
+    design <- getDesign(object)
+    haveDesign <- length(design) > 0
+    if(haveDesign) {
+      cat("\nDesign variable(s) for stratified sampling:\n")
+      print(design)
+    }
+    group <- getGrouping(object)
+    if(length(group) > 0) {
+      cat("\nGrouping variable giving sampling units:\n")
+      print(group)
+    }
+    size <- getSize(object)
+    if(!is.null(size)) {
+      tmp <- "\nSize of the resulting samples"
+      if(haveDesign) {
+        if(length(size) == 1) tmp <- paste(tmp, "for each stratum")
+        else tmp <- paste(tmp, "by stratum")
+      }
+      cat(paste(tmp, ":\n", sep=""))
+      print(size)
+    }
+  })
+
+# two-stage sampling
+setMethod(
+  "show", "TwoStageControl", 
+  function(object) {
+    callNextMethod()
+    design <- getDesign(object)
+    haveDesign <- length(design) > 0
+    if(haveDesign) {
+      cat("\nDesign variable(s) for stratified sampling:\n")
+      print(design)
+    }
+    group <- getGrouping(object)
+    haveSSUs <- length(group) > 1
+    if(haveSSUs) {
+      cat("\nGrouping variables giving PSUs and SSUs, respectively:\n")
+    } else cat("\nGrouping variable giving PSUs:\n")
+    print(group)
+    size <- getSize(object, stage=1)
+    if(!is.null(size)) {
+      tmp <- "\nNumber of PSUs to be sampled"
+      if(haveDesign) {
+        if(length(size) == 1) tmp <- paste(tmp, "for each stratum")
+        else tmp <- paste(tmp, "by stratum")
+      }
+      cat(paste(tmp, ":\n", sep=""))
+      print(size)
+    }
+    size <- getSize(object, stage=2)
+    if(!is.null(size)) {
+      tmp <- if(haveSSUs) "SSUs" else "individuals"
+      tmp <- paste("\nNumber of", tmp, "to be sampled")
+      tmp <- paste(tmp, if(length(size) == 1) "for each " else "by ")
+      cat(paste(tmp, "PSU:\n", sep=""))
+      print(size)
+    }
+  })
+
+
+## sample setup
+
+setMethod(
+  "show", "SampleSetup", 
+  function(object) {
+    k <- length(object)
+    if(k == 0) cat("No samples are set up\n")
+    else {
+      if(k == 1) cat("Indices of observations in the sample:\n\n")
+      else {
+        cat("Indices of observations for each of the", k, "samples:\n\n")
+      }
+      print(getIndices(object))
+    }
+  })
+
+setMethod(
+  "show", "SummarySampleSetup", 
+  function(object) {
+    size <- getSize(object)
+    k <- length(size)
+    if(k == 0) cat("No samples are set up\n")
+    else {
+      if(length(unique(size)) == 1) {  # also TRUE if k == 1
+        if(k == 1) msg <- "%i sample of size %i is set up\n"
+        else msg <- "%i samples of size %i are set up\n"
+        cat(sprintf(msg, k, size[1]))
+      } else {
+        cat(k, "samples are set up\n\n")
+        cat("The sample sizes are:\n")
+        print(size)
+      }
+    }
+  })
+
+
 ## contamination control
 
 setMethod(
@@ -112,14 +223,14 @@ setMethod(
 setMethod(
   "show", "SimControl", 
   function(object) {
-    contControl <- getContControl(object)
+    contControl <- getControl(object, which="cont")
     if(is.null(contControl)) {
       cat("Contamination will not be added\n")
     } else {
       cat("Settings for contamination:\n")
       show(contControl)
     }
-    NAControl <- getNAControl(object)
+    NAControl <- getControl(object, which="NA")
     blanks <- if(is.null(contControl) && is.null(NAControl)) "\n" else "\n\n"
     cat(blanks)
     if(is.null(NAControl)) {

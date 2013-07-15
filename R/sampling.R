@@ -33,3 +33,47 @@ samplex <- function(x, size, prob = NULL) {
     } else x
   } else sample(x, size, prob = prob)
 }
+
+# Midzuno sampling
+midzuno <- function(prob, eps = 1e-06) {
+  prob <- 1 - tilleCpp(1 - prob, eps)  # call internal function for tille sampling
+  which(prob >= 1 - eps)  # indices of sampled observations
+}
+
+# Tille sampling
+tille <- function(prob, eps = 1e-06) {
+  prob <- tilleCpp(prob, eps)  # call internal function
+  which(prob >= 1 - eps)  # indices of sampled observations
+}
+
+# internal function for Tille sampling that calls the C++ function
+tilleCpp <- function(prob, eps = 1e-06) {
+  if(any(is.na(prob))) stop("there are missing values in 'prob'")
+  list <- (prob > eps) & (prob < 1 - eps)  # indices of probabilities to be used
+  probList <- prob[list]  # probabilities to be used
+  if(length(probList) > 0) {
+    prob[list] <- .Call("R_tille", R_prob=probList)  # call C++ function
+  } else warning("all values in 'prob' outside the interval (eps, 1-eps)")
+  prob
+}
+
+# Brewer sampling
+brewer <- function(prob, eps = 1e-06) {
+  if(any(is.na(prob))) stop("there are missing values in 'prob'")
+  list <- (prob > eps) & (prob < 1 - eps)  # indices of probabilities to be used
+  probList <- prob[list]  # probabilities to be used
+  N <- length(probList)
+  if(N < 1) stop("all values in 'prob' outside the interval (eps, 1-eps)")
+  prob[list] <- .Call("R_brewer", R_prob=probList)  # call C++ function
+  which(prob >= 1 - eps)  # indices of sampled observations
+}
+
+# compute inclusion probabilities
+inclusionProb <- function(prob, size) {
+  prob <- as.numeric(prob)
+  size <- as.integer(size[1])
+  if(length(prob) == 0) return(numeric())
+  if(length(size) == 0 || size == 0) return(rep.int(0, length(prob)))
+  if(size < 0) stop("'size' must be a non-negative integer")
+  .Call("R_inclusionProb", R_prob=prob, R_size=size, PACKAGE="simFrame")
+}

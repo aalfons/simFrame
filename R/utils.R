@@ -3,25 +3,19 @@
 #         Erasmus University Rotterdam
 # ------------------------------------
 
-## utilities for class "BasicVector"
-
-# get character eqivalent
-getCharacter <- function(x, names) {
-  if(is(x, "character")) x
-  else if((is(x, "logical") || is(x, "numeric")) && length(x)) names[x]
-  else character()  # other classes
+# get argument names of a function
+argNames <- function(fun, removeDots = TRUE) {
+  nam <- names(formals(fun))
+  if(removeDots) nam <- setdiff(nam, "...")
+  nam
 }
 
-# get length of specified selection
-getSelectionLength <- function(x) {
-  if(is(x, "character")) length(x)
-  else if(is(x, "numeric") && all(x >= 0)) length(x[x > 0])
-  else NA  # other classes
+# check for errors in a list (for sample setup)
+checkError <- function(x) {
+  # x ... list
+  if(length(x)) sapply(x, function(x) class(x) == "try-error")
+  else logical()
 }
-
-# ---------------------------------------
-
-## utilities for class "NumericMatrix"
 
 # check if data is numeric
 checkNumericMatrix <- function(x) {
@@ -30,23 +24,19 @@ checkNumericMatrix <- function(x) {
   else FALSE  # other classes
 }
 
-# ----------------------------------
-
-## other utilities
-
-# get argument names of a function
-argNames <- function(fun, removeDots = TRUE) {
-  nam <- names(formals(fun))
-  if(removeDots) nam <- setdiff(nam, "...")
-  nam
-}
-
 # check for errors or empty vectors in a list (for simulation results)
 checkOK <- function(x) {
   # x ... list
   if(length(x)) {
     sapply(x, function(x) class(x) != "try-error" && length(x))
   } else logical()
+}
+
+# check the 'stage' argument of accessors for two-stage sampling designs
+checkStage <- function(stage) {
+  if(!isTRUE(stage == 1) && !isTRUE(stage == 2)) {
+    stop("'stage' must be either 1 or 2")
+  }
 }
 
 # get NA rate for simulation results
@@ -92,11 +82,27 @@ doCall <- function(fun, first, tuning, dots = list()) {
   else do.call(fun, c(first, tuning, dots))
 }
 
+# function to expand a vector according to groups
+# unsplit does not do the right thing here as it expects the vector to be in 
+# the order of the factor levels, but we have order of first occurence
+expand <- function(x, groups, unique) {
+  names(x) <- as.character(unique)
+  x <- x[as.character(groups)]
+  unname(x)
+}
+
+# get character eqivalent of a selection vector
+getCharacter <- function(x, names) {
+  if(is(x, "character")) x
+  else if((is(x, "logical") || is(x, "numeric")) && length(x)) names[x]
+  else character()  # other classes
+}
+
 ## get empty results
 getEmptyResults <- function(control) {
-  neps <- length(getContControl(control))
+  neps <- length(getControl(control, which="cont"))
   if(neps == 0) neps <- 1
-  nNA <- length(getNAControl(control))
+  nNA <- length(getControl(control, which="NA"))
   if(nNA == 0) nNA <- 1
   replicate(neps*nNA, list(values=numeric()))
 }
@@ -110,6 +116,13 @@ getRepetitions <- function(x) {
   if(is(x, "numeric")) if(length(x)) 1 else 0 
   else if(is(x, "data.frame") || is(x, "matrix")) nrow(x)
   else numeric()  # other classes
+}
+
+# get length of specified selection
+getSelectionLength <- function(x) {
+  if(is(x, "character")) length(x)
+  else if(is(x, "numeric") && all(x >= 0)) length(x[x > 0])
+  else NA  # other classes
 }
 
 # get result of one simulation run in the correct format
@@ -134,18 +147,20 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   nsam <- length(samples)
   origNrep <- if(missing(reps)) numeric() else length(reps)
   nrep <- length(reps)
-  contControl <- getContControl(control)
+  contControl <- getControl(control, which="cont")
   ncont <- length(contControl)
   if(ncont) {
     epsilon <- getEpsilon(contControl)
-    contTuning <- convertTuning(getTuning(contControl))
+    origContTuning <- getTuning(contControl)
+    contTuning <- convertTuning(origContTuning)
     nTuning <- length(contTuning)
     contIndices <- getIndices(contControl)
   } else {
     epsilon <- numeric()
+    origContTuning <- data.frame()
     nTuning <- 0
   }
-  NAControl <- getNAControl(control)
+  NAControl <- getControl(control, which="NA")
   nNA <- length(NAControl)
   if(nNA) {
     origNARate <- getNARate(NAControl)
@@ -197,8 +212,9 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   rownames(x) <- NULL
   # return results
   SimResults(values=x, design=design, colnames=nam, epsilon=epsilon, 
-             NARate=origNARate, dataControl=dataControl, 
-             sampleControl=sampleControl, nrep=origNrep, control=control)
+             contTuning=origContTuning, NARate=origNARate, 
+             dataControl=dataControl, sampleControl=sampleControl, 
+             nrep=origNrep, control=control)
 }
 
 # get information about strata as data.frame
@@ -220,4 +236,34 @@ getStrataTable <- function(x, design) {
   ans <- as.data.frame(table(tmp))
   names(ans) <- c(names(tmp), "Size")
   ans
+}
+
+# get stratum sizes
+getStratumSizes <- function(x, design, USE.NAMES = TRUE) {
+  if(is(x, "data.frame")) x <- getStrataSplit(x, design)
+  sapply(x, length, USE.NAMES=USE.NAMES)
+}
+
+# evaluate calls to sample methods with stratification and group sampling
+simEval <- function(call, split, groups, unique) {
+  if(!missing(split)) {
+    if(missing(groups)) {
+      # 'call' returns list of within-strata indices.
+      tmp <- eval(call)
+    } else {
+      # 'groups' and 'unique' are lists
+      # 'call' returns list of within-strata indices of groups. these 
+      # are used to obtain the within-strata indices of individuals.
+      tmp <- mapply(function(i, g, u) which(g %in% u[i]), 
+                    eval(call), groups, unique, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    }
+    # within-strata indices are turned into global indices 
+    # and the resulting list is converted to a vector.
+    unlist(mapply("[", split, tmp, SIMPLIFY=FALSE, USE.NAMES=FALSE))
+  } else if(!missing(groups)) {  # only 'groups' is not missing
+    # 'groups' and 'unique' are vectors
+    # 'call' returns list of groups. these are
+    # used to obtain the indices of individuals.
+    which(groups %in% unique[eval(call)])
+  } else eval(call)
 }

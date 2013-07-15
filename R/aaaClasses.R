@@ -149,6 +149,25 @@ TwoStageControl <- function(..., fun1 = srs, fun2 = srs, size1 = NULL,
 
 # ---------------------------------------
 
+## sample setup
+
+setClass("SampleSetup",
+         representation(indices = "list", prob = "numeric", 
+                        control = "VirtualSampleControl", 
+                        seed = "list", call = "OptCall"),
+         prototype(call = NULL))
+
+SampleSetup <- function(...) new("SampleSetup", ...)
+
+# summary
+
+setClass("SummarySampleSetup",
+         representation(size = "numeric"))
+
+SummarySampleSetup <- function(...) new("SummarySampleSetup", ...)
+
+# ---------------------------------------
+
 ## contamination control
 
 # virtual class
@@ -287,9 +306,9 @@ SimControl <- function(...) new("SimControl", ...)
 ## simulation results
 
 setClass("SimResults",
-         representation(values = "data.frame", design = "character", 
-                        colnames = "character", epsilon = "numeric", 
-                        NARate = "NumericMatrix", 
+         representation(values = "data.frame", colnames = "character", 
+                        design = "character", epsilon = "numeric", 
+                        contTuning = "data.frame", NARate = "NumericMatrix", 
                         dataControl = "OptDataControl", 
                         sampleControl = "OptSampleControl", 
                         nrep = "numeric", control = "SimControl", 

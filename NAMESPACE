@@ -9,3 +9,6 @@ importFrom(utils, head, tail)
 
 # export everything (for testing)
 exportPattern("^[[:alpha:]]+")
+
+# load dynamic C++ library
+useDynLib(simFrame)
