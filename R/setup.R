@@ -33,7 +33,6 @@ setMethod(
   })
 
 # ---------------------------------------
-
 ## get sample setup using control class "SampleControl"
 
 # group sampling: for methods with the argument 'x', the observation 

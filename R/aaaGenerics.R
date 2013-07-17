@@ -21,7 +21,7 @@ setGeneric(
 setGeneric(
   "runSimulation",
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
     # initializations
     call <- match.call()
     # call method and store call
@@ -40,14 +40,14 @@ setGeneric(
 setGeneric(
   "setup",
   function(x, control, ...) {
-    # make sure that .Random.seed exists
-    if(!exists(".Random.seed", envir=.GlobalEnv, inherits = FALSE)) runif(1)
-    # call method and store seed before and after
-    firstSeed <- .Random.seed
-    res <- standardGeneric("setup")
-    lastSeed <- .Random.seed
-    setSeed(res, list(firstSeed, lastSeed))
+    # initializations
     call <- match.call()
+    if(!missing(control) && is(control, "VirtualSampleControl")) {
+      seed <- getSeed(control)
+      if(length(seed) > 0) set.seed(seed)
+    }
+    # call method and store call
+    res <- standardGeneric("setup")
     setCall(res, call)
     res
   },

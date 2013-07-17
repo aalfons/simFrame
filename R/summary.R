@@ -14,7 +14,7 @@ setMethod(
   "summary", "SampleSetup", 
   function(object) {
     size <- sapply(getIndices(object), length, USE.NAMES=FALSE)
-    if(length(size) == 0) size <- numeric()  # in case of empty list
+    if(length(size) == 0) size <- integer()  # in case of empty list
     SummarySampleSetup(size=size)
   })
 

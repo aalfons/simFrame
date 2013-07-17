@@ -12,10 +12,10 @@
 ## data generation
 
 setMethod(
-  "getSize", "DataControl", 
+  "getSize", "VirtualDataControl", 
   function(x) slot(x, "size"))
 # setMethod(
-#   "setSize", "DataControl", 
+#   "setSize", "VirtualDataControl", 
 #   function(x, size) {
 #     eval.parent(substitute(slot(x, "size") <- size, env=parent.frame()), n=2)
 #   })
@@ -40,6 +40,16 @@ setMethod(
       tuning <- do.call(expand.grid, tuning)
     }
     eval.parent(substitute(slot(x, "tuning") <- tuning))
+  })
+
+setMethod(
+  "getIndices", "DataControl", 
+  function(x) slot(x, "indices"))
+setMethod(
+  "setIndices", "DataControl", 
+  function(x, size, tuning) {
+    eval.parent(substitute(slot(x, "indices") <- convertToIndices(size, tuning), 
+                           env=parent.frame()), n=2)
   })
 
 setMethod(
@@ -68,6 +78,11 @@ setMethod(
 setMethod(
   "setK", "VirtualSampleControl", 
   function(x, k) eval.parent(substitute(slot(x, "k") <- k)))
+
+setMethod("getSeed", "VirtualSampleControl", function(x) slot(x, "seed"))
+setMethod(
+  "setSeed", "VirtualSampleControl", 
+  function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
 
 
 # basic sampling designs
@@ -239,7 +254,6 @@ setMethod(
 setMethod("getIndices", "SampleSetup", function(x) slot(x, "indices"))
 setMethod("getProb", "SampleSetup", function(x) slot(x, "prob"))
 setMethod("getControl", "SampleSetup", function(x) slot(x, "control"))
-setMethod("getSeed", "SampleSetup", function(x) slot(x, "seed"))
 setMethod("getCall", "SampleSetup", function(x) slot(x, "call"))
 
 # private mutators (setters)
@@ -249,9 +263,6 @@ setMethod(
     eval.parent(substitute(slot(x, "indices") <- indices, env=parent.frame()), 
                 n=2)
   })
-setMethod(
-  "setSeed", "SampleSetup", 
-  function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
 setMethod(
   "setCall", "SampleSetup", 
   function(x, call) eval.parent(substitute(slot(x, "call") <- call)))
@@ -433,8 +444,9 @@ setMethod("getDots", "SimControl", function(x) slot(x, "dots"))
 #           })
 
 setMethod("getSeed", "SimControl", function(x) slot(x, "seed"))
-setMethod("setSeed", "SimControl", 
-          function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
+setMethod(
+  "setSeed", "SimControl", 
+  function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
 
 
 ## class "SimResults"

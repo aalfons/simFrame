@@ -11,16 +11,32 @@ setMethod(
     # use normal distribution as default
     if(is.null(args$distribution)) setDistribution(.Object, rnorm)
     # make sure that tuning parameters are stored as data frame
-    if(is.list(tuning <- args$tuning)) {
+    tuning <- args$tuning
+    if(is.list(tuning)) {
       setTuning(.Object, tuning)
+      tuning <- getTuning(.Object)
       args$tuning <- NULL
     }
+    # set indices for sample size and tuning parameters
+    size <- args$size
+    setIndices(.Object, size, tuning)
+    args$indices <- NULL
     # add current object to arguments and call method for superclass
     args[[".Object"]] <- .Object
     do.call(callNextMethod, args)
   })
 
-# sample control
+# sampling
+setMethod(
+  "initialize", "VirtualSampleControl", 
+  function(.Object, ...) {
+    args <- list(...)
+    # use simple random sampling as default
+    if(is.null(args$seed)) setSeed(.Object, as.integer(Sys.time()))
+    callNextMethod()  # call method for superclass (or default)
+  })
+
+# basic sampling designs
 setMethod(
   "initialize", "SampleControl", 
   function(.Object, ...) {
@@ -30,7 +46,7 @@ setMethod(
     callNextMethod()  # call method for superclass (or default)
   })
 
-# two-stage sample control
+# two-stage sampling designs
 setMethod(
   "initialize", "TwoStageControl", 
   function(.Object, ...) {
@@ -45,7 +61,6 @@ setMethod(
   "initialize", "ContControl", 
   function(.Object, ...) {
     args <- list(...)
-    epsilon <- args$epsilon
     # make sure that tuning parameters are stored as data frame
     tuning <- args$tuning
     if(is.list(tuning)) {
@@ -54,7 +69,8 @@ setMethod(
       args$tuning <- NULL
     }
     # set indices for contamination level and tuning parameters
-    setIndices(.Object, args$epsilon, tuning)
+    epsilon <- args$epsilon
+    setIndices(.Object, epsilon, tuning)
     args$indices <- NULL
     # add current object to arguments and call method for superclass
     args[[".Object"]] <- .Object
@@ -97,6 +113,6 @@ setMethod(
   function(.Object, ...) {
     args <- list(...)
     # use simple random sampling as default
-    if(is.null(args$seed)) setSeed(.Object, as.numeric(Sys.time()))
+    if(is.null(args$seed)) setSeed(.Object, as.integer(Sys.time()))
     callNextMethod()  # call method for superclass (or default)
   })

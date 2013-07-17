@@ -8,9 +8,9 @@ setMethod(
   "runSimulation", 
   signature(x = "ANY", setup = "ANY", nrep = "ANY", control = "missing"),
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
     # construct control object
-    if(is.null(seed)) {
+    if(missing(seed)) {
       control <- SimControl(contControl=contControl, NAControl=NAControl, 
                             design=design, fun=fun, dots=list(...))
     } else {
@@ -20,11 +20,12 @@ setMethod(
     }
     # call other method
     if(missing(setup)) {
-      if(missing(nrep)) runSimulation(x, control=control)
-      else runSimulation(x, nrep=nrep, control=control)
+      if(missing(nrep)) runSimulation(x, control=control, ncores=ncores, cl=cl)
+      else runSimulation(x, nrep=nrep, control=control, ncores=ncores, cl=cl)
     } else {
-      if(missing(nrep)) runSimulation(x, setup, control=control)
-      else runSimulation(x, setup, nrep, control)
+      if(missing(nrep)) runSimulation(x, setup, control=control, 
+                                      ncores=ncores, cl=cl)
+      else runSimulation(x, setup, nrep, control, ncores=ncores, cl=cl)
     }
   })
 
@@ -36,7 +37,7 @@ setMethod(
   signature(x = "VirtualDataControl", setup = "missing", 
             nrep = "numeric", control = "SimControl"),
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
     # initializations
     if(length(nrep) == 0) stop("'nrep' must be a non-negative integer")
     else if(length(nrep) > 1) nrep <- nrep[1]
@@ -44,26 +45,41 @@ setMethod(
       return(SimResults(design=getDesign(control), dataControl=x, 
                         nrep=nrep, control=control))
     }
-    # run the simulations
-    set.seed(getSeed(control))
     r <- seq_len(nrep)
-    tmp <- lapply(r, modelSimulation, x, control)
+    seed <- getSeed(control)
+    # set up cluster for parallel computing if requested
+    cl <- startCluster(ncores, cl)
+    # run the simulations
+    if(is.null(cl)) {
+      set.seed(seed)
+      tmp <- lapply(r, modelSimulation, x, control)
+    } else {
+      if(attr(cl, "stopOnExit")) on.exit(stopCluster(cl))
+      clusterSetRNGStream(cl, iseed=seed)
+      tmp <- parLapply(cl, r, modelSimulation, x, control)
+    }
     # construct results
     getSimResults(tmp, dataControl=x, reps=r, control=control)
   })
 
 # 'i' as first argument is necessary for parallel computing with 'parLapply'
 modelSimulation <- function(i, x, control) {
-  #   print(paste(Sys.time(), i, sep=": "))
-  md <- try(generate(x))
-  if(class(md) == "try-error") return(getEmptyResults(control))
-  design <- getDesign(control)
-  if(length(design)) {
-    spl <- getStrataSplit(md, design, USE.NAMES=FALSE)
-    leg <- getStrataLegend(md, design)
-    mdSpl <- lapply(spl, function(s, x) x[s, , drop=FALSE], md)
-    manageSimulationByDomain(mdSpl, spl, control, leg)
-  } else manageSimulation(md, control)
+#   print(paste(Sys.time(), i, sep=": "))
+  # initializations
+  ndata <- length(x)
+  # generate data and run simulations and run simulations
+  tmp <- lapply(seq_len(ndata), function(d) {
+    md <- try(generate(x, d))
+    if(class(md) == "try-error") return(getEmptyResults(control))
+    design <- getDesign(control)
+    if(length(design)) {
+      spl <- getStrataSplit(md, design, USE.NAMES=FALSE)
+      leg <- getStrataLegend(md, design)
+      mdSpl <- lapply(spl, function(s, x) x[s, , drop=FALSE], md)
+      manageSimulationByDomain(mdSpl, spl, control, leg)
+    } else manageSimulation(md, control)
+  })
+  do.call(c, tmp)
 }
 
 
@@ -74,12 +90,12 @@ setMethod(
   signature(x = "data.frame", setup = "VirtualSampleControl", 
             nrep = "missing", control = "SimControl"),
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
-    # set seed of the random number generator before setting up samples
-    set.seed(getSeed(control))
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+    # seed of the random number is first set by generic function 'setup'
     setup <- setup(x, setup)
-    # seed of the random number is reset in the next method
-    runSimulation(x, setup, control=control)
+    # seed is reset in the next method of 'runSimulation' (unless parallel 
+    # computing is used, then the seed is set for random number streams)
+    runSimulation(x, setup, control=control, ncores=ncores, cl=cl)
   })
 
 setMethod(
@@ -87,7 +103,7 @@ setMethod(
   signature(x = "data.frame", setup = "SampleSetup", 
             nrep = "missing", control = "SimControl"),
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
     # initializations
     nsam <- length(setup)
     if(nsam == 0) {  # nothing to do
@@ -95,10 +111,19 @@ setMethod(
                         sampleControl=getControl(setup), 
                         control=control))
     }
-    # run the simulations
-    set.seed(getSeed(control))
     s <- seq_len(nsam)
-    tmp <- lapply(s, designSimulation, x, setup, control)
+    seed <- getSeed(control)
+    # set up cluster for parallel computing if requested
+    cl <- startCluster(ncores, cl)
+    # run the simulations
+    if(is.null(cl)) {
+      set.seed(seed)
+      tmp <- lapply(s, designSimulation, x, setup, control)
+    } else {
+      if(attr(cl, "stopOnExit")) on.exit(stopCluster(cl))
+      clusterSetRNGStream(cl, iseed=seed)
+      tmp <- parLapply(cl, s, designSimulation, x, setup, control)
+    }
     # construct results
     getSimResults(tmp, sampleControl=getControl(setup), samples=s, 
                   control=control)
@@ -106,7 +131,7 @@ setMethod(
 
 # internal function also used for parallel computing with 'parLapply'
 designSimulation <- function(i, x, setup, control) {
-  #   print(paste(Sys.time(), i, sep=": "))
+#   print(paste(Sys.time(), i, sep=": "))
   sam <- drawS3(x, setup, i)
   if(nrow(sam) == 0) return(getEmptyResults(control))
   design <- getDesign(control)
@@ -126,19 +151,33 @@ setMethod(
   signature(x = "VirtualDataControl", setup = "VirtualSampleControl", 
             nrep = "numeric", control = "SimControl"),
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
     # initializations
+    if(length(x) > 1) {
+      warning("multiple data configurations currently not implemented")
+    }
     if(length(nrep) == 0) stop("'nrep' must be a non-negative integer")
     else if(length(nrep) > 1) nrep <- nrep[1]
     nsam <- length(setup)
-    if(nrep == 0 || nsam == 0) {  # nothing to do
+    setSeed(setup, integer())  # do not reset random seed when drawing samples
+    if(nrep == 0 || nsam == 0) {
+      # nothing to do
       return(SimResults(design=getDesign(control), dataControl=x, 
                         sampleControl=setup, nrep=nrep, control=control))
     }
-    # run the simulations (generate data repeatedly and draw samples)
-    set.seed(getSeed(control))
     r <- seq_len(nrep)
-    tmp <- lapply(r, mixedSimulation, x, setup, control)
+    seed <- getSeed(control)
+    # set up cluster for parallel computing if requested
+    cl <- startCluster(ncores, cl)
+    # run the simulations (generate data repeatedly and draw samples)
+    if(is.null(cl)) {
+      set.seed(seed)
+      tmp <- lapply(r, mixedSimulation, x, setup, control)
+    } else {
+      if(attr(cl, "stopOnExit")) on.exit(stopCluster(cl))
+      clusterSetRNGStream(cl, iseed=seed)
+      tmp <- parLapply(cl, r, mixedSimulation, x, setup, control)
+    }
     # construct results
     getSimResults(tmp, dataControl=x, sampleControl=setup, 
                   samples=seq_len(nsam), reps=r, control=control)
@@ -146,6 +185,7 @@ setMethod(
 
 # internal function also used for parallel computing with 'parLapply'
 mixedSimulation <- function(i, x, setup, control) {
+#   print(paste(Sys.time(), i, sep=": "))
   # generate data
   md <- try(generate(x))
   nsam <- length(setup)
@@ -167,7 +207,7 @@ setMethod(
   signature(x = "data.frame", setup = "missing", 
             nrep = "numeric", control = "SimControl"),
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
     # initializations
     if(length(nrep) == 0) stop("'nrep' must be a non-negative integer")
     else if(length(nrep) > 1) nrep <- nrep[1]
@@ -175,15 +215,41 @@ setMethod(
     if(nrep == 0) {  # nothing to do
       return(SimResults(design=design, nrep=nrep, control=control))
     }
+    seed <- getSeed(control)
+    # set up cluster for parallel computing if requested
+    cl <- startCluster(ncores, cl)
     # get results (adjustments are needed for parallel computing)
-    set.seed(getSeed(control))
-    if(length(design)) {
-      spl <- getStrataSplit(x, design, USE.NAMES=FALSE)
-      leg <- getStrataLegend(x, design)
-      xSpl <- lapply(spl, function(s, x) x[s, , drop=FALSE], x)
-      tmp <- replicate(nrep, manageSimulationByDomain(xSpl, spl, control, leg), 
-                       simplify=FALSE)
-    } else tmp <- replicate(nrep, manageSimulation(x, control), simplify=FALSE)
+    if(is.null(cl)) {
+      set.seed(seed)
+      if(length(design)) {
+        spl <- getStrataSplit(x, design, USE.NAMES=FALSE)
+        leg <- getStrataLegend(x, design)
+        xSpl <- lapply(spl, function(s, x) x[s, , drop=FALSE], x)
+        tmp <- replicate(nrep, 
+                         manageSimulationByDomain(xSpl, spl, control, leg), 
+                         simplify=FALSE)
+      } else tmp <- replicate(nrep, manageSimulation(x, control), 
+                              simplify=FALSE)
+    } else {
+      if(attr(cl, "stopOnExit")) on.exit(stopCluster(cl))
+      clusterSetRNGStream(cl, iseed=seed)
+      # get results
+      r <- 1:nrep
+      if(length(design)) {
+        # necessary objects need to be constructed on workers
+        seqList <- clusterSplit(cl, r)
+        nrList <- lapply(seqList, length)
+        tmp <- clusterApply(cl, nrList, function(nr, x, control) {
+          design <- getDesign(control)
+          spl <- getStrataSplit(x, design, USE.NAMES=FALSE)
+          xSpl <- lapply(spl, function(s, x) x[s, , drop=FALSE], x)
+          leg <- getStrataLegend(x, design)
+          replicate(nr, manageSimulationByDomain(xSpl, spl, control, leg), 
+                    simplify=FALSE)
+        }, x, control)
+        tmp <- do.call(c, tmp)
+      } else tmp <- parLapply(cl, r, function(i) manageSimulation(x, control))
+    }
     # construct results
     getSimResults(tmp, reps=seq_len(nrep), control=control)
   })
@@ -195,7 +261,7 @@ setMethod(
   signature(x = "data.frame", setup = "missing", 
             nrep = "missing", control = "SimControl"),
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed = NULL) {
+           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
     runSimulation(x, nrep=1, control=control)
   })
 

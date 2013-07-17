@@ -3,6 +3,10 @@
 #         Erasmus University Rotterdam
 # ------------------------------------
 
+## data control
+setMethod("length", "VirtualDataControl", function(x) length(getSize(x)))
+setMethod("length", "DataControl", function(x) nrow(getIndices(x)))
+
 ## sample control
 setMethod("length", "VirtualSampleControl", function(x) getK(x))
 

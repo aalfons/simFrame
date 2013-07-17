@@ -6,10 +6,16 @@
 ## data control
 
 setMethod(
-  "show", "DataControl", 
+  "show", "VirtualDataControl", 
   function(object) {
     cat("Number of observations to be generated:\n")
     print(getSize(object))
+  })
+
+setMethod(
+  "show", "DataControl", 
+  function(object) {
+    callNextMethod()
     tuning <- getTuning(object)
     if(length(tuning) > 0) {
       cat("\nTuning parameters:\n")

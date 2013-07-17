@@ -104,7 +104,7 @@ getEmptyResults <- function(control) {
   if(neps == 0) neps <- 1
   nNA <- length(getControl(control, which="NA"))
   if(nNA == 0) nNA <- 1
-  replicate(neps*nNA, list(values=numeric()))
+  replicate(neps*nNA, numeric())
 }
 
 # get names of real columns of a data.frame 
@@ -115,7 +115,7 @@ getNames <- function(x) setdiff(names(x), c(".weight",".contaminated"))
 getRepetitions <- function(x) {
   if(is(x, "numeric")) if(length(x)) 1 else 0 
   else if(is(x, "data.frame") || is(x, "matrix")) nrow(x)
-  else numeric()  # other classes
+  else integer()  # other classes
 }
 
 # get length of specified selection
@@ -142,10 +142,22 @@ getSimResultByDomain <- function(x, legend) {
 
 # contruct object to be returned
 getSimResults <- function(x, dataControl = NULL, sampleControl = NULL, 
-                          samples = numeric(), reps = numeric(), control) {
+                          samples = integer(), reps = numeric(), control) {
   # initializations
+  ndata <- length(dataControl)
   nsam <- length(samples)
-  origNrep <- if(missing(reps)) numeric() else length(reps)
+  if(ndata > 1 && nsam == 0) {
+    size <- getSize(dataControl)
+    origDataTuning <- getTuning(dataControl)
+    dataTuning <- convertTuning(origDataTuning)
+    ndt <- length(dataTuning)
+    dataIndices <- getIndices(dataControl)
+  } else {
+    size <- integer()
+    origDataTuning <- data.frame()
+    ndt <- 0
+  }
+  origNrep <- if(missing(reps)) integer() else length(reps)
   nrep <- length(reps)
   contControl <- getControl(control, which="cont")
   ncont <- length(contControl)
@@ -153,12 +165,12 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
     epsilon <- getEpsilon(contControl)
     origContTuning <- getTuning(contControl)
     contTuning <- convertTuning(origContTuning)
-    nTuning <- length(contTuning)
+    nct <- length(contTuning)
     contIndices <- getIndices(contControl)
   } else {
     epsilon <- numeric()
     origContTuning <- data.frame()
-    nTuning <- 0
+    nct <- 0
   }
   NAControl <- getControl(control, which="NA")
   nNA <- length(NAControl)
@@ -178,16 +190,24 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   ca <- call("expand.grid")  # initialize call
   if(nNA) ca$NARate <- NARate
   if(ncont) {
-    if(nTuning) {
-      ca$Index <- seq_len(ncont)
+    if(nct) {
+      ca$ContIndex <- seq_len(ncont)
       cont <- data.frame(Epsilon=epsilon[contIndices[, 1]], 
                          ContTuning=contTuning[contIndices[, 2]])
+      cont <- within(cont, ContTuning[Epsilon == 0] <- NA)
     } else ca$Epsilon <- epsilon
   }
   if(nsam) ca$Sample <- samples
+  if(ndata > 1 && nsam == 0) {
+    if(ndt) {
+      ca$DataIndex <- seq_len(ndata)
+      data <- data.frame(Size=size[dataIndices[, 1]], 
+                         DataTuning=dataTuning[dataIndices[, 2]])
+    } else ca$Size <- size
+  }
   if(nrep) ca$Rep <- reps
   info <- eval(ca)  # create data.frame with additional information
-  if(nTuning) {
+  if(nct) {
     if(nNA) {
       replace <- 2
       after <- 1
@@ -196,8 +216,14 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
       after <- 0
     }
     before <- if(nsam || nrep) ncol(info):(replace+1) else 0
-    info <- cbind(info[, before, drop=FALSE], cont, info[, after, drop=FALSE])
+    info <- cbind(info[, before, drop=FALSE], cont[info[, replace], ], 
+                  info[, after, drop=FALSE])
   } else info <- info[, ncol(info):1, drop=FALSE]  # reverse column order
+  if(ndt) {
+    if(nrep) info <- cbind(info[, 1, drop=FALSE], data[info[, 2], ], 
+                           info[, -(1:2), drop=FALSE])
+    else info <- cbind(data[info[, 1], ], info[, -1, drop=FALSE])
+  }
   info <- cbind(Run=seq_len(nruns), info)[ok, , drop=FALSE]  # add runs
   # additional information needs to be adjusted for stratified simulations
   design <- getDesign(control)
@@ -266,4 +292,32 @@ simEval <- function(call, split, groups, unique) {
     # used to obtain the indices of individuals.
     which(groups %in% unique[eval(call)])
   } else eval(call)
+}
+
+# start cluster for parallel computing
+startCluster <- function(ncores = 1, cl = NULL) {
+  # set up parallel computing if requested
+  haveCl <- inherits(cl, "cluster")
+  if(haveCl) {
+    haveNcores <- FALSE
+    attr(cl, "stopOnExit") <- FALSE
+  } else {
+    if(is.na(ncores)) ncores <- detectCores()  # use all available cores
+    if(!is.numeric(ncores) || is.infinite(ncores) || ncores < 1) {
+      # use default value
+      ncores <- formals()$ncores
+      warning("invalid value of 'ncores'; using default value")
+    }
+    ncores <- as.integer(ncores)
+    haveNcores <- ncores > 1
+  }
+  # set up multicore or snow cluster if not supplied
+  if(haveNcores) {
+    if(.Platform$OS.type == "windows") {
+      cl <- makePSOCKcluster(rep.int("localhost", ncores))
+    } else cl <- makeForkCluster(ncores)
+    attr(cl, "stopOnExit") <- TRUE
+  }
+  # return cluster for parallel computing
+  cl
 }

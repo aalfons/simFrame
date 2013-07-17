@@ -8,13 +8,17 @@
 # validity and this speeds things up slightly
 generateS3 <- function(control, i = 1) {
   # initializations
+  indices <- getIndices(control)
   size <- getSize(control)
-  distribution <- getDistribution(control)
   tuning <- getTuning(control)
+  if(nrow(indices)) {
+    size <- size[indices[i, 1]]
+    tuning <- tuning[indices[i, 2], , drop=FALSE]
+  }
+  distribution <- getDistribution(control)
   dots <- getDots(control)
   nam <- getColnames(control)
   # generate data
-  if(nrow(tuning) > 0) tuning <- tuning[i, , drop=FALSE]
   values <- doCall(distribution, size, tuning, dots)
   # set column names
   if(is.null(dim(values)) && is.null(nam)) nam <- "V1" 

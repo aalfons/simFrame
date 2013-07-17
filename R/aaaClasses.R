@@ -17,23 +17,33 @@ setClassUnion("OptNumeric", c("NULL", "numeric"))
 
 ## control class for generating model based data
 
-validDataControlObject <- function(object) {
-  if(length(object@size) == 1 && object@size >= 0) TRUE
-  else "'size' must be a single non-negative integer"
+# virtual class
+
+validVirtualDataControlObject <- function(object) {
+  if(length(object@size) > 0 && all(object@size > 0)) TRUE
+  else "'size' must contain positive integers"
 }
 
+setClass("VirtualDataControl",
+         representation(size = "numeric"),
+         prototype(size=100),
+         contains = "VIRTUAL",
+         validity = validVirtualDataControlObject)
+
+# basic class
 setClass("DataControl",
-         representation(size = "numeric", distribution = "function", 
-                        tuning = "ListOrDataFrame", dots = "list", 
+         representation(distribution = "function", tuning = "ListOrDataFrame", 
+                        indices = "NumericMatrix", dots = "list", 
                         colnames = "OptCharacter"),
-         prototype(size = 0, tuning = data.frame(), colnames = NULL),
-         validity = validDataControlObject)
+         prototype(tuning = data.frame(), indices = matrix(integer(0), ncol=2), 
+                   colnames = NULL),
+         contains = "VirtualDataControl")
 
 # constructor
 DataControl <- function(...) new("DataControl", ...)
 
-# class union for extending the framework
-setClassUnion("VirtualDataControl", "DataControl")
+# # class union for extending the framework
+# setClassUnion("VirtualDataControl", "DataControl")
 
 # class union for optional argument in methods
 setClassUnion("OptDataControl", c("NULL", "VirtualDataControl"))
@@ -49,7 +59,7 @@ validVirtualSampleControlObject <- function(object) {
 }
 
 setClass("VirtualSampleControl",
-         representation(k = "numeric"),
+         representation(k = "numeric", seed = "numeric"),
          prototype(k = 1),
          contains = "VIRTUAL",
          validity = validVirtualSampleControlObject)
@@ -154,7 +164,7 @@ TwoStageControl <- function(..., fun1 = srs, fun2 = srs, size1 = NULL,
 setClass("SampleSetup",
          representation(indices = "list", prob = "numeric", 
                         control = "VirtualSampleControl", 
-                        seed = "list", call = "OptCall"),
+                        call = "OptCall"),
          prototype(call = NULL))
 
 SampleSetup <- function(...) new("SampleSetup", ...)
@@ -313,8 +323,8 @@ setClass("SimResults",
                         dataControl = "OptDataControl", 
                         sampleControl = "OptSampleControl", 
                         nrep = "numeric", control = "SimControl", 
-                        seed = "list", call = "OptCall"),
-         prototype(NARate = as.matrix(numeric()), call = NULL, 
-                   dataControl = NULL, sampleControl = NULL))
+                        call = "OptCall"),
+         prototype(NARate = as.matrix(numeric()), dataControl = NULL, 
+                   sampleControl = NULL, call = NULL))
 
 SimResults <- function(...) new("SimResults", ...)
