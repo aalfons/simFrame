@@ -474,7 +474,9 @@ setMethod(
 setMethod("getCall", "SimResults", function(x) slot(x, "call"))
 
 # private mutators (setters)
-setMethod("setValues", "SimResults", 
-          function(x, values) eval.parent(substitute(slot(x, "values") <- values)))
-setMethod("setCall", "SimResults", 
-          function(x, call) eval.parent(substitute(slot(x, "call") <- call)))
+setMethod(
+  "setValues", "SimResults", 
+  function(x, values) eval.parent(substitute(slot(x, "values") <- values)))
+setMethod(
+  "setCall", "SimResults", 
+  function(x, call) eval.parent(substitute(slot(x, "call") <- call)))
