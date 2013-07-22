@@ -23,7 +23,7 @@ LazyLoad: \tab yes\cr
 \author{
 Andreas Alfons [aut, cre]
 
-Maintainer: Andreas Alfons <andreas.alfons@kuleuven.be>
+Maintainer: Andreas Alfons <alfons@ese.eur.nl>
 }
 \references{
 Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for 
