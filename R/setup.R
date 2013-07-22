@@ -59,14 +59,11 @@ setMethod(
     size <- getSize(control)
     useSize <- !is.null(size)
     prob <- getProb(control)
-    haveNewProb <- is(prob, "character") || is(prob, "logical")
-    if(haveNewProb) {
-      prob <- getCharacter(prob, cnam)
-      if(length(prob) > 1) {
-        stop("'prob' must not specify more than one variable")
-      }
-      useProb <- length(prob) > 0
-    } else useProb <- !is.null(prob) 
+    prob <- getCharacter(prob, cnam)
+    if(length(prob) > 1) {
+      stop("'prob' must not specify more than one variable")
+    }
+    useProb <- length(prob) > 0
     dots <- getDots(control)
     k <- getK(control)
     
@@ -102,27 +99,11 @@ setMethod(
           call$size <- size
         }
         if(useProb) {
-          if(haveNewProb) {
-            probSplit <- lapply(split, function(s) x[s, prob])
-            strata <- x[, design]
-            # probability weights for unique group member by strata
-            probSplit <- mapply(function(x, i) x[i], probSplit, 
-                                iGroupSplit, SIMPLIFY=FALSE, USE.NAMES=FALSE)
-          } else {
-            Ngroups <- sum(N)  # number of groups
-            if(length(prob) != Ngroups) {
-              stop(gettextf("'prob' must be a vector of length %i", Ngroups))
-            }
-            # this saves time in case of multiple design variables
-            if(length(design) == 1) strata <- x[, design]
-            else strata <- unsplit(seq_along(split), x[, design])
-            # if we determine unique groups in the following way, 
-            # it also works if different group members are in 
-            # different strata
-            iGroups <- unsplit(iGroupSplit, strata)
-            probSplit <- split(prob, strata[iGroups])
-            names(probSplit) <- NULL
-          }
+          probSplit <- lapply(split, function(s) x[s, prob])
+          strata <- x[, design]
+          # probability weights for unique group member by strata
+          probSplit <- mapply(function(x, i) x[i], probSplit, 
+                              iGroupSplit, SIMPLIFY=FALSE, USE.NAMES=FALSE)
           call$prob <- probSplit
           if(useSize) {
             probSplit <- mapply(inclusionProb, probSplit, size, 
@@ -152,13 +133,7 @@ setMethod(
           call$size <- size
         }
         if(useProb) {
-          if(haveNewProb) prob <- x[, prob]
-          else {
-            Ntotal <- nrow(x)  # size of population
-            if(length(prob) != Ntotal) {
-              stop(gettextf("'prob' must be a vector of length %i", Ntotal))
-            }
-          }
+          prob <- x[, prob]
           probSplit <- lapply(split, function(s) prob[s])
           call$prob <- probSplit
           if(useSize) {
@@ -189,7 +164,7 @@ setMethod(
         # group sampling
         # --------------
         groups <- x[, grouping]  # group of each observation
-        if(useX || (useProb && haveNewProb)) {
+        if(useX || useProb) {
           iGroups <- !duplicated(groups)  # logicals to extract unique groups
           uniqueGroups <- groups[iGroups]  # unique groups
         } else uniqueGroups <- unique(groups)  # unique groups
@@ -201,10 +176,7 @@ setMethod(
           call$size <- size
         }
         if(useProb) {
-          if(haveNewProb) prob <- x[iGroups, prob]
-          else if(length(prob) != N) {
-            stop(gettextf("'prob' must be a vector of length %i", N))
-          }
+          prob <- x[iGroups, prob]
           call$prob <- prob
           if(useSize) prob <- inclusionProb(prob, size)
           prob <- expand(prob, groups, uniqueGroups)
@@ -226,10 +198,7 @@ setMethod(
           call$size <- size
         }
         if(useProb) {
-          if(haveNewProb) prob <- x[, prob]
-          else if(length(prob) != N) {
-            stop(gettextf("'prob' must be a vector of length %i", N))
-          }
+          prob <- x[, prob]
           call$prob <- prob
           if(useSize) prob <- inclusionProb(prob, size)
         } else prob <- rep.int(size/N, N)
@@ -287,20 +256,17 @@ setMethod(
     size <- getSize(control, stage=1)
     useSize <- !is.null(size)  # use sample size in call to sampling method
     prob1 <- getProb(control, stage=1)
-    haveNewProb <- is(prob1, "character") || is(prob1, "logical")
-    if(haveNewProb) {
-      prob1 <- getCharacter(prob1, cnam)
-      if(length(prob1) > 1) {
-        stop("'prob1' must not specify more than one variable")
-      }
-      useProb <- length(prob1) > 0
-    } else useProb <- !is.null(prob1) 
+    prob1 <- getCharacter(prob1, cnam)
+    if(length(prob1) > 1) {
+      stop("'prob1' must not specify more than one variable")
+    }
+    useProb <- length(prob1) > 0
     dots <- getDots(control, stage=1)
     k <- getK(control)
     
     ## computations
     PSU <- x[, grouping[1]]  # primary sampling units
-    if((length(design) > 0) || useX || (useProb && haveNewProb)) {
+    if((length(design) > 0) || useX || useProb) {
       iPSU <- !duplicated(PSU)  # indices of unique primary sampling units
       uniquePSU <- PSU[iPSU]  # unique primary sampling units
     } else uniquePSU <- unique(PSU)
@@ -329,13 +295,7 @@ setMethod(
       }
       # compute first stage inclusion probabilities
       if(useProb) {
-        if(haveNewProb) prob1 <- xPSU[, prob1]
-        else {
-          NPSU <- sum(N)  # number of PSUs
-          if(length(prob1) != NPSU) {  # check probability weights
-            stop(gettextf("'prob1' must be a vector of length %i", NPSU))
-          }
-        }
+        prob1 <- xPSU[, prob1]
         probSplit <- lapply(iSplit, function(i) prob1[i])
         names(probSplit) <- NULL
         call$prob <- probSplit  # add probability weights to function call
@@ -376,12 +336,7 @@ setMethod(
       }
       # compute first stage inclusion probabilities
       if(useProb) {
-        if(haveNewProb) prob1 <- x[iPSU, prob1]
-        else {
-          if(length(prob1) != N) {  # check probability weights
-            stop(gettextf("'prob1' must be a vector of length %i", N))
-          }
-        }
+        prob1 <- x[iPSU, prob1]
         call$prob <- prob1  # add probability weights to function call
         # compute inclusion probabilities for each individual
         if(useSize) prob1 <- inclusionProb(prob1, size)
@@ -414,14 +369,11 @@ setMethod(
     size <- getSize(control, stage=2)
     useSize <- !is.null(size)  # use sample size in call to sampling method
     prob2 <- getProb(control, stage=2)
-    haveNewProb <- is(prob2, "character") || is(prob2, "logical")
-    if(haveNewProb) {
-      prob2 <- getCharacter(prob2, cnam)
-      if(length(prob2) > 1) {
-        stop("'prob2' must not specify more than one variable")
-      }
-      useProb <- length(prob2) > 0
-    } else useProb <- !is.null(prob2) 
+    prob2 <- getCharacter(prob2, cnam)
+    if(length(prob2) > 1) {
+      stop("'prob2' must not specify more than one variable")
+    }
+    useProb <- length(prob2) > 0
     dots <- getDots(control, stage=2)
     
     # get list containing the indices of SSUs in each PSU
@@ -456,15 +408,8 @@ setMethod(
     }
     if(useProb) {
       # second stage probability weights
-      if(haveNewProb) {
-        if(useSSU) prob2 <- x[iSSU, prob2]
-        else prob2 <- x[, prob2]
-      } else {
-        NSSU <- sum(N)
-        if(length(prob2) != NSSU) {  # check probability weights
-          stop(gettextf("'prob2' must be a vector of length %i", NSSU))
-        }
-      }
+      if(useSSU) prob2 <- x[iSSU, prob2]
+      else prob2 <- x[, prob2]
       if(useSSU) probSplit <- lapply(iSplit, function(i) prob2[i])
       else probSplit <- lapply(SSUbyPSU, function(i) prob2[i])
     }

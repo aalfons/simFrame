@@ -453,16 +453,16 @@ setMethod(
 
 # public accessors (getters)
 setMethod("getValues", "SimResults", function(x) slot(x, "values"))
-setMethod("getDesign", "SimResults", function(x) slot(x, "design"))
+# setMethod("getDesign", "SimResults", function(x) slot(x, "design"))
 setMethod("getColnames", "SimResults", function(x) slot(x, "colnames"))
-setMethod("getEpsilon", "SimResults", function(x) slot(x, "epsilon"))
-setMethod(
-  "getTuning", "SimResults", 
-  function(x, which = c("data", "cont")) {
-    which <- match.arg(which)
-    slot(x, paste(which, "Tuning", sep=""))
-  })
-setMethod("getNARate", "SimResults", function(x) slot(x, "NARate"))
+# setMethod("getEpsilon", "SimResults", function(x) slot(x, "epsilon"))
+# setMethod(
+#   "getTuning", "SimResults", 
+#   function(x, which = c("data", "cont")) {
+#     which <- match.arg(which)
+#     slot(x, paste(which, "Tuning", sep=""))
+#   })
+# setMethod("getNARate", "SimResults", function(x) slot(x, "NARate"))
 setMethod("getNrep", "SimResults", function(x) slot(x, "nrep"))
 setMethod(
   "getControl", "SimResults", 

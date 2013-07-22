@@ -45,10 +45,7 @@ setMethod(
       epsilon <- epsilon[indices[i, 1]]
       tuning <- tuning[indices[i, 2], , drop=FALSE]
     }
-    if(epsilon == 0 || nrow(x) == 0) {
-      x$.contaminated <- rep.int(FALSE, nrow(x))
-      return(x)
-    } else if(ncol(x) == 0) return(x)  # nothing to do
+    if(epsilon == 0 || nrow(x) == 0 || ncol(x) == 0) return(x)  # nothing to do
     target <- getTarget(control)
     if(is.null(target)) target <- getNames(x)
     grouping <- getGrouping(control)

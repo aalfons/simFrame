@@ -12,8 +12,7 @@ argNames <- function(fun, removeDots = TRUE) {
 
 # check for errors in a list (for sample setup)
 checkError <- function(x) {
-  # x ... list
-  if(length(x)) sapply(x, function(x) class(x) == "try-error")
+  if(length(x) > 0) sapply(x, function(x) class(x) == "try-error")
   else logical()
 }
 
@@ -26,9 +25,8 @@ checkNumericMatrix <- function(x) {
 
 # check for errors or empty vectors in a list (for simulation results)
 checkOK <- function(x) {
-  # x ... list
-  if(length(x)) {
-    sapply(x, function(x) class(x) != "try-error" && length(x))
+  if(length(x) > 0) {
+    sapply(x, function(x) class(x) != "try-error" && length(x) > 0)
   } else logical()
 }
 
@@ -56,7 +54,7 @@ convertToIndices <- function(x, tuning) {
   } else {
     isZero <- x == 0
     i <- rep.int(seq_len(nX), ifelse(isZero, 1, nTuning))
-    j <- unlist(list(seq_len(nTuning), 1)[isZero+1])
+    j <- unlist(list(seq_len(nTuning), 0)[isZero+1])
     indices <- cbind(i, j, deparse.level=0)
   }
   # return indices
@@ -94,7 +92,7 @@ expand <- function(x, groups, unique) {
 # get character eqivalent of a selection vector
 getCharacter <- function(x, names) {
   if(is(x, "character")) x
-  else if((is(x, "logical") || is(x, "numeric")) && length(x)) names[x]
+  else if((is(x, "logical") || is(x, "numeric")) && length(x) > 0) names[x]
   else character()  # other classes
 }
 
@@ -142,88 +140,33 @@ getSimResultByDomain <- function(x, legend) {
 
 # contruct object to be returned
 getSimResults <- function(x, dataControl = NULL, sampleControl = NULL, 
-                          samples = integer(), reps = numeric(), control) {
+                          nrep = integer(), control) {
   # initializations
   ndata <- length(dataControl)
-  nsam <- length(samples)
-  if(ndata > 1 && nsam == 0) {
-    size <- getSize(dataControl)
-    origDataTuning <- getTuning(dataControl)
-    dataTuning <- convertTuning(origDataTuning)
-    ndt <- length(dataTuning)
-    dataIndices <- getIndices(dataControl)
-  } else {
-    size <- integer()
-    origDataTuning <- data.frame()
-    ndt <- 0
-  }
-  origNrep <- if(missing(reps)) integer() else length(reps)
-  nrep <- length(reps)
+  nsamp <- length(sampleControl)
+  origNrep <- nrep
+  if(length(nrep) == 0) nrep <- 0
   contControl <- getControl(control, which="cont")
   ncont <- length(contControl)
-  if(ncont) {
-    epsilon <- getEpsilon(contControl)
-    origContTuning <- getTuning(contControl)
-    contTuning <- convertTuning(origContTuning)
-    nct <- length(contTuning)
-    contIndices <- getIndices(contControl)
-  } else {
-    epsilon <- numeric()
-    origContTuning <- data.frame()
-    nct <- 0
-  }
   NAControl <- getControl(control, which="NA")
   nNA <- length(NAControl)
-  if(nNA) {
-    origNARate <- getNARate(NAControl)
-    NARate <- convertNARate(origNARate)
-  } else origNARate <- numeric()
   # combine results from all runs into one list
-  if(nsam && nrep) x <- do.call(c, x)
+  if(nsamp && nrep) x <- do.call(c, x)
   if(ncont || nNA) x <- do.call(c, x)
   # check for errors or empty results
   nruns <- length(x)
   ok <- checkOK(x)
   x <- x[ok]
   if(length(x) == 0) stop("error or empty result in every simulation run")
-  # get additional information (at least one of 'nrep' or 'nsam' is positive)
+  # get additional information (at least one of 'nrep' or 'nsamp' is positive)
   ca <- call("expand.grid")  # initialize call
-  if(nNA) ca$NARate <- NARate
-  if(ncont) {
-    if(nct) {
-      ca$ContIndex <- seq_len(ncont)
-      cont <- data.frame(Epsilon=epsilon[contIndices[, 1]], 
-                         ContTuning=contTuning[contIndices[, 2]])
-      cont <- within(cont, ContTuning[Epsilon == 0] <- NA)
-    } else ca$Epsilon <- epsilon
-  }
-  if(nsam) ca$Sample <- samples
-  if(ndata > 1 && nsam == 0) {
-    if(ndt) {
-      ca$DataIndex <- seq_len(ndata)
-      data <- data.frame(Size=size[dataIndices[, 1]], 
-                         DataTuning=dataTuning[dataIndices[, 2]])
-    } else ca$Size <- size
-  }
-  if(nrep) ca$Rep <- reps
+  if(nNA > 0) ca[["NA"]] <- seq_len(nNA)
+  if(ncont > 0) ca$Cont <- seq_len(ncont)
+  if(nsamp > 0) ca$Sample <- seq_len(nsamp)
+  if(ndata > 0) ca$Data <- seq_len(ndata)
+  if(nrep > 0) ca$Rep <- seq_len(nrep)
   info <- eval(ca)  # create data.frame with additional information
-  if(nct) {
-    if(nNA) {
-      replace <- 2
-      after <- 1
-    } else {
-      replace <- 1
-      after <- 0
-    }
-    before <- if(nsam || nrep) ncol(info):(replace+1) else 0
-    info <- cbind(info[, before, drop=FALSE], cont[info[, replace], ], 
-                  info[, after, drop=FALSE])
-  } else info <- info[, ncol(info):1, drop=FALSE]  # reverse column order
-  if(ndt) {
-    if(nrep) info <- cbind(info[, 1, drop=FALSE], data[info[, 2], ], 
-                           info[, -(1:2), drop=FALSE])
-    else info <- cbind(data[info[, 1], ], info[, -1, drop=FALSE])
-  }
+  info <- info[, ncol(info):1, drop=FALSE]  # reverse column order
   info <- cbind(Run=seq_len(nruns), info)[ok, , drop=FALSE]  # add runs
   # additional information needs to be adjusted for stratified simulations
   design <- getDesign(control)
@@ -237,10 +180,9 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   nam <- names(x)[-seq_len(ninfo)]
   rownames(x) <- NULL
   # return results
-  SimResults(values=x, design=design, colnames=nam, epsilon=epsilon, 
-             contTuning=origContTuning, NARate=origNARate, 
-             dataControl=dataControl, sampleControl=sampleControl, 
-             nrep=origNrep, control=control)
+  SimResults(values=x, colnames=nam, dataControl=dataControl, 
+             sampleControl=sampleControl, nrep=origNrep, 
+             control=control)
 }
 
 # get information about strata as data.frame
@@ -280,8 +222,8 @@ simEval <- function(call, split, groups, unique) {
       # 'groups' and 'unique' are lists
       # 'call' returns list of within-strata indices of groups. these 
       # are used to obtain the within-strata indices of individuals.
-      tmp <- mapply(function(i, g, u) which(g %in% u[i]), 
-                    eval(call), groups, unique, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+      tmp <- mapply(function(i, g, u) which(g %in% u[i]), eval(call), 
+                    groups, unique, SIMPLIFY=FALSE, USE.NAMES=FALSE)
     }
     # within-strata indices are turned into global indices 
     # and the resulting list is converted to a vector.
