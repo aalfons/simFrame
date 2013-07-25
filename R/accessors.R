@@ -48,7 +48,7 @@ setMethod(
 setMethod(
   "setIndices", "DataControl", 
   function(x, size, tuning) {
-    eval.parent(substitute(slot(x, "indices") <- convertToIndices(size, tuning), 
+    eval.parent(substitute(slot(x, "indices") <- convertToIndices(size, tuning, checkZero=FALSE), 
                            env=parent.frame()), n=2)
   })
 
@@ -306,7 +306,7 @@ setMethod(
 setMethod(
   "setIndices", "ContControl", 
   function(x, epsilon, tuning) {
-    eval.parent(substitute(slot(x, "indices") <- convertToIndices(epsilon, tuning), 
+    eval.parent(substitute(slot(x, "indices") <- convertToIndices(epsilon, tuning, checkZero=TRUE), 
                            env=parent.frame()), n=2)
   })
 

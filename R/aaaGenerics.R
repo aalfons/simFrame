@@ -53,6 +53,8 @@ setGeneric(
   },
   valueClass = "SampleSetup")
 
+setGeneric("simPlot", function(object, ...) standardGeneric("simPlot"))
+
 
 ## public accessor and mutator functions (to be exported)
 
@@ -140,6 +142,8 @@ setGeneric("setValues", function(x, values) standardGeneric("setValues"))
 ## existing S3 or S4 generics (just to be safe)
 
 setGeneric("aggregate")
+setGeneric("fortify", 
+           function(model, data = NULL, ...) standardGeneric("fortify"))
 setGeneric("head")
 setGeneric("length")
 setGeneric("plot")

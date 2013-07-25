@@ -45,16 +45,21 @@ convertNARate <- function(x) {
 }
 
 ## get matrix of indices in a vector and a data frame with tuning parameters
-convertToIndices <- function(x, tuning) {
+convertToIndices <- function(x, tuning, checkZero = TRUE) {
   # obtain indices
   nTuning <- nrow(tuning)
   nX <- length(x)
   if(is.null(nTuning) || nTuning == 0) {
     indices <- cbind(seq_len(nX), rep.int(0, nX))
   } else {
-    isZero <- x == 0
-    i <- rep.int(seq_len(nX), ifelse(isZero, 1, nTuning))
-    j <- unlist(list(seq_len(nTuning), 0)[isZero+1])
+    if(checkZero) {
+      isZero <- x == 0
+      i <- rep.int(seq_len(nX), ifelse(isZero, 1, nTuning))
+      j <- unlist(list(seq_len(nTuning), 0)[isZero+1])
+    } else {
+      i <- rep(seq_len(nX), each=nTuning)
+      j <- rep.int(seq_len(nTuning), nX)
+    }
     indices <- cbind(i, j, deparse.level=0)
   }
   # return indices
@@ -160,7 +165,7 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   if(length(x) == 0) stop("error or empty result in every simulation run")
   # get additional information (at least one of 'nrep' or 'nsamp' is positive)
   ca <- call("expand.grid")  # initialize call
-  if(nNA > 0) ca$Miss <- seq_len(nNA)
+  if(nNA > 0) ca$NARate <- convertNARate(getNARate(NAControl))
   if(ncont > 0) ca$Cont <- seq_len(ncont)
   if(nsamp > 0) ca$Sample <- seq_len(nsamp)
   if(ndata > 0) ca$Data <- seq_len(ndata)

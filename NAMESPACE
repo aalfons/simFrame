@@ -1,6 +1,7 @@
 # import packages
-import(lattice)
+import(ggplot2)
 import(methods)
+import(reshape2)
 
 # import specific functions from packages
 importFrom(stats, aggregate)
