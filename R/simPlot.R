@@ -7,9 +7,9 @@ setMethod(
   "simPlot", "SimResults", 
   function(object, data = NULL, cont = NULL, NARate = NULL, select = NULL, 
            method = c("box", "density", "line"), average = c("mean", "median"), 
-           ...) {
+           level = 0.95, ...) {
     data <- fortify(object, data=data, cont=cont, NARate=NARate, select=select, 
-                    method=method)
+                    method=method, average=average, level=level)
     simPlot(data, ...)
   })
 
