@@ -310,13 +310,10 @@ SimControl <- function(...) new("SimControl", ...)
 ## simulation results
 
 setClass("SimResults",
-         representation(values = "data.frame", 
-                        colnames = "character", 
-                        dataControl = "OptDataControl", 
-                        sampleControl = "OptSampleControl", 
-                        nrep = "numeric", 
-                        control = "SimControl", 
-                        call = "OptCall"),
+         representation(values = "data.frame", colnames = "character", 
+                        info = "numeric", dataControl = "OptDataControl", 
+                        sampleControl = "OptSampleControl", nrep = "numeric", 
+                        control = "SimControl", call = "OptCall"),
          prototype(dataControl = NULL, sampleControl = NULL, call = NULL))
 
 SimResults <- function(...) new("SimResults", ...)

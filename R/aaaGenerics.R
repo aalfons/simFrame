@@ -90,6 +90,8 @@ setGeneric("getGrouping", function(x) standardGeneric("getGrouping"))
 
 setGeneric("getIndices", function(x) standardGeneric("getIndices"))
 
+setGeneric("getInfo", function(x) standardGeneric("getInfo"))
+
 setGeneric("getIntoContamination", 
            function(x) standardGeneric("getIntoContamination"))
 # setGeneric("setIntoContamination", 

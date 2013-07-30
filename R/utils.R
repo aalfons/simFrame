@@ -182,12 +182,14 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   # put it all together
   x <- cbind(info, do.call(rbind, x))
   ninfo <- ncol(info) + length(design)
-  nam <- names(x)[-seq_len(ninfo)]
+  cn <- names(x)[-seq_len(ninfo)]
   rownames(x) <- NULL
+  # number of levels in additional information
+  info <- c(Data=ndata, Cont=ncont, NARate=nNA, 
+            sapply(x[, design, drop=FALSE], nlevels))
   # return results
-  SimResults(values=x, colnames=nam, dataControl=dataControl, 
-             sampleControl=sampleControl, nrep=origNrep, 
-             control=control)
+  SimResults(values=x, colnames=cn, info=info, dataControl=dataControl, 
+             sampleControl=sampleControl, nrep=origNrep, control=control)
 }
 
 # get information about strata as data.frame

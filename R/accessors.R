@@ -455,6 +455,7 @@ setMethod(
 setMethod("getValues", "SimResults", function(x) slot(x, "values"))
 # setMethod("getDesign", "SimResults", function(x) slot(x, "design"))
 setMethod("getColnames", "SimResults", function(x) slot(x, "colnames"))
+setMethod("getInfo", "SimResults", function(x) slot(x, "info"))
 # setMethod("getEpsilon", "SimResults", function(x) slot(x, "epsilon"))
 # setMethod(
 #   "getTuning", "SimResults", 

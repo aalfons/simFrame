@@ -13,6 +13,8 @@ setMethod(
     ## take the requested subset of the results
     model <- subset(model, data=data, cont=cont, NARate=NARate, select=select)
     cn <- getColnames(model)
+    ninfo <- getInfo(model)
+    info <- names(ninfo)[ninfo > 0]
     ## extract simulation results
     if(method == "line") {
       average <- match.arg(average)
@@ -33,21 +35,19 @@ setMethod(
         probs <- c(0.5, alpha/2, 1-alpha/2)
       }
       values <- aggregate(model, FUN=fun, probs=probs)
-      info <- setdiff(names(values), cn)
-    } else {
-      values <- getValues(model)
-      info <- setdiff(names(values), c("Run", "Rep", "Sample", cn))
-      values <- values[, c(info, cn), drop=FALSE]
-    }
+    } else values <- getValues(model)[, c(info, cn), drop=FALSE]
     ## extract additional information
     # number of observations and tuning parameters for data generation
     if(length(info) > 0) {
       if("Data" %in% info) {
-        dataControl <- getControl(model, which="data")
-        indices <- getIndices(dataControl)
-        size <- getSize(dataControl)[indices[, 1]]
-        tuning <- convertTuning(getTuning(dataControl))[indices[, 2]]
         remove <- match("Data", info)
+        dataControl <- getControl(model, which="data")
+        size <- getSize(dataControl)
+        if(is(dataControl, "DataControl")) {
+          indices <- getIndices(dataControl)
+          size <- size[indices[, 1]]
+          tuning <- convertTuning(getTuning(dataControl))[indices[, 2]]
+        } else tuning <- NULL
         data <- values[, remove]
         if(length(tuning) == 0) {
           # no tuning parameters, replace data column with number of 
@@ -68,31 +68,33 @@ setMethod(
       }
       # contamination level and tuning parameters for contamination
       if("Cont" %in% info) {
+        remove <- match("Cont", info)
         control <- getControl(model)
         contControl <- getControl(control, which="cont")
         epsilon <- getEpsilon(contControl)
-        tuning <- getTuning(contControl)
-        indices <- getIndices(contControl)
-        remove <- match("Cont", info)
-        # for contamination level 0, replicate results for all combinations of  
-        # tuning parameters (those are of course only computed once)
-        if(nrow(tuning) > 0 && 0 %in% epsilon) {
-          isZero <- (epsilon == 0)[indices[, 1]]
-          ntune <- nrow(tuning)
-          by <- rep.int(seq_along(contControl), ifelse(isZero, ntune, 1))
-          indices <- convertToIndices(epsilon, tuning, checkZero=FALSE)
-          contList <- split(seq_len(nrow(indices)), by)
-          valueList <- split(values, values[, remove])
-          valueList <- mapply(function(values, cont, isZero) {
-            n <- nrow(values)
-            if(isZero) values <- values[rep(seq_len(n), ntune),]
-            values$Cont <- rep.int(cont, n)
-            values
-          }, valueList, contList, isZero, SIMPLIFY=FALSE, USE.NAMES=FALSE)
-          values <- do.call(rbind, valueList)
-        }
+        if(is(contControl, "ContControl")) {
+          tuning <- getTuning(contControl)
+          indices <- getIndices(contControl)
+          # for contamination level 0, replicate results for all combinations of  
+          # tuning parameters (those are of course only computed once)
+          if(nrow(tuning) > 0 && 0 %in% epsilon) {
+            isZero <- (epsilon == 0)[indices[, 1]]
+            ntune <- nrow(tuning)
+            by <- rep.int(seq_along(contControl), ifelse(isZero, ntune, 1))
+            indices <- convertToIndices(epsilon, tuning, checkZero=FALSE)
+            contList <- split(seq_len(nrow(indices)), by)
+            valueList <- split(values, values[, remove])
+            valueList <- mapply(function(values, cont, isZero) {
+              n <- nrow(values)
+              if(isZero) values <- values[rep(seq_len(n), ntune),]
+              values$Cont <- rep.int(cont, n)
+              values
+            }, valueList, contList, isZero, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+            values <- do.call(rbind, valueList)
+          }
+          epsilon <- epsilon[indices[, 1]]
+        } else tuning <- data.frame()
         # replace contamination column
-        epsilon <- epsilon[indices[, 1]]
         cont <- values[, remove]
         if(nrow(tuning) == 0) {
           # no tuning parameters, replace contamination column with 

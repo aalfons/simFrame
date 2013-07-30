@@ -8,8 +8,9 @@ setMethod(
   function(x, select = NULL, FUN = mean, ...) {
     # initializations
     cn <- getColnames(x)
+    info <- getInfo(x)
+    by <- names(info)[info > 0]
     x <- getValues(x)
-    by <- setdiff(names(x), c("Run", "Rep", "Sample", cn))
     select <- if(is.null(select)) cn else getCharacter(select, cn)
     # aggregate simulation results
     aggregate(x[, select, drop=FALSE], by=x[, by, drop=FALSE], FUN=FUN, ...)
