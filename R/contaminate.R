@@ -4,7 +4,7 @@
 # ------------------------------------
 
 setMethod(
-  "contaminate", signature(x = "data.frame", control = "SimpleContControl"),
+  "contaminate", signature(x = "data.frame", control = "BasicContControl"),
   function(x, control, i = 1) {
     # initializations
     indices <- getIndices(control)

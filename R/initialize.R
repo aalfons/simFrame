@@ -38,7 +38,7 @@ setMethod(
 
 # basic sampling designs
 setMethod(
-  "initialize", "SampleControl", 
+  "initialize", "BasicSampleControl", 
   function(.Object, ...) {
     args <- list(...)
     # use simple random sampling as default
@@ -48,7 +48,7 @@ setMethod(
 
 # two-stage sampling designs
 setMethod(
-  "initialize", "TwoStageControl", 
+  "initialize", "TwoStageSampleControl", 
   function(.Object, ...) {
     args <- list(...)
     # use simple random sampling as default
@@ -79,7 +79,7 @@ setMethod(
 
 # simple contamination
 setMethod(
-  "initialize", "SimpleContControl", 
+  "initialize", "BasicContControl", 
   function(.Object, ...) {
     args <- list(...)
     # use normal distribution as default for contamination data

@@ -45,7 +45,7 @@ setMethod(
 
 # single-stage sampling
 setMethod(
-  "show", "SampleControl", 
+  "show", "BasicSampleControl", 
   function(object) {
     callNextMethod()
     design <- getDesign(object)
@@ -73,7 +73,7 @@ setMethod(
 
 # two-stage sampling
 setMethod(
-  "show", "TwoStageControl", 
+  "show", "TwoStageSampleControl", 
   function(object) {
     callNextMethod()
     design <- getDesign(object)

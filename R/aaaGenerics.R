@@ -3,21 +3,31 @@
 #         Erasmus University Rotterdam
 # ------------------------------------
 
+#' @import methods
+#' @import stats4
+
+NULL
+
+
+#' @export
 setGeneric(
   "contaminate",
   function(x, control, ...) standardGeneric("contaminate"),
   valueClass = "data.frame")
 
+#' @export
 setGeneric(
   "draw",
   function(x, setup, ...) standardGeneric("draw"), 
   valueClass = "data.frame")
 
+#' @export
 setGeneric(
   "generate",
   function(control, ...) standardGeneric("generate"), 
   valueClass = "data.frame")
 
+#' @export
 setGeneric(
   "runSimulation",
   function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
@@ -32,11 +42,13 @@ setGeneric(
   valueClass = "SimResults"
 )
 
+#' @export
 setGeneric(
   "setNA",
   function(x, control, ...) standardGeneric("setNA"),
   valueClass = "data.frame")
 
+#' @export
 setGeneric(
   "setup",
   function(x, control, ...) {
@@ -53,77 +65,85 @@ setGeneric(
   },
   valueClass = "SampleSetup")
 
+#' @import ggplot2
+#' @export
 setGeneric("simPlot", function(object, ...) standardGeneric("simPlot"))
 
 
-## public accessor and mutator functions (to be exported)
+## public accessor functions (to be exported)
 
+#' @export
 setGeneric("getAux", function(x) standardGeneric("getAux"))
-# setGeneric("setAux", function(x, aux) standardGeneric("setAux"))
 
+#' @export
 setGeneric("getCall", function(x, ...) standardGeneric("getCall"))
 
+#' @export
 setGeneric("getCollect", function(x) standardGeneric("getCollect"))
-# setGeneric("setCollect", function(x, collect) standardGeneric("setCollect"))
 
+#' @export
 setGeneric("getColnames", function(x) standardGeneric("getColnames"))
-# setGeneric("setColnames", function(x, colnames) standardGeneric("setColnames"))
 
+#' @export
 setGeneric("getControl", function(x, ...) standardGeneric("getControl"))
 
+#' @export
 setGeneric("getDesign", function(x) standardGeneric("getDesign"))
-# setGeneric("setDesign", function(x, design) standardGeneric("setDesign"))
 
+#' @export
 setGeneric("getDistribution", function(x) standardGeneric("getDistribution"))
 
+#' @export
 setGeneric("getDots", function(x, ...) standardGeneric("getDots"))
-# setGeneric("setDots", function(x, dots, ...) standardGeneric("setDots"))
 
+#' @export
 setGeneric("getEpsilon", function(x) standardGeneric("getEpsilon"))
-# setGeneric("setEpsilon", function(x, epsilon) standardGeneric("setEpsilon"))
 
+#' @export
 setGeneric("getFun", function(x, ...) standardGeneric("getFun"))
-# setGeneric("setFun", function(x, fun, ...) standardGeneric("setFun"))
 
+#' @export
 setGeneric("getGrouping", function(x) standardGeneric("getGrouping"))
-# setGeneric("setGrouping", function(x, grouping) standardGeneric("setGrouping"))
 
+#' @export
 setGeneric("getIndices", function(x) standardGeneric("getIndices"))
 
+#' @export
 setGeneric("getInfo", function(x) standardGeneric("getInfo"))
 
+#' @export
 setGeneric("getIntoContamination", 
            function(x) standardGeneric("getIntoContamination"))
-# setGeneric("setIntoContamination", 
-#            function(x, intoContamination) {
-#              standardGeneric("setIntoContamination")
-#            })
 
+#' @export
 setGeneric("getK", function(x) standardGeneric("getK"))
-setGeneric("setK", function(x, k) standardGeneric("setK"))
 
+#' @export
 setGeneric("getNARate", function(x) standardGeneric("getNARate"))
-# setGeneric("setNARate", function(x, NARate) standardGeneric("setNARate"))
 
+#' @export
 setGeneric("getNrep", function(x) standardGeneric("getNrep"))
 
+#' @export
 setGeneric("getProb", function(x, ...) standardGeneric("getProb"))
-# setGeneric("setProb", function(x, prob, ...) standardGeneric("setProb"))
 
+#' @export
 setGeneric("getSeed", function(x) standardGeneric("getSeed"))
 
+#' @export
 setGeneric("getSize", function(x, ...) standardGeneric("getSize"))
-# setGeneric("setSize", function(x, size, ...) standardGeneric("setSize"))
 
+#' @export
 setGeneric("getTarget", function(x) standardGeneric("getTarget"))
-# setGeneric("setTarget", function(x, target) standardGeneric("setTarget"))
 
+#' @export
 setGeneric("getTuning", function(x, ...) standardGeneric("getTuning"))
 
+#' @export
 setGeneric("getValues", function(x) standardGeneric("getValues"))
 
 
-## private accessor and mutator functions
+## private mutator functions
 
 setGeneric("setCall", function(x, call) standardGeneric("setCall"))
 
@@ -134,6 +154,8 @@ setGeneric("setFun", function(x, fun, ...) standardGeneric("setFun"))
 
 setGeneric("setIndices", function(x, ...) standardGeneric("setIndices"))
 
+setGeneric("setK", function(x, k) standardGeneric("setK"))
+
 setGeneric("setSeed", function(x, seed) standardGeneric("setSeed"))
 
 setGeneric("setTuning", function(x, tuning) standardGeneric("setTuning"))
@@ -143,13 +165,31 @@ setGeneric("setValues", function(x, values) standardGeneric("setValues"))
 
 ## existing S3 or S4 generics (just to be safe)
 
+#' @export
 setGeneric("aggregate")
+
+#' @import ggplot2
+#' @export
 setGeneric("fortify", 
            function(model, data = NULL, ...) standardGeneric("fortify"))
+
+#' @export
 setGeneric("head")
+
+#' @export
 setGeneric("length")
+
+#' @export
 setGeneric("plot")
+
+#' @export
 setGeneric("show")
+
+#' @export
 setGeneric("subset")
+
+#' @export
 setGeneric("summary")
+
+#' @export
 setGeneric("tail")

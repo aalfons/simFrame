@@ -3,33 +3,50 @@
 #         Erasmus University Rotterdam
 # ------------------------------------
 
+#' @import methods
+
+NULL
+
+
 ## class unions of elementary classes (for convenience)
 
+#' @exportClass BasicVector
 setClassUnion("BasicVector", c("character", "logical", "numeric"))
+
+#' @exportClass NumericMatrix
 setClassUnion("NumericMatrix", c("numeric", "matrix"))
+
+#' @exportClass OptCall
 setClassUnion("OptCall", c("NULL", "call"))
+
+#' @exportClass OptCharacter
 setClassUnion("OptCharacter", c("NULL", "character"))
+
+#' @exportClass ListOrDataFrame
 setClassUnion("ListOrDataFrame", c("list", "data.frame"))
+
+#' @exportClass OptNumeric
 setClassUnion("OptNumeric", c("NULL", "numeric"))
 
 # ---------------------------------------
 
 ## control class for generating model based data
 
-# virtual class
-
 validVirtualDataControlObject <- function(object) {
   if(length(object@size) > 0 && all(object@size > 0)) TRUE
   else "'size' must contain positive integers"
 }
 
+#' @exportClass VirtualDataControl
 setClass("VirtualDataControl",
          representation(size = "numeric"),
          prototype(size=100),
          contains = "VIRTUAL",
          validity = validVirtualDataControlObject)
 
-# basic class
+
+## basic class
+#' @exportClass DataControl
 setClass("DataControl",
          representation(distribution = "function", tuning = "ListOrDataFrame", 
                         indices = "NumericMatrix", dots = "list", 
@@ -38,34 +55,40 @@ setClass("DataControl",
                    colnames = NULL),
          contains = "VirtualDataControl")
 
-# constructor
+## constructor
+#' @export
 DataControl <- function(...) new("DataControl", ...)
 
-# # class union for extending the framework
-# setClassUnion("VirtualDataControl", "DataControl")
 
-# class union for optional argument in methods
+## class union for optional argument in methods
+#' @exportClass OptDataControl
 setClassUnion("OptDataControl", c("NULL", "VirtualDataControl"))
 
 # ---------------------------------------
 
 ## sample control
 
-# virtual class
 validVirtualSampleControlObject <- function(object) {
   if(length(object@k) == 1 && object@k > 0) TRUE
   else "'k' must be a single positive integer"
 }
 
+#' @exportClass VirtualSampleControl
 setClass("VirtualSampleControl",
          representation(k = "numeric", seed = "numeric"),
          prototype(k = 1),
          contains = "VIRTUAL",
          validity = validVirtualSampleControlObject)
 
+
+## class union for optional argument in methods
+#' @exportClass OptSampleControl
 setClassUnion("OptSampleControl", c("NULL", "VirtualSampleControl"))
 
-validSampleControlObject <- function(object) {
+
+## basic sampling designs
+
+validBasicSampleControlObject <- function(object) {
   lengthGrouping <- getSelectionLength(object@grouping)
   lengthProb <- getSelectionLength(object@prob)
   ok <- c(is.na(lengthGrouping) || lengthGrouping <= 1, 
@@ -80,7 +103,8 @@ validSampleControlObject <- function(object) {
   else msg[!ok]
 }
 
-setClass("SampleControl",
+#' @exportClass BasicSampleControl
+setClass("BasicSampleControl",
          representation(design = "BasicVector", grouping = "BasicVector", 
                         collect = "logical", fun = "function", 
                         size = "OptNumeric", prob = "BasicVector", 
@@ -88,11 +112,15 @@ setClass("SampleControl",
          prototype(design = character(), grouping = character(), 
                    collect = FALSE, size = NULL, prob = character()),
          contains = "VirtualSampleControl",
-         validity = validSampleControlObject)
+         validity = validBasicSampleControlObject)
 
-SampleControl <- function(...) new("SampleControl", ...)
+#' @export
+BasicSampleControl <- function(...) new("BasicSampleControl", ...)
 
-validTwoStageControlObject <- function(object) {
+
+## two-stage sampling designs
+
+validTwoStageSampleControlObject <- function(object) {
   l <- getSelectionLength(object@grouping)
   fun <- object@fun
   size <- object@size
@@ -118,7 +146,8 @@ validTwoStageControlObject <- function(object) {
   else msg[!ok]
 }
 
-setClass("TwoStageControl",
+#' @exportClass TwoStageSampleControl
+setClass("TwoStageSampleControl",
          representation(design = "BasicVector", grouping = "BasicVector", 
                         fun = "list", size = "list", prob = "list", 
                         dots = "list"),
@@ -127,12 +156,13 @@ setClass("TwoStageControl",
                    prob = list(character(), character()), 
                    dots = list(list(), list())),
          contains = "VirtualSampleControl",
-         validity = validTwoStageControlObject)
+         validity = validTwoStageSampleControlObject)
 
-TwoStageControl <- function(..., fun1 = srs, fun2 = srs, size1 = NULL, 
-                            size2 = NULL, prob1 = character(), 
-                            prob2 = character(), dots1 = list(), 
-                            dots2 = list()) {
+#' @export
+TwoStageSampleControl <- function(..., fun1 = srs, fun2 = srs, size1 = NULL, 
+                                  size2 = NULL, prob1 = character(), 
+                                  prob2 = character(), dots1 = list(), 
+                                  dots2 = list()) {
   # list components for the two stages can be supplied separately
   args <- list(...)
   if(is.null(args$fun) && !(missing(fun1) && missing(fun2))) {
@@ -147,33 +177,49 @@ TwoStageControl <- function(..., fun1 = srs, fun2 = srs, size1 = NULL,
   if(is.null(args$dots) && !(missing(dots1) && missing(dots2))) {
     args$dots <- list(dots1, dots2)
   }
-  do.call(new, c("TwoStageControl", args))
+  do.call(new, c("TwoStageSampleControl", args))
+}
+
+
+## wrapper (mostly for compatibility)
+#' @export
+SampleControl <- function(..., type = c("Basic", "TwoStage")) {
+  type <- match.arg(type)
+  if(type == "TwoStage") TwoStageSampleControl(...)
+  else {
+    class <- paste(type, "SampleControl", sep="")
+    new(class, ...)
+  }
 }
 
 # ---------------------------------------
 
 ## sample setup
 
+#' @exportClass SampleSetup
 setClass("SampleSetup",
          representation(indices = "list", prob = "numeric", 
                         control = "VirtualSampleControl", 
                         call = "OptCall"),
          prototype(call = NULL))
 
+#' @export
 SampleSetup <- function(...) new("SampleSetup", ...)
 
-# summary
 
+## summary
+
+#' @exportClass SummarySampleSetup
 setClass("SummarySampleSetup",
          representation(size = "numeric"))
 
+#' @export
 SummarySampleSetup <- function(...) new("SummarySampleSetup", ...)
 
 # ---------------------------------------
 
 ## contamination control
 
-# virtual class
 validVirtualContControlObject <- function(object) {
   ok <- c(length(object@target) > 0 || is.null(object@target), 
           length(object@epsilon) > 0, 
@@ -185,28 +231,40 @@ validVirtualContControlObject <- function(object) {
   else msg[!ok]
 }
 
+#' @exportClass VirtualContControl
 setClass("VirtualContControl",
          representation(target = "OptCharacter", epsilon = "numeric"),
          prototype(target = NULL, epsilon = 0.05),
          contains = "VIRTUAL",
          validity = validVirtualContControlObject)
 
+
+## class union for optional argument in methods
+#' @exportClass OptContControl
 setClassUnion("OptContControl", c("NULL", "VirtualContControl"))
 
-# internal control class (not expected to be extended by the user)
+
+## internal control class (not expected to be extended by the user)
+#' @exportClass ContControl
 setClass("ContControl",
          representation(tuning = "ListOrDataFrame", indices = "NumericMatrix"),
          prototype(tuning = data.frame(), indices = matrix(integer(0), ncol=2)), 
          contains = c("VIRTUAL", "VirtualContControl"))
 
-# simple control class for contaminating the first observations
-setClass("SimpleContControl",
+
+## simple control class for contaminating the first observations
+
+#' @exportClass BasicContControl
+setClass("BasicContControl",
          representation(fun = "function", dots = "list"),
          contains = "ContControl")
 
-CARContControl <- function(...) new("CARContControl", ...)
+#' @export
+BasicContControl <- function(...) new("BasicContControl", ...)
 
-# internal control class (not expected to be extended by the user)
+
+## internal control class (not expected to be extended by the user)
+
 validRandomContControlObject <- function(object) {
   ok <- c(length(object@grouping) <= 1, length(object@aux) <= 1)
   msg <- c("'grouping' must not specify more than one variable", 
@@ -215,27 +273,38 @@ validRandomContControlObject <- function(object) {
   else msg[!ok]
 }
 
+#' @exportClass RandomContControl
 setClass("RandomContControl",
          representation(grouping = "character", aux = "character"),
          contains = c("VIRTUAL", "ContControl"),
          validity = validRandomContControlObject)
 
-# contaminated completely at random (CCAR)
+
+## contaminated completely at random (CCAR)
+
+#' @exportClass CCARContControl
 setClass("CCARContControl",
          representation(distribution = "function", dots = "list"),
          contains = "RandomContControl")
 
+#' @export
 CCARContControl <- function(...) new("CCARContControl", ...)
 
-# contaminated at random (CAR)
+
+## contaminated at random (CAR)
+
+#' @exportClass CARContControl
 setClass("CARContControl",
          representation(fun = "function", dots = "list"),
          contains = "RandomContControl")
 
+#' @export
 CARContControl <- function(...) new("CARContControl", ...)
 
-# wrapper (mostly for compatibility)
-ContControl <- function(..., type = c("Simple", "CCAR", "CAR")) {
+
+## wrapper (mostly for compatibility)
+#' @export
+ContControl <- function(..., type = c("Basic", "CCAR", "CAR")) {
   type <- match.arg(type)
   class <- paste(type, "ContControl", sep="")
   new(class, ...)
@@ -245,7 +314,6 @@ ContControl <- function(..., type = c("Simple", "CCAR", "CAR")) {
 
 ## NA control
 
-# virtual class
 validVirtualNAControlObject <- function(object) {
   NARate <- object@NARate
   nl <- getLength(NARate)
@@ -261,16 +329,21 @@ validVirtualNAControlObject <- function(object) {
   else msg[!ok]
 }
 
+#' @exportClass VirtualNAControl
 setClass("VirtualNAControl",
          representation(target = "OptCharacter", NARate = "NumericMatrix"),
          prototype(target = NULL, NARate = 0.05),
          contains = "VIRTUAL",
          validity = validVirtualNAControlObject)
 
+
+## class union for optional argument in methods
+#' @exportClass OptNAControl
 setClassUnion("OptNAControl", c("NULL", "VirtualNAControl"))
 
 
-# select values randomly for each target variable
+## select values randomly for each target variable
+
 validNAControlObject <- function(object) {
   lengthAux <- length(object@aux)
   ok <- c(length(object@grouping) <= 1, 
@@ -281,6 +354,7 @@ validNAControlObject <- function(object) {
   else msg[!ok]
 }
 
+#' @exportClass NAControl
 setClass("NAControl",
          representation(grouping = "character", aux = "character", 
                         intoContamination = "logical"),
@@ -288,12 +362,14 @@ setClass("NAControl",
          contains = "VirtualNAControl", 
          validity = validNAControlObject)
 
+#' @export
 NAControl <- function(...) new("NAControl", ...)
 
 # ---------------------------------------
 
 ## simulation control
 
+#' @exportClass SimControl
 setClass("SimControl",
          representation(contControl = "OptContControl", 
                         NAControl = "OptNAControl",
@@ -303,12 +379,14 @@ setClass("SimControl",
                         seed = "numeric"),
          prototype(contControl = NULL, NAControl = NULL, design = character()))
 
+#' @export
 SimControl <- function(...) new("SimControl", ...)
 
 # ---------------------------------------
 
 ## simulation results
 
+#' @exportClass SimResults
 setClass("SimResults",
          representation(values = "data.frame", colnames = "character", 
                         info = "numeric", dataControl = "OptDataControl", 
@@ -316,4 +394,5 @@ setClass("SimResults",
                         control = "SimControl", call = "OptCall"),
          prototype(dataControl = NULL, sampleControl = NULL, call = NULL))
 
+#' @export
 SimResults <- function(...) new("SimResults", ...)

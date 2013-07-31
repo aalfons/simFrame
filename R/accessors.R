@@ -88,53 +88,53 @@ setMethod(
 # basic sampling designs
 
 setMethod(
-  "getDesign", "SampleControl", function(x) slot(x, "design"))
+  "getDesign", "BasicSampleControl", function(x) slot(x, "design"))
 # setMethod(
-#   "setDesign", "SampleControl", 
+#   "setDesign", "BasicSampleControl", 
 #   function(x, design) eval.parent(substitute(slot(x, "design") <- design)))
 
 setMethod(
-  "getGrouping", "SampleControl", function(x) slot(x, "grouping"))
+  "getGrouping", "BasicSampleControl", function(x) slot(x, "grouping"))
 # setMethod(
-#   "setGrouping", "SampleControl", 
+#   "setGrouping", "BasicSampleControl", 
 #   function(x, grouping) {
 #     eval.parent(substitute(slot(x, "grouping") <- grouping))
 #   })
 
 setMethod(
-  "getCollect", "SampleControl", function(x) slot(x, "collect"))
+  "getCollect", "BasicSampleControl", function(x) slot(x, "collect"))
 # setMethod(
-#   "setCollect", "SampleControl", 
+#   "setCollect", "BasicSampleControl", 
 #   function(x, collect) eval.parent(substitute(slot(x, "collect") <- collect)))
 
 setMethod(
-  "getFun", "SampleControl", function(x) slot(x, "fun"))
+  "getFun", "BasicSampleControl", function(x) slot(x, "fun"))
 setMethod(
-  "setFun", "SampleControl", 
+  "setFun", "BasicSampleControl", 
   function(x, fun) {
     eval.parent(substitute(slot(x, "fun") <- fun, env=parent.frame()), n=2)
   })
 
 setMethod(
-  "getSize", "SampleControl", function(x) slot(x, "size"))
+  "getSize", "BasicSampleControl", function(x) slot(x, "size"))
 # setMethod(
-#   "setSize", "SampleControl", 
+#   "setSize", "BasicSampleControl", 
 #   function(x, size) {
 #     eval.parent(substitute(slot(x, "size") <- size, env=parent.frame()), n=2)
 #   })
 
 setMethod(
-  "getProb", "SampleControl", function(x) slot(x, "prob"))
+  "getProb", "BasicSampleControl", function(x) slot(x, "prob"))
 # setMethod(
-#   "setProb", "SampleControl", 
+#   "setProb", "BasicSampleControl", 
 #   function(x, prob) {
 #     eval.parent(substitute(slot(x, "prob") <- prob, env=parent.frame()), n=2)
 #   })
 
 setMethod(
-  "getDots", "SampleControl", function(x) slot(x, "dots"))
+  "getDots", "BasicSampleControl", function(x) slot(x, "dots"))
 # setMethod(
-#   "setDots", "SampleControl", 
+#   "setDots", "BasicSampleControl", 
 #   function(x, dots) {
 #     eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
 #   })
@@ -143,15 +143,15 @@ setMethod(
 # two-stage sampling designs
 
 setMethod(
-  "getDesign", "TwoStageControl", function(x) slot(x, "design"))
+  "getDesign", "TwoStageSampleControl", function(x) slot(x, "design"))
 # setMethod(
-#   "setDesign", "TwoStageControl", 
+#   "setDesign", "TwoStageSampleControl", 
 #   function(x, design) eval.parent(substitute(slot(x, "design") <- design)))
 
 setMethod(
-  "getGrouping", "TwoStageControl", function(x) slot(x, "grouping"))
+  "getGrouping", "TwoStageSampleControl", function(x) slot(x, "grouping"))
 # setMethod(
-#   "setGrouping", "TwoStageControl", 
+#   "setGrouping", "TwoStageSampleControl", 
 #   function(x, grouping) {
 #     eval.parent(substitute(slot(x, "grouping") <- grouping))
 #   })
@@ -160,7 +160,7 @@ setMethod(
 # the generic function and needs to be extracted from the additional arguments
 
 setMethod(
-  "getFun", "TwoStageControl", 
+  "getFun", "TwoStageSampleControl", 
   function(x, stage = NULL) {
     fun <- slot(x, "fun")
     if(is.null(stage)) fun
@@ -170,7 +170,7 @@ setMethod(
     }
   })
 setMethod(
-  "setFun", "TwoStageControl", 
+  "setFun", "TwoStageSampleControl", 
   function(x, fun, stage = NULL) {
     pf <- parent.frame()  # environment of generic function
     if(is.null(stage)) expr <- substitute(slot(x, "fun") <- fun, pf)
@@ -182,7 +182,7 @@ setMethod(
   })
 
 setMethod(
-  "getSize", "TwoStageControl", 
+  "getSize", "TwoStageSampleControl", 
   function(x, stage = NULL) {
     size <- slot(x, "size")
     if(is.null(stage)) size
@@ -192,7 +192,7 @@ setMethod(
     }
   })
 # setMethod(
-#   "setSize", "TwoStageControl", 
+#   "setSize", "TwoStageSampleControl", 
 #   function(x, size, stage = NULL) {
 #     pf <- parent.frame()  # environment of generic function
 #     if(is.null(stage)) expr <- substitute(slot(x, "size") <- size, pf)
@@ -204,7 +204,7 @@ setMethod(
 #   })
 
 setMethod(
-  "getProb", "TwoStageControl", 
+  "getProb", "TwoStageSampleControl", 
   function(x, stage = NULL) {
     prob <- slot(x, "prob")
     if(is.null(stage)) prob
@@ -214,7 +214,7 @@ setMethod(
     }
   })
 # setMethod(
-#   "setProb", "TwoStageControl", 
+#   "setProb", "TwoStageSampleControl", 
 #   function(x, prob, stage = NULL) {
 #     pf <- parent.frame()  # environment of generic function
 #     if(is.null(stage)) expr <- substitute(slot(x, "prob") <- prob, pf)
@@ -226,7 +226,7 @@ setMethod(
 #   })
 
 setMethod(
-  "getDots", "TwoStageControl", 
+  "getDots", "TwoStageSampleControl", 
   function(x, stage = NULL) {
     dots <- slot(x, "dots")
     if(is.null(stage)) dots
@@ -236,7 +236,7 @@ setMethod(
     }
   })
 # setMethod(
-#   "setDots", "TwoStageControl", 
+#   "setDots", "TwoStageSampleControl", 
 #   function(x, dots, stage = NULL) {
 #     pf <- parent.frame()  # environment of generic function
 #     if(is.null(stage)) expr <- substitute(slot(x, "dots") <- dots, pf)
@@ -311,16 +311,16 @@ setMethod(
   })
 
 setMethod(
-  "getFun", "SimpleContControl", 
+  "getFun", "BasicContControl", 
   function(x) slot(x, "fun"))
 setMethod(
-  "setFun", "SimpleContControl", 
+  "setFun", "BasicContControl", 
   function(x, fun) {
     eval.parent(substitute(slot(x, "fun") <- fun, env=parent.frame()), n=2)
   })
 
 setMethod(
-  "getDots", "SimpleContControl", 
+  "getDots", "BasicContControl", 
   function(x) slot(x, "dots"))
 
 setMethod(

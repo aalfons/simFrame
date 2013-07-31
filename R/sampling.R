@@ -3,7 +3,8 @@
 #         Erasmus University Rotterdam
 # ------------------------------------
 
-# simple random sampling
+## simple random sampling
+#' @export
 srs <- function(N, size, replace = FALSE) {
   if(N == 0) integer()
   else {
@@ -13,7 +14,8 @@ srs <- function(N, size, replace = FALSE) {
   }
 }
 
-# unequal probability sampling
+## unequal probability sampling
+#' @export
 ups <- function(N, size, prob, replace = FALSE) {
   if(N == 0) integer()
   else {
@@ -22,7 +24,7 @@ ups <- function(N, size, prob, replace = FALSE) {
   }
 }
 
-# for internal use (in 'setNA')
+## for internal use (in 'setNA')
 samplex <- function(x, size, prob = NULL) {
   if(length(x) == 0) x
   else if(length(x) == 1) {
@@ -34,19 +36,23 @@ samplex <- function(x, size, prob = NULL) {
   } else sample(x, size, prob = prob)
 }
 
-# Midzuno sampling
+## Midzuno sampling
+#' @useDynLib simFrame
+#' @export
 midzuno <- function(prob, eps = 1e-06) {
   prob <- 1 - tilleCpp(1 - prob, eps)  # call internal function for tille sampling
   which(prob >= 1 - eps)  # indices of sampled observations
 }
 
-# Tille sampling
+## Tille sampling
+#' @useDynLib simFrame
+#' @export
 tille <- function(prob, eps = 1e-06) {
   prob <- tilleCpp(prob, eps)  # call internal function
   which(prob >= 1 - eps)  # indices of sampled observations
 }
 
-# internal function for Tille sampling that calls the C++ function
+## internal function for Tille sampling that calls the C++ function
 tilleCpp <- function(prob, eps = 1e-06) {
   if(any(is.na(prob))) stop("there are missing values in 'prob'")
   list <- (prob > eps) & (prob < 1 - eps)  # indices of probabilities to be used
@@ -57,7 +63,9 @@ tilleCpp <- function(prob, eps = 1e-06) {
   prob
 }
 
-# Brewer sampling
+## Brewer sampling
+#' @useDynLib simFrame
+#' @export
 brewer <- function(prob, eps = 1e-06) {
   if(any(is.na(prob))) stop("there are missing values in 'prob'")
   list <- (prob > eps) & (prob < 1 - eps)  # indices of probabilities to be used
@@ -68,7 +76,9 @@ brewer <- function(prob, eps = 1e-06) {
   which(prob >= 1 - eps)  # indices of sampled observations
 }
 
-# compute inclusion probabilities
+## compute inclusion probabilities
+#' @useDynLib simFrame
+#' @export
 inclusionProb <- function(prob, size) {
   prob <- as.numeric(prob)
   size <- as.integer(size[1])

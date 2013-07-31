@@ -17,10 +17,11 @@ setMethod(
       stop(gettextf("\"%s\" does not extend class \"VirtualSampleControl\"", 
                     control))
     }
-    # temporary solution: constructor for class "TwoStageControl" has 
+    # temporary solution: constructor for class "TwoStageSampleControl" has 
     # arguments that aren't slots
-    if(isTRUE(control == "TwoStageControl")) control <- TwoStageControl(...)
-    else control <- new(control, ...)
+    if(isTRUE(control == "TwoStageSampleControl")) {
+      control <- TwoStageSampleControl(...)
+    } else control <- new(control, ...)
     setup(x, control)
   })
 
@@ -33,14 +34,15 @@ setMethod(
   })
 
 # ---------------------------------------
-## get sample setup using control class "SampleControl"
+
+## get sample setup using control class "BasicSampleControl"
 
 # group sampling: for methods with the argument 'x', the observation 
 #                 with the first occurrence of the group will be used 
 #                 as prototype (how to aggregate the data?)
 
 setMethod(
-  "setup", signature(x = "data.frame", control = "SampleControl"), 
+  "setup", signature(x = "data.frame", control = "BasicSampleControl"), 
   function(x, control) {
     # initializations
     cnam <- names(x)
@@ -231,10 +233,10 @@ setMethod(
 
 # ---------------------------------------
 
-## get two-stage sample setup using control class "TwoStageControl"
+## get two-stage sample setup using control class "TwoStageSampleControl"
 
 setMethod(
-  "setup", signature(x = "data.frame", control = "TwoStageControl"), 
+  "setup", signature(x = "data.frame", control = "TwoStageSampleControl"), 
   function(x, control) {
     
     ## -----------
