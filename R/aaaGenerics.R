@@ -4,7 +4,6 @@
 # ------------------------------------
 
 #' @import methods
-#' @import stats4
 
 NULL
 
@@ -76,9 +75,6 @@ setGeneric("simPlot", function(object, ...) standardGeneric("simPlot"))
 setGeneric("getAux", function(x) standardGeneric("getAux"))
 
 #' @export
-setGeneric("getCall", function(x, ...) standardGeneric("getCall"))
-
-#' @export
 setGeneric("getCollect", function(x) standardGeneric("getCollect"))
 
 #' @export
@@ -137,7 +133,7 @@ setGeneric("getSize", function(x, ...) standardGeneric("getSize"))
 setGeneric("getTarget", function(x) standardGeneric("getTarget"))
 
 #' @export
-setGeneric("getTuning", function(x, ...) standardGeneric("getTuning"))
+setGeneric("getTuning", function(x) standardGeneric("getTuning"))
 
 #' @export
 setGeneric("getValues", function(x) standardGeneric("getValues"))
@@ -170,8 +166,15 @@ setGeneric("aggregate")
 
 #' @import ggplot2
 #' @export
+setGeneric("autoplot")
+
+#' @import ggplot2
+#' @export
 setGeneric("fortify", 
            function(model, data = NULL, ...) standardGeneric("fortify"))
+
+#' @export
+setGeneric("getCall")
 
 #' @export
 setGeneric("head")

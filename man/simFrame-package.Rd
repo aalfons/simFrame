@@ -1,7 +1,7 @@
 \name{simFrame-package}
+\docType{package}
 \alias{simFrame-package}
 \alias{simFrame}
-\docType{package}
 \title{
 Simulation framework
 }
@@ -14,6 +14,7 @@ Package: \tab simFrame\cr
 Version: \tab 0.6.0\cr
 Date: \tab 2013-07-13\cr
 Depends: \tab R (>= 2.14.0), Rcpp (>= 0.8.6), parallel, ggplot2 (>= 0.9.3)\cr
+Imports: \tab methods, stats4\cr
 Suggests: \tab laeken, mvtnorm, robCompositions, sampling\cr
 LinkingTo: \tab Rcpp\cr
 License: \tab GPL (>= 2)\cr

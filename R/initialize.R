@@ -99,7 +99,7 @@ setMethod(
 
 # contamination at random (CAR)
 setMethod(
-  "initialize", "CCARContControl", 
+  "initialize", "CARContControl", 
   function(.Object, ...) {
     args <- list(...)
     # use normal distribution as default for contamination data

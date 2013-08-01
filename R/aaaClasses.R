@@ -4,6 +4,7 @@
 # ------------------------------------
 
 #' @import methods
+#' @import stats4
 
 NULL
 
@@ -48,8 +49,8 @@ setClass("VirtualDataControl",
 ## basic class
 #' @exportClass DataControl
 setClass("DataControl",
-         representation(distribution = "function", tuning = "ListOrDataFrame", 
-                        indices = "NumericMatrix", dots = "list", 
+         representation(tuning = "ListOrDataFrame", indices = "NumericMatrix", 
+                        distribution = "function", dots = "list", 
                         colnames = "OptCharacter"),
          prototype(tuning = data.frame(), indices = matrix(integer(0), ncol=2), 
                    colnames = NULL),
@@ -180,18 +181,6 @@ TwoStageSampleControl <- function(..., fun1 = srs, fun2 = srs, size1 = NULL,
   do.call(new, c("TwoStageSampleControl", args))
 }
 
-
-## wrapper (mostly for compatibility)
-#' @export
-SampleControl <- function(..., type = c("Basic", "TwoStage")) {
-  type <- match.arg(type)
-  if(type == "TwoStage") TwoStageSampleControl(...)
-  else {
-    class <- paste(type, "SampleControl", sep="")
-    new(class, ...)
-  }
-}
-
 # ---------------------------------------
 
 ## sample setup
@@ -300,15 +289,6 @@ setClass("CARContControl",
 
 #' @export
 CARContControl <- function(...) new("CARContControl", ...)
-
-
-## wrapper (mostly for compatibility)
-#' @export
-ContControl <- function(..., type = c("Basic", "CCAR", "CAR")) {
-  type <- match.arg(type)
-  class <- paste(type, "ContControl", sep="")
-  new(class, ...)
-}
 
 # ---------------------------------------
 

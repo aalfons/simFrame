@@ -3,6 +3,7 @@ Version: 0.6.0
 Title: Simulation framework
 Date: 2013-07-13
 Depends: R (>= 2.14.0), Rcpp (>= 0.8.6), parallel, ggplot2 (>= 0.9.3)
+Imports: methods, stats4
 Suggests: laeken, mvtnorm, robCompositions, sampling
 LinkingTo: Rcpp
 Description: A general framework for statistical simulation.

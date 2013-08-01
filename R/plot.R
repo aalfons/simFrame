@@ -31,7 +31,19 @@ setMethod(
   })
 
 
-## internal function for box plot
+setMethod(
+  "plot", signature(x = "SimResults", y = "missing"), 
+  function(x, y, ...) simPlot(x, ...))
+
+
+setMethod(
+  "autoplot", "SimResults", 
+  function(object, ...) simPlot(object, ...))
+
+
+## internal functions
+
+# box plot
 boxPlot <- function(data, mapping, facets = NULL, main = NULL, 
                     xlab = NULL, ylab = NULL, ...) {
   # define default title and axis labels
@@ -47,7 +59,7 @@ boxPlot <- function(data, mapping, facets = NULL, main = NULL,
   p
 }
 
-## internal function for density plot
+# density plot
 densityPlot <- function(data, mapping, facets = NULL, main = NULL, 
                         xlab = NULL, ylab = NULL, ...) {
   # define default title and axis labels
@@ -64,7 +76,7 @@ densityPlot <- function(data, mapping, facets = NULL, main = NULL,
   p
 }
 
-## internal function for line plot
+# line plot
 linePlot <- function(data, mapping, facets = NULL, main = NULL, 
                      xlab = NULL, ylab = NULL, ...) {
   # define default title and axis labels
