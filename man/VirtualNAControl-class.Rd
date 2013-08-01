@@ -4,11 +4,7 @@
 \alias{VirtualNAControl-class}
 \alias{getNARate,VirtualNAControl-method}
 \alias{getTarget,VirtualNAControl-method}
-\alias{head,VirtualNAControl-method}
-\alias{length,VirtualNAControl-method}
 \alias{show,VirtualNAControl-method}
-\alias{summary,VirtualNAControl-method}
-\alias{tail,VirtualNAControl-method}
 
 \title{Class \code{"VirtualNAControl"}}
 \description{

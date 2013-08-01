@@ -3,22 +3,12 @@
 \docType{class}
 \alias{SimResults-class}
 \alias{SimResults}
-\alias{aggregate,SimResults-method}
-\alias{autoplot,SimResults-method}
-\alias{fortify,SimResults-method}
 \alias{getCall,SimResults-method}
 \alias{getColnames,SimResults-method}
-\alias{getControl,SimResults-method}
 \alias{getInfo,SimResults-method}
 \alias{getNrep,SimResults-method}
 \alias{getValues,SimResults-method}
-\alias{head,SimResults-method}
-\alias{plot,SimResults,missing-method}
 \alias{show,SimResults-method}
-\alias{simPlot,SimResults-method}
-\alias{subset,SimResults-method}
-\alias{summary,SimResults-method}
-\alias{tail,SimResults-method}
 
 \title{Class \code{"SimResults"}}
 \description{Class for simulation results.}

@@ -10,7 +10,6 @@
 \alias{getGrouping,BasicSampleControl-method}
 \alias{getProb,BasicSampleControl-method}
 \alias{getSize,BasicSampleControl-method}
-\alias{setup,data.frame,BasicSampleControl-method}
 \alias{show,BasicSampleControl-method}
 
 \title{Class \code{"BasicSampleControl"}}

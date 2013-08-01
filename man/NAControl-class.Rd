@@ -6,7 +6,6 @@
 \alias{getAux,NAControl-method}
 \alias{getGrouping,NAControl-method}
 \alias{getIntoContamination,NAControl-method}
-\alias{setNA,data.frame,NAControl-method}
 \alias{show,NAControl-method}
 
 \title{Class \code{"NAControl"}}

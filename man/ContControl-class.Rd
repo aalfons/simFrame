@@ -4,7 +4,6 @@
 \alias{ContControl-class}
 \alias{getIndices,ContControl-method}
 \alias{getTuning,ContControl-method}
-\alias{length,ContControl-method}
 \alias{show,ContControl-method}
 
 \title{Class \code{"ContControl"}}

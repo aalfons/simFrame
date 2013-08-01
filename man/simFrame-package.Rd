@@ -1,7 +1,7 @@
 \name{simFrame-package}
-\docType{package}
 \alias{simFrame-package}
 \alias{simFrame}
+\docType{package}
 \title{
 Simulation framework
 }
@@ -19,6 +19,71 @@ Suggests: \tab laeken, mvtnorm, robCompositions, sampling\cr
 LinkingTo: \tab Rcpp\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
+}
+
+Index:
+\preformatted{
+BasicContControl-class
+                        Class '"BasicContControl"'
+BasicSampleControl-class
+                        Class '"BasicSampleControl"'
+BasicVector-class       Class '"BasicVector"'
+CARContControl-class    Class '"CARContControl"'
+CCARContControl-class   Class '"CCARContControl"'
+ContControl             Create contamination control objects
+ContControl-class       Class '"ContControl"'
+DataControl-class       Class '"DataControl"'
+ListOrDataFrame-class   Class '"ListOrDataFrame"'
+NAControl-class         Class '"NAControl"'
+NumericMatrix-class     Class '"NumericMatrix"'
+OptCall-class           Class '"OptCall"'
+OptCharacter-class      Class '"OptCharacter"'
+OptContControl-class    Class '"OptContControl"'
+OptDataControl-class    Class '"OptDataControl"'
+OptNAControl-class      Class '"OptNAControl"'
+OptNumeric-class        Class '"OptNumeric"'
+OptSampleControl-class
+                        Class '"OptSampleControl"'
+RandomContControl-class
+                        Class '"RandomContControl"'
+SampleControl           Create sample control objects
+SampleSetup-class       Class '"SampleSetup"'
+SimControl-class        Class '"SimControl"'
+SimResults-class        Class '"SimResults"'
+SummarySampleSetup-class
+                        Class '"SummarySampleSetup"'
+TwoStageSampleControl-class
+                        Class '"TwoStageSampleControl"'
+VirtualContControl-class
+                        Class '"VirtualContControl"'
+VirtualDataControl-class
+                        Class '"VirtualDataControl"'
+VirtualNAControl-class
+                        Class '"VirtualNAControl"'
+VirtualSampleControl-class
+                        Class '"VirtualSampleControl"'
+aggregate-methods       Method for aggregating simulation results
+contaminate             Contaminate data
+draw                    Draw a sample
+eusilcP                 Synthetic EU-SILC data
+fortify-methods         Convert simulation results into a 'data.frame'
+                        for plotting
+generate                Generate data
+getAux                  Accessor functions for objects
+head-methods            Methods for returning the first parts of an
+                        object
+inclusionProb           Inclusion probabilities
+length-methods          Methods for getting the length of an object
+runSimulation           Run a simulation experiment
+sampling                Random sampling
+setNA                   Set missing values
+setup                   Set up multiple samples
+simFrame-package        Simulation framework
+simPlot                 Plot simulation results
+subset-methods          Subsetting simulation results
+summary-methods         Methods for producing a summary of an object
+tail-methods            Methods for returning the last parts of an
+                        object
 }
 }
 \author{

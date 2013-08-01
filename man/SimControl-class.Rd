@@ -3,21 +3,11 @@
 \docType{class}
 \alias{SimControl-class}
 \alias{SimControl}
-\alias{getControl,SimControl-method}
 \alias{getDesign,SimControl-method}
 \alias{getDots,SimControl-method}
 \alias{getFun,SimControl-method}
 \alias{getSeed,SimControl-method}
-\alias{head,SimControl-method}
-\alias{runSimulation,data.frame,missing,missing,SimControl-method}
-\alias{runSimulation,data.frame,missing,numeric,SimControl-method}
-\alias{runSimulation,data.frame,SampleSetup,missing,SimControl-method}
-\alias{runSimulation,data.frame,VirtualSampleControl,missing,SimControl-method}
-\alias{runSimulation,VirtualDataControl,missing,numeric,SimControl-method}
-\alias{runSimulation,VirtualDataControl,VirtualSampleControl,numeric,SimControl-method}
 \alias{show,SimControl-method}
-\alias{summary,SimControl-method}
-\alias{tail,SimControl-method}
 
 \title{Class \code{"SimControl"}}
 \description{Class for controlling how simulation runs are performed.}

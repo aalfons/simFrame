@@ -2,16 +2,9 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{VirtualSampleControl-class}
-\alias{draw,data.frame,VirtualSampleControl-method}
 \alias{getK,VirtualSampleControl-method}
 \alias{getSeed,VirtualSampleControl-method}
-\alias{head,VirtualSampleControl-method}
-\alias{length,VirtualSampleControl-method}
-\alias{runSimulation,data.frame,VirtualSampleControl,missing,SimControl-method}
-\alias{runSimulation,VirtualDataControl,VirtualSampleControl,numeric,SimControl-method}
 \alias{show,VirtualSampleControl-method}
-\alias{summary,VirtualSampleControl-method}
-\alias{tail,VirtualSampleControl-method}
 
 \title{Class \code{"VirtualSampleControl"}}
 \description{

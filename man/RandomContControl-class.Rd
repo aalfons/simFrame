@@ -2,7 +2,6 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{RandomContControl-class}
-\alias{contaminate,data.frame,RandomContControl-method}
 \alias{getAux,RandomContControl-method}
 \alias{getGrouping,RandomContControl-method}
 \alias{show,RandomContControl-method}

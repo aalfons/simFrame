@@ -4,12 +4,7 @@
 \alias{TwoStageSampleControl-class}
 \alias{TwoStageSampleControl}
 \alias{getDesign,TwoStageSampleControl-method}
-\alias{getDots,TwoStageSampleControl-method}
-\alias{getFun,TwoStageSampleControl-method}
 \alias{getGrouping,TwoStageSampleControl-method}
-\alias{getProb,TwoStageSampleControl-method}
-\alias{getSize,TwoStageSampleControl-method}
-\alias{setup,data.frame,TwoStageSampleControl-method}
 \alias{show,TwoStageSampleControl-method}
 
 \title{Class \code{"TwoStageSampleControl"}}

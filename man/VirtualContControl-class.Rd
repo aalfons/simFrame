@@ -4,11 +4,7 @@
 \alias{VirtualContControl-class}
 \alias{getEpsilon,VirtualContControl-method}
 \alias{getTarget,VirtualContControl-method}
-\alias{head,VirtualContControl-method}
-\alias{length,VirtualContControl-method}
 \alias{show,VirtualContControl-method}
-\alias{summary,VirtualContControl-method}
-\alias{tail,VirtualContControl-method}
 
 \title{Class \code{"VirtualContControl"}}
 \description{

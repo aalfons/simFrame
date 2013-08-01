@@ -3,17 +3,11 @@
 \docType{class}
 \alias{SampleSetup-class}
 \alias{SampleSetup}
-\alias{draw,data.frame,SampleSetup-method}
 \alias{getCall,SampleSetup-method}
 \alias{getControl,SampleSetup-method}
 \alias{getIndices,SampleSetup-method}
 \alias{getProb,SampleSetup-method}
-\alias{head,SampleSetup-method}
-\alias{length,SampleSetup-method}
-\alias{runSimulation,data.frame,SampleSetup,missing,SimControl-method}
 \alias{show,SampleSetup-method}
-\alias{summary,SampleSetup-method}
-\alias{tail,SampleSetup-method}
 
 \title{Class \code{"SampleSetup"}}
 \description{Class for set up samples.}

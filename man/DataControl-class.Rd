@@ -3,13 +3,11 @@
 \docType{class}
 \alias{DataControl-class}
 \alias{DataControl}
-\alias{generate,DataControl-method}
 \alias{getColnames,DataControl-method}
 \alias{getDistribution,DataControl-method}
 \alias{getDots,DataControl-method}
 \alias{getIndices,DataControl-method}
 \alias{getTuning,DataControl-method}
-\alias{length,DataControl-method}
 \alias{show,DataControl-method}
 
 \title{Class \code{"DataControl"}}

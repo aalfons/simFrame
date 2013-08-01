@@ -3,7 +3,6 @@
 \docType{class}
 \alias{BasicContControl-class}
 \alias{BasicContControl}
-\alias{contaminate,data.frame,BasicContControl-method}
 \alias{getDots,BasicContControl-method}
 \alias{getFun,BasicContControl-method}
 
