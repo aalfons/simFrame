@@ -23,7 +23,7 @@
 }
 \section{Details}{
   The summary statistics of the simulation results are computed using the 
-  \code{\link[utils]{aggregate}} method for the \code{data.frame} in slot 
+  \code{\link[stats]{aggregate}} method for the \code{data.frame} in slot 
   \code{values}.
 }
 \value{
