@@ -7,7 +7,7 @@ setMethod(
   "fortify", "SimResults", 
   function(model, data = NULL, cont = NULL, NARate = NULL, select = NULL, 
            method = c("box", "density", "line"), average = c("mean", "median"), 
-           level = NA, ...) {
+           se = FALSE, ...) {
     ## initializations
     # take the requested subset of the results
     model <- subset(model, data=data, cont=cont, NARate=NARate, select=select)
@@ -35,25 +35,37 @@ setMethod(
     ## extract simulation results
     if(method == "line") {
       average <- match.arg(average)
-      level <- rep(as.numeric(level), length.out=1)
-      if(is.na(level) || level < 0 || level > 1) level <- 0
-      alpha <- 1 - level
       if(average == "mean") {
-        fun <- function(x, probs) {
-          q <- quantile(x, probs=probs, na.rm=TRUE, names=FALSE)
-          names(q) <- c("Lower", "Upper")
-          c(Value=mean(x, na.rm=TRUE), q)
+        fun <- function(x) {
+          # remove missing or infinite values
+          x <- x[is.finite(x)]
+          # compute mean
+          xn <- mean(x)
+          # compute approximate confidence interval
+          q <- qnorm(0.975)
+          s <- sd(x)
+          n <- length(x)
+          ci <- xn + c(-q, q) * s/sqrt(n)
+          names(ci) <- c("Lower", "Upper")
+          # return values
+          c(Value=xn, ci)
         }
-        probs <- c(alpha/2, 1-alpha/2)
       } else {
-        fun <- function(x, probs) {
-          q <- quantile(x, probs=probs, na.rm=TRUE, names=FALSE)
-          names(q) <- c("Value", "Lower", "Upper")
-          q
+        fun <- function(x) {
+          # remove missing or infinite values
+          x <- x[is.finite(x)]
+          # compute median
+          med <- median(x)
+          # compute approximate confidence interval
+          iqr <- IQR(x)
+          n <- length(x)
+          ci <- med + c(-1.58, 1.58) * iqr/sqrt(n)
+          names(ci) <- c("Lower", "Upper")
+          # return values
+          c(Value=med, ci)
         }
-        probs <- c(0.5, alpha/2, 1-alpha/2)
       }
-      values <- aggregate(model, FUN=fun, probs=probs)
+      values <- aggregate(model, FUN=fun)
     } else values <- getValues(model)[, c(info, cn), drop=FALSE]
     ## extract additional information
     # number of observations and tuning parameters for data generation
@@ -162,14 +174,15 @@ setMethod(
       whichMax <- which.max(ninfo[xvars])
       xvar <- cond[whichMax]
       cond <- cond[-whichMax]
-      if(level == 0) {
-        attr(values, "mapping") <- aes_string(x=xvar, y="Value", color="Method")
-        attr(values, "geom") <- geom_line
-      } else {
+      if(isTRUE(se)) {
         attr(values, "mapping") <- aes_string(x=xvar, y="Value", ymin="Lower", 
                                               ymax="Upper", color="Method", 
                                               fill="Method")
-        attr(values, "geom") <- function(..., stat) geom_smooth(..., stat="identity")
+        attr(values, "geom") <- function(..., stat) geom_smooth(..., 
+                                                                stat="identity")
+      } else {
+        attr(values, "mapping") <- aes_string(x=xvar, y="Value", color="Method")
+        attr(values, "geom") <- geom_line
       }
     }
     # add facetting formula
