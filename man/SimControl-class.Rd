@@ -120,13 +120,13 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 data("eusilcP")  # load data
 
 ## control objects for sampling and contamination
-sc <- BasicSampleControl(size = 500, k = 50, seed = 12345)
+sc <- BasicSampleControl(size = 100, k = 50, seed = 12345)
 cc <- CARContControl(target = "eqIncome", epsilon = 0.02, 
     fun = function(x) x * 10)
 
 ## function for simulation runs
 sim <- function(x) {
-    c(mean = mean(x$eqIncome), trimmed = mean(x$eqIncome, 0.02))
+    c(mean = mean(x$eqIncome), trimmed = mean(x$eqIncome, 0.05))
 }
 
 ## combine these to "SimControl" object and run simulation
@@ -151,15 +151,15 @@ rgnorm <- function(n, means) {
 
 ## control objects for data generation and contamination
 means <- c(0, 0.25)
-dc <- DataControl(size = 500, distribution = rgnorm, 
+dc <- DataControl(size = 100, distribution = rgnorm, 
     dots = list(means = means))
 cc <- CCARContControl(target = "value", 
-    epsilon = 0.02, dots = list(mean = 15))
+    epsilon = 0.02, dots = list(mean = 10))
 
 ## function for simulation runs
 sim <- function(x) {
     c(mean = mean(x$value), 
-        trimmed = mean(x$value, trim = 0.02), 
+        trimmed = mean(x$value, trim = 0.05), 
         median = median(x$value))
 }
 

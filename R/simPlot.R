@@ -7,7 +7,7 @@ setMethod(
   "simPlot", "SimResults", 
   function(object, data = NULL, cont = NULL, NARate = NULL, select = NULL, 
            method = c("box", "density", "line"), average = c("mean", "median"), 
-           se = FALSE, ...) {
+           se = TRUE, ...) {
     if(missing(method)) {
       data <- fortify(object, data=data, cont=cont, NARate=NARate, 
                       select=select, average=average, se=se)
@@ -32,13 +32,13 @@ setMethod(
 
 
 setMethod(
-  "plot", signature(x = "SimResults", y = "missing"), 
-  function(x, y, ...) simPlot(x, ...))
+  "autoplot", "SimResults", 
+  function(object, ...) simPlot(object, ...))
 
 
 setMethod(
-  "autoplot", "SimResults", 
-  function(object, ...) simPlot(object, ...))
+  "plot", signature(x = "SimResults", y = "missing"), 
+  function(x, y, ...) simPlot(x, ...))
 
 
 ## internal functions

@@ -7,9 +7,10 @@ setMethod(
   "fortify", "SimResults", 
   function(model, data = NULL, cont = NULL, NARate = NULL, select = NULL, 
            method = c("box", "density", "line"), average = c("mean", "median"), 
-           se = FALSE, ...) {
+           se = TRUE, ...) {
     ## initializations
     # take the requested subset of the results
+    if(is(data, "function")) data <- NULL  # dirty hack (generic has no default)
     model <- subset(model, data=data, cont=cont, NARate=NARate, select=select)
     # extract variable names
     cn <- getColnames(model)

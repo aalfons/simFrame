@@ -170,8 +170,9 @@ setGeneric("autoplot")
 
 #' @import ggplot2
 #' @export
-setGeneric("fortify", 
-           function(model, data = NULL, ...) standardGeneric("fortify"))
+# setGeneric("fortify", 
+#            function(model, data = NULL, ...) standardGeneric("fortify"))
+setGeneric("fortify")
 
 #' @export
 setGeneric("getCall")
