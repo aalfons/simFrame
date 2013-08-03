@@ -5,7 +5,7 @@
 
 setMethod(
   "subset", "SimResults", 
-  function(x, data = NULL, cont = NULL, NARate = NULL, select = NULL, ...) {
+  function(x, data = NULL, cont = NULL, miss = NULL, select = NULL, ...) {
     # initializations
     values <- getValues(x)
     cn <- getColnames(x)
@@ -27,11 +27,11 @@ setMethod(
       tmp <- values$Cont %in% cont
       subset <- if(is.null(subset)) tmp else tmp & subset
     }
-    if(!is.null(NARate) && "NARate" %in% info) {
+    if(!is.null(miss) && "Miss" %in% info) {
       NAControl <- getControl(control, which="NA")
-      NARate <- convertNARate(getNARate(NAControl))[NARate]
-      ninfo["NARate"] <- length(NARate)
-      tmp <- values$NARate %in% NARate
+      miss <- seq_along(NAControl)[miss]
+      ninfo["Miss"] <- length(miss)
+      tmp <- values$Miss %in% miss
       subset <- if(is.null(subset)) tmp else tmp & subset
     }
     # take subset of the results

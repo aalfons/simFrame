@@ -12,8 +12,8 @@
   results, the default behavior can be overriden.
 }
 \usage{
-\S4method{fortify}{SimResults}(model, data = NULL, cont = NULL, 
-        NARate = NULL, select = NULL, 
+\S4method{fortify}{SimResults}(model, data, cont = NULL, 
+        miss = NULL, select = NULL, 
         method = c("box", "density", "line"), 
         average = c("mean", "median"), 
         se = TRUE, \dots)
@@ -28,8 +28,8 @@
   \item{cont}{an optional integer or logical index vector specifying the 
     contamination settings for which to convert simulation results.}
 
-  \item{NARate}{an optional integer or logical index vector specifying the 
-    missing value rates for which to convert simulation results.}
+  \item{miss}{an optional integer or logical index vector specifying the 
+    missing data settings for which to convert simulation results.}
 
   \item{select}{an optional integer, character or logical vector specifying the 
     columns to be converted.  It must specify a subset of the \code{colnames} 

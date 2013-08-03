@@ -2,6 +2,8 @@ Changes in simFrame version 0.6.0
 
     + Redesign of the package.
     
+    + Using package 'ggplot2' now for graphics instead of 'lattice'.
+    
     + Slight optimizations in C++ code to compute inclusion probabilities.
 
 

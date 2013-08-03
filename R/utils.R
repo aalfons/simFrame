@@ -163,7 +163,7 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   if(length(x) == 0) stop("error or empty result in every simulation run")
   # get additional information (at least one of 'nrep' or 'nsamp' is positive)
   ca <- call("expand.grid")  # initialize call
-  if(nNA > 0) ca$NARate <- convertNARate(getNARate(NAControl))
+  if(nNA > 0) ca$Miss <- seq_len(nNA)
   if(ncont > 0) ca$Cont <- seq_len(ncont)
   if(nsamp > 0) ca$Sample <- seq_len(nsamp)
   if(ndata > 0) ca$Data <- seq_len(ndata)
@@ -183,7 +183,7 @@ getSimResults <- function(x, dataControl = NULL, sampleControl = NULL,
   cn <- names(x)[-seq_len(ninfo)]
   rownames(x) <- NULL
   # number of levels in additional information
-  info <- c(Data=ndata, Cont=ncont, NARate=nNA) 
+  info <- c(Data=ndata, Cont=ncont, Miss=nNA) 
   if(length(design) > 0) {
     info <- c(info, sapply(x[, design, drop=FALSE], nlevels))
   }

@@ -12,7 +12,7 @@ A general framework for statistical simulation.
 \tabular{ll}{
 Package: \tab simFrame\cr
 Version: \tab 0.6.0\cr
-Date: \tab 2013-07-13\cr
+Date: \tab 2013-08-03\cr
 Depends: \tab R (>= 2.14.0), Rcpp (>= 0.8.6), parallel, ggplot2 (>= 0.9.3)\cr
 Imports: \tab methods, stats4\cr
 Suggests: \tab laeken, mvtnorm, robCompositions, sampling\cr

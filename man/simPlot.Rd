@@ -16,7 +16,7 @@
 }
 \usage{
 \S4method{simPlot}{SimResults}(object, data = NULL, cont = NULL, 
-        NARate = NULL, select = NULL, 
+        miss = NULL, select = NULL, 
         method = c("box", "density", "line"), 
         average = c("mean", "median"), 
         se = TRUE, \dots)
@@ -42,8 +42,8 @@
   \item{cont}{an optional integer or logical index vector specifying the 
     contamination settings for which to plot simulation results.}
 
-  \item{NARate}{an optional integer or logical index vector specifying the 
-    missing value rates for which to plot simulation results.}
+  \item{miss}{an optional integer or logical index vector specifying the 
+    missing data settings for which to plot simulation results.}
 
   \item{select}{an optional integer, character or logical vector specifying the 
     columns to be plotted.  It must specify a subset of the \code{colnames} 

@@ -5,13 +5,14 @@
 
 setMethod(
   "fortify", "SimResults", 
-  function(model, data = NULL, cont = NULL, NARate = NULL, select = NULL, 
+  function(model, data, cont = NULL, miss = NULL, select = NULL, 
            method = c("box", "density", "line"), average = c("mean", "median"), 
            se = TRUE, ...) {
-    ## initializations
+    ## initializations (generic function has no default for 'data')
+    if(missing(data)) data <- NULL
     # take the requested subset of the results
-    if(is(data, "function")) data <- NULL  # dirty hack (generic has no default)
-    model <- subset(model, data=data, cont=cont, NARate=NARate, select=select)
+    nfull <- getInfo(model)
+    model <- subset(model, data=data, cont=cont, miss=miss, select=select)
     # extract variable names
     cn <- getColnames(model)
     ninfo <- getInfo(model)
@@ -78,13 +79,18 @@ setMethod(
         indices <- getIndices(dataControl)
         size <- size[indices[, 1]]
         tuning <- convertTuning(getTuning(dataControl))[indices[, 2]]
-      } else tuning <- NULL
+      } else {
+        if(length(size) != nfull["Data"]) remove <- 0
+        tuning <- NULL
+      }
+    }
+    if(remove > 0) {
       data <- values[, remove]
       if(length(tuning) == 0) {
         # no tuning parameters, replace data column with number of 
         # observations
-        names(values)[remove] <- "Size"
         values[, remove] <- size[data]
+        names(values)[remove] <- "Size"
         names(ninfo)[remove] <- "Size"
         info[remove] <- "Size"
       } else {
@@ -128,14 +134,19 @@ setMethod(
           values <- do.call(rbind, valueList)
         }
         epsilon <- epsilon[indices[, 1]]
-      } else tuning <- data.frame()
+      } else {
+        if(length(epsilon) != nfull["Cont"]) remove <- 0
+        tuning <- data.frame()
+      }
+    }
+    if(remove > 0) {
       # replace contamination column
       cont <- values[, remove]
       if(nrow(tuning) == 0) {
         # no tuning parameters, replace contamination column with 
         # contamination level
-        names(values)[remove] <- "Epsilon"
         values[, remove] <- epsilon[cont]
+        names(values)[remove] <- "Epsilon"
         names(ninfo)[remove] <- "Epsilon"
         info[remove] <- "Epsilon"
       } else {
@@ -153,6 +164,25 @@ setMethod(
                    ninfo[-remove])
         info <- c(info[before], "Epsilon", "ContTuning", info[-remove])
       }
+    }
+    # missing data settings
+    remove <- match("Miss", info, nomatch=0)
+    if(remove > 0) {
+      NAControl <- getControl(control, which="NA")
+      NARate <- getNARate(NAControl)
+      dNA <- dim(NARate)
+      if(dNA[1] != nfull["Miss"]) remove <- 0
+    }
+    if(remove > 0) {
+      # replace missing data column
+      if(dNA[2] == 1) {
+        miss <- values[, remove]
+        values[, remove] <- as.numeric(NARate)[miss]
+      }
+      # replace name for missing data
+      names(values)[remove] <- "NARate"
+      names(ninfo)[remove] <- "NARate"
+      info[remove] <- "NARate"
     }
     ## reshape simulation results
     values <- lapply(cn, function(j, info) {

@@ -5,16 +5,15 @@
 
 setMethod(
   "simPlot", "SimResults", 
-  function(object, data = NULL, cont = NULL, NARate = NULL, select = NULL, 
+  function(object, data = NULL, cont = NULL, miss = NULL, select = NULL, 
            method = c("box", "density", "line"), average = c("mean", "median"), 
            se = TRUE, ...) {
     if(missing(method)) {
-      data <- fortify(object, data=data, cont=cont, NARate=NARate, 
-                      select=select, average=average, se=se)
+      data <- fortify(object, data=data, cont=cont, miss=miss, select=select, 
+                      average=average, se=se)
     } else {
-      data <- fortify(object, data=data, cont=cont, NARate=NARate, 
-                      select=select, method=method, average=average, 
-                      se=se)
+      data <- fortify(object, data=data, cont=cont, miss=miss, select=select, 
+                      method=method, average=average, se=se)
     }
     simPlot(data, ...)
   })

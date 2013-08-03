@@ -8,7 +8,7 @@
   Extract subsets of simulation results.
 }
 \usage{
-\S4method{subset}{SimResults}(x, data = NULL, cont = NULL, NARate = NULL, 
+\S4method{subset}{SimResults}(x, data = NULL, cont = NULL, miss = NULL, 
        select = NULL, \dots)
 }
 \arguments{
@@ -21,8 +21,8 @@
   \item{cont}{an optional integer or logical index vector specifying the 
     contamination settings for which to keep the simulation results.}
 
-  \item{NARate}{an optional integer or logical index vector specifying the 
-    missing value rates for which to keep the simulation results.}
+  \item{miss}{an optional integer or logical index vector specifying the 
+    missing data settings for which to keep the simulation results.}
 
   \item{select}{an optional integer, character or logical vector specifying the 
     columns to be extracted.  It must specify a subset of the \code{colnames} 
