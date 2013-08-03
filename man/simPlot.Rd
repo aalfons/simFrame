@@ -30,8 +30,8 @@
 }
 \arguments{
   \item{object, x}{the simulation results to be plotted, i.e., an object of 
-    class \code{"SimResults"}.  For \code{simPlot}, this may also be a 
-    \code{data.frame} constructed from such an object via 
+    class \code{"\linkS4class{SimResults}"}.  For \code{simPlot}, this may also 
+    be a data frame constructed from such an object via 
     \code{\link[simFrame:fortify-methods]{fortify}}.}
   
   \item{y}{not used.}
@@ -47,7 +47,7 @@
 
   \item{select}{an optional integer, character or logical vector specifying the 
     columns to be plotted.  It must specify a subset of the \code{colnames} 
-    slot of \code{x}, which is the default.}
+    slot of the simulation results, which is the default.}
 
   \item{method}{a character string specifying which plot to produce.  Possible 
     values are \code{"box"} for a box plot, \code{"density"} for a density plot 
@@ -73,7 +73,7 @@
   \item{\dots}{additional arguments to be passed down, eventually to the 
     function drawing the visual representation (see 
     \code{\link[ggplot2]{geom_boxplot}}, \code{\link[ggplot2]{geom_density}}, 
-    \code{\link[ggplot2]{geom_smooth}} or \code{\link[ggplot2]{geom_line}}.}
+    \code{\link[ggplot2]{geom_smooth}} or \code{\link[ggplot2]{geom_line}}).}
 }
 \value{
   An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
@@ -82,7 +82,7 @@
   \describe{
   \item{\code{signature(object = "SimResults")}}{plot simulation results.}
   \item{\code{signature(object = "data.frame")}}{plot simulation 
-    results that have been converted to a \code{data.frame} via 
+    results that have been converted to a data frame via 
     \code{\link[simFrame:fortify-methods]{fortify}}.}
   }
 }
@@ -116,9 +116,9 @@ data("eusilcP")  # load data
 
 ## control objects for sampling and contamination
 sc <- SampleControl(size = 100, k = 50, seed = 12345)
-cc <- CARContControl(target = "eqIncome", 
+cc <- ContControl(target = "eqIncome", 
     epsilon = seq(0, 0.05, by = 0.01), 
-    fun = function(x) x * 10)
+    fun = function(x) x * 10, type = "CAR")
 
 ## function for simulation runs
 sim <- function(x) {
@@ -148,11 +148,11 @@ rgnorm <- function(n, means) {
 
 ## control objects for data generation and contamination
 means <- c(0, 0.25)
-dc <- DataControl(size = 100, distribution = rgnorm, 
+dc <- DataControl(size = 100, fun = rgnorm, 
     dots = list(means = means))
-cc <- CCARContControl(target = "value", 
+cc <- ContControl(target = "value", 
     epsilon = seq(0, 0.05, by = 0.01), 
-    dots = list(mean = 10))
+    dots = list(mean = 10), type = "CCAR")
 
 ## function for simulation runs
 sim <- function(x) {

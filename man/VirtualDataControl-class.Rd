@@ -33,11 +33,11 @@ Class \code{"\linkS4class{OptDataControl}"}, directly.
       returns the object itself.}
     \item{\code{length}}{\code{signature(x = "VirtualDataControl")}: get the 
       number of data sizes to be used.}
-    \item{runSimulation}{\code{signature(x = "VirtualDataControl", 
-      setup = "missing", nrep = "numeric", control = "SimControl")}: run a 
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
+      setup = "ANY", nrep = "ANY", control = "SimControl")}: run a 
       simulation experiment.}
-    \item{runSimulation}{\code{signature(x = "VirtualDataControl", 
-      setup = "VirtualSampleControl", nrep = "numeric", 
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
+      setup = "VirtualSampleControl", nrep = "ANY", 
       control = "SimControl")}: run a simulation experiment.}
     \item{show}{\code{signature(object = "VirtualDataControl")}: print the 
       object on the \R console.}

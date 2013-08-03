@@ -16,29 +16,29 @@ Objects can be created by calls of the form \code{SimControl(\dots)}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{contControl}:}{Object of class \code{"OptContControl"}; a 
-      control object for contamination, or \code{NULL}.}
-    \item{\code{NAControl}:}{Object of class \code{"OptNAControl"}; a control 
-      object for inserting missing values, or \code{NULL}.}
-    \item{\code{design}:}{Object of class \code{"character"} specifying 
-      variables (columns) to be used for splitting the data into domains.  The 
-      simulations, including contamination and the insertion of missing values, 
-      are then performed on every domain.}
-    \item{\code{fun}:}{Object of class \code{"function"} to be applied in each 
-      simulation run.}
-    \item{\code{dots}:}{Object of class \code{"list"} containing additional 
-      arguments to be passed to \code{fun}.}
-    \item{\code{seed}:}{Object of class \code{"numeric"} to be used as initial 
-      seed of the random number generator.  If not supplied explicitly, the 
-      seed will be based on the date and time of construction.}
+    \item{\code{contControl}:}{A control object for contamination (inheriting 
+      from class \code{"\linkS4class{VirtualContControl}"}), or \code{NULL}.}
+    \item{\code{NAControl}:}{A control object for inserting missing values 
+      (inheriting from class \code{"\linkS4class{VirtualNAControl}"}), or 
+      \code{NULL}.}
+    \item{\code{design}:}{An optional character vector specifying variables 
+      (columns) to be used for splitting the data into domains.  The 
+      simulations, including contamination and the insertion of missing 
+      values, are then performed on every domain.}
+    \item{\code{fun}:}{A function to be applied in each simulation run.}
+    \item{\code{dots}:}{A list containing additional arguments to be passed to 
+      \code{fun}.}
+    \item{\code{seed}:}{An integer to be used as initial seed of the random 
+      number generator.  If not supplied explicitly, the seed will be based on 
+      the date and time of construction.}
   }
 }
 \section{Details}{
   There are some requirements for \code{fun}.  Most importantly, it must return 
-  a numeric vector.  A \code{data.frame} is passed to \code{fun} in every 
-  simulation run.  The corresponding argument must be called \code{x}.  If 
-  comparisons with the original data need to be made, e.g., for evaluating the 
-  quality of imputation methods, the function should have an argument called 
+  a numeric vector.  A data frame is passed to \code{fun} in every simulation 
+  run.  The corresponding argument must be called \code{x}.  If comparisons 
+  with the original data need to be made, e.g., for evaluating the quality of 
+  imputation methods, the function should have an argument called 
   \code{orig}.  If different domains are used in the simulation, the indices of 
   the current domain can be passed to the function via an argument called 
   \code{domain}.
@@ -48,8 +48,8 @@ Objects can be created by calls of the form \code{SimControl(\dots)}.
 }
 \section{Accessor methods}{
   \describe{
-    \item{getControl}{\code{signature(x = "SimControl")}: get the control 
-      object for contamination or inserting missing values.}
+    \item{\code{getControl}}{\code{signature(x = "SimControl")}: get the 
+      control object for contamination or inserting missing values.}
     \item{\code{getDesign}}{\code{signature(x = "SimControl")}: get slot 
       \code{design}.}
     \item{\code{getFun}}{\code{signature(x = "SimControl")}: get slot 
@@ -63,23 +63,20 @@ Objects can be created by calls of the form \code{SimControl(\dots)}.
   \describe{
     \item{\code{head}}{\code{signature(x = "SimControl")}: currently returns 
       the object itself.}
-    \item{runSimulation}{\code{signature(x = "data.frame", 
-      setup = "missing", nrep = "missing", control = "SimControl")}: run a 
+    \item{\code{runSimulation}}{\code{signature(x = "data.frame", 
+      setup = "ANY", nrep = "ANY", control = "SimControl")}: run a 
       simulation experiment.}
-    \item{runSimulation}{\code{signature(x = "data.frame", 
-      setup = "missing", nrep = "numeric", control = "SimControl")}: run a 
+    \item{\code{runSimulation}}{\code{signature(x = "data.frame", 
+      setup = "SampleSetup", nrep = "ANY", control = "SimControl")}: run a 
       simulation experiment.}
-    \item{runSimulation}{\code{signature(x = "data.frame", 
-      setup = "SampleSetup", nrep = "missing", control = "SimControl")}: run a 
-      simulation experiment.}
-    \item{runSimulation}{\code{signature(x = "data.frame", 
-      setup = "VirtualSampleControl", nrep = "missing", 
+    \item{\code{runSimulation}}{\code{signature(x = "data.frame", 
+      setup = "VirtualSampleControl", nrep = "ANY", 
       control = "SimControl")}: run a simulation experiment.}
-    \item{runSimulation}{\code{signature(x = "VirtualDataControl", 
-      setup = "missing", nrep = "numeric", control = "SimControl")}: run a 
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
+      setup = "ANY", nrep = "ANY", control = "SimControl")}: run a 
       simulation experiment.}
-    \item{runSimulation}{\code{signature(x = "VirtualDataControl", 
-      setup = "VirtualSampleControl", nrep = "numeric", 
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
+      setup = "VirtualSampleControl", nrep = "ANY", 
       control = "SimControl")}: run a simulation experiment.}
     \item{\code{show}}{\code{signature(object = "SimControl")}: print the 
       object on the \R console.}
@@ -110,9 +107,9 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 data("eusilcP")  # load data
 
 ## control objects for sampling and contamination
-sc <- BasicSampleControl(size = 100, k = 50, seed = 12345)
-cc <- CARContControl(target = "eqIncome", epsilon = 0.02, 
-    fun = function(x) x * 10)
+sc <- SampleControl(size = 100, k = 50, seed = 12345)
+cc <- ContControl(target = "eqIncome", epsilon = 0.02, 
+    fun = function(x) x * 10, type = "CAR")
 
 ## function for simulation runs
 sim <- function(x) {
@@ -141,10 +138,10 @@ rgnorm <- function(n, means) {
 
 ## control objects for data generation and contamination
 means <- c(0, 0.25)
-dc <- DataControl(size = 100, distribution = rgnorm, 
+dc <- DataControl(size = 100, fun = rgnorm, 
     dots = list(means = means))
-cc <- CCARContControl(target = "value", 
-    epsilon = 0.02, dots = list(mean = 10))
+cc <- ContControl(target = "value", epsilon = 0.02, 
+    dots = list(mean = 10), type = "CCAR")
 
 ## function for simulation runs
 sim <- function(x) {

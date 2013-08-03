@@ -14,8 +14,6 @@
 \alias{getControl,SimResults-method}
 \alias{getDesign}
 \alias{getDesign-methods}
-\alias{getDistribution}
-\alias{getDistribution-methods}
 \alias{getDots}
 \alias{getDots-methods}
 \alias{getDots,TwoStageSampleControl-method}
@@ -50,6 +48,8 @@
 \alias{getTarget-methods}
 \alias{getTuning}
 \alias{getTuning-methods}
+\alias{getType}
+\alias{getType-methods}
 \alias{getValues}
 \alias{getValues-methods}
 
@@ -73,8 +73,6 @@ getControl(x, \dots)
 \S4method{getControl}{SimResults}(x, which = c("sim", "data", "sample"))
 
 getDesign(x)
-
-getDistribution(x)
 
 getDots(x, \dots)
 \S4method{getDots}{TwoStageSampleControl}(x, stage = NULL)
@@ -109,6 +107,8 @@ getSize(x, \dots)
 getTarget(x)
 
 getTuning(x)
+
+getType(x)
 
 getValues(x)
 }
@@ -163,15 +163,8 @@ getValues(x)
 }
 \section{Methods for function \code{getDesign}}{
   \describe{
-  \item{\code{signature(x = "BasicSampleControl")}}{}
-  \item{\code{signature(x = "TwoStageSampleControl")}}{}
+  \item{\code{signature(x = "SampleControl")}}{}
   \item{\code{signature(x = "SimControl")}}{}
-  }
-}
-\section{Methods for function \code{getDistribution}}{
-  \describe{
-  \item{\code{signature(x = "DataControl")}}{}
-  \item{\code{signature(x = "CCARContControl")}}{}
   }
 }
 \section{Methods for function \code{getDots}}{
@@ -179,9 +172,7 @@ getValues(x)
   \item{\code{signature(x = "DataControl")}}{}
   \item{\code{signature(x = "BasicSampleControl")}}{}
   \item{\code{signature(x = "TwoStageSampleControl")}}{}
-  \item{\code{signature(x = "BasicContControl")}}{}
-  \item{\code{signature(x = "CCARContControl")}}{}
-  \item{\code{signature(x = "CARContControl")}}{}
+  \item{\code{signature(x = "ContControl")}}{}
   \item{\code{signature(x = "SimControl")}}{}
   }
 }
@@ -192,17 +183,17 @@ getValues(x)
 }
 \section{Methods for function \code{getFun}}{
   \describe{
+  \item{\code{signature(x = "DataControl")}}{}
   \item{\code{signature(x = "BasicSampleControl")}}{}
   \item{\code{signature(x = "TwoStageSampleControl")}}{}
   \item{\code{signature(x = "BasicContControl")}}{}
-  \item{\code{signature(x = "CARContControl")}}{}
+  \item{\code{signature(x = "ContControl")}}{}
   \item{\code{signature(x = "SimControl")}}{}
   }
 }
 \section{Methods for function \code{getGrouping}}{
   \describe{
-  \item{\code{signature(x = "BasicSampleControl")}}{}
-  \item{\code{signature(x = "TwoStageSampleControl")}}{}
+  \item{\code{signature(x = "SampleControl")}}{}
   \item{\code{signature(x = "RandomContControl")}}{}
   \item{\code{signature(x = "NAControl")}}{}
   }
@@ -269,6 +260,11 @@ getValues(x)
 \section{Methods for function \code{getTuning}}{
   \describe{
   \item{\code{signature(x = "DataControl")}}{}
+  \item{\code{signature(x = "ContControl")}}{}
+  }
+}
+\section{Methods for function \code{getType}}{
+  \describe{
   \item{\code{signature(x = "ContControl")}}{}
   }
 }

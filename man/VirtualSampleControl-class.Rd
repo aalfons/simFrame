@@ -42,11 +42,11 @@ Class \code{"\linkS4class{OptSampleControl}"}, directly.
     \item{\code{length}}{\code{signature(x = "VirtualSampleControl")}: get the 
       number of samples to be set up.}
     \item{\code{runSimulation}}{\code{signature(x = "data.frame", 
-      setup = "VirtualSampleControl", nrep = "missing", 
-      control = "SimControl")}: run a simulation experiment.}
+      setup = "VirtualSampleControl", nrep = "ANY", control = "SimControl")}: 
+      run a simulation experiment.}
     \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
-      setup = "VirtualSampleControl", nrep = "numeric", 
-      control = "SimControl")}: run a simulation experiment.}
+      setup = "VirtualSampleControl", nrep = "ANY", control = "SimControl")}: 
+      run a simulation experiment.}
     \item{\code{show}}{\code{signature(object = "VirtualSampleControl")}: print 
       the object on the \R console.}
     \item{\code{summary}}{\code{signature(object = "VirtualSampleControl")}: 

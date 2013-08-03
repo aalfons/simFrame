@@ -21,26 +21,23 @@ Instead, objects are expected to be created by the function
 }
 \section{Slots}{
   \describe{
-    \item{\code{values}:}{Object of class \code{"data.frame"} containing the 
-      simulation results.}
-    \item{\code{colnames}:}{Object of class \code{"character"} giving the names 
-      of the columns of \code{values} that contain the actual simulation 
-      results.}
-    \item{\code{info}:}{Object of class \code{"numeric"} giving the number of 
-      configurations for different controls of the simulation experiment.}
-    \item{\code{dataControl}:}{Object of class \code{"OptDataControl"}; the 
-      control object used for data generation in model-based simulation, or 
+    \item{\code{values}:}{A data frame containing the simulation results.}
+    \item{\code{colnames}:}{A character vector giving the names of the columns 
+      of \code{values} that contain the actual simulation results.}
+    \item{\code{info}:}{A numeric vector giving the number of configurations 
+      for different controls of the simulation experiment.}
+    \item{\code{dataControl}:}{The control object used for data generation 
+      (inheriting from class \code{"\linkS4class{VirtualDataControl}"}), or 
       \code{NULL}.}
-    \item{\code{sampleControl}:}{Object of class \code{"OptSampleControl"}; the 
-      control object used for sampling in design-based simulation, or 
+    \item{\code{sampleControl}:}{The control object used for sampling 
+      (inheriting from class \code{"\linkS4class{VirtualSampleControl}"}), or 
       \code{NULL}.}
-    \item{\code{nrep}:}{Object of class \code{"numeric"} giving the number of 
-      repetitions of the simulation experiment (for model-based simulation or 
-      simulation based on real data).}
-    \item{\code{control}:}{Object of class \code{"SimControl"}; the control 
-      object used for running the simulations.}
-    \item{\code{call}:}{Object of class \code{"OptCall"}; the function call 
-       used to run the simulation experiment, or \code{NULL}.}
+    \item{\code{nrep}:}{An integer giving the number of repetitions of the 
+      simulation experiment (if applicable).}
+    \item{\code{control}:}{The control object of class 
+      \code{"\linkS4class{SimControl}"} used for running the simulations.}
+    \item{\code{call}:}{The function call used to run the simulation 
+      experiment, or \code{NULL}.}
   }
 }
 \section{Accessor methods}{
@@ -63,10 +60,11 @@ Instead, objects are expected to be created by the function
   \describe{
     \item{\code{aggregate}}{\code{signature(x = "SimResults")}: aggregate 
       simulation results.}
-    \item{autoplot}{\code{signature(object = "SimResults")}: selects a suitable 
-      graphical representation of the simulation results automatically.}
-    \item{fortify}{\code{signature(model = "SimResults")}: convert simulation 
-      results to a \code{data.frame} for plotting.}
+    \item{\code{autoplot}}{\code{signature(object = "SimResults")}: selects a 
+      suitable graphical representation of the simulation results 
+      automatically.}
+    \item{\code{fortify}}{\code{signature(model = "SimResults")}: convert 
+      simulation results to a data frame for plotting.}
     \item{\code{head}}{\code{signature(x = "SimResults")}: returns the first 
       parts of simulation results.}
     \item{\code{plot}}{\code{signature(x = "SimResults", y = "missing")}: 
@@ -74,9 +72,10 @@ Instead, objects are expected to be created by the function
       automatically.}
     \item{\code{show}}{\code{signature(object = "SimResults")}: print 
       simulation results on the \R console.}
-    \item{simPlot}{\code{signature(object = "SimResults")}: selects a suitable 
-      graphical representation of the simulation results automatically.}
-    \item{subset}{\code{signature(x = "SimResults")}: take a subset of 
+    \item{\code{simPlot}}{\code{signature(object = "SimResults")}: selects a 
+      suitable graphical representation of the simulation results 
+      automatically.}
+    \item{\code{subset}}{\code{signature(x = "SimResults")}: take a subset of 
       simulation results.}
     \item{\code{summary}}{\code{signature(x = "SimResults")}: produce a summary 
       of simulation results.}

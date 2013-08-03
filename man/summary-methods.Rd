@@ -39,8 +39,8 @@
 \section{Methods}{
   \describe{
   \item{\code{signature(x = "SampleSetup")}}{returns an object of class 
-    \code{SummarySampleSetup}, which contains information on the size of each 
-    of the set up samples.}
+    \code{"\linkS4class{SummarySampleSetup}"}", which contains information on 
+    the size of each of the set up samples.}
   \item{\code{signature(x = "SimControl")}}{currently returns the 
     object itself.}
   \item{\code{signature(x = "SimResults")}}{produces a summary of the 

@@ -13,7 +13,7 @@
 }
 \arguments{
   \item{x}{the simulation results from which to extract subsets, i.e., an 
-    object of class \code{"SimResults"}.}
+    object of class \code{"\linkS4class{SimResults}"}.}
 
   \item{data}{an optional integer or logical index vector specifying the data 
     configurations for which to keep the simulation results.}
@@ -26,13 +26,12 @@
 
   \item{select}{an optional integer, character or logical vector specifying the 
     columns to be extracted.  It must specify a subset of the \code{colnames} 
-    slot of \code{x}, which is the default.}
+    slot of the simulation results, which is the default.}
 
   \item{\dots}{additional arguments are currently ignored.}
 }
 \value{
-  An object similar to \code{x} containing just the
-  selected results.
+  An object similar to \code{x} containing just the selected results.
 }
 \section{Methods}{
   \describe{
@@ -57,9 +56,9 @@ data("eusilcP")  # load data
 
 ## control objects for sampling and contamination
 sc <- SampleControl(size = 100, k = 50, seed = 12345)
-cc <- CARContControl(target = "eqIncome", 
+cc <- ContControl(target = "eqIncome", 
     epsilon = seq(0, 0.05, by = 0.01), 
-    fun = function(x) x * 10)
+    fun = function(x) x * 10, type = "CAR")
 
 ## function for simulation runs
 sim <- function(x) {
@@ -90,11 +89,11 @@ rgnorm <- function(n, means) {
 
 ## control objects for data generation and contamination
 means <- c(0, 0.25)
-dc <- DataControl(size = 100, distribution = rgnorm, 
+dc <- DataControl(size = 100, fun = rgnorm, 
     dots = list(means = means))
-cc <- CCARContControl(target = "value", 
+cc <- ContControl(target = "value", 
     epsilon = seq(0, 0.05, by = 0.01), 
-    dots = list(mean = 10))
+    dots = list(mean = 10), type = "CCAR")
 
 ## function for simulation runs
 sim <- function(x) {

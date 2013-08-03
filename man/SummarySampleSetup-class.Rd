@@ -20,8 +20,8 @@ class \code{"\linkS4class{SampleSetup}"}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{size}:}{Object of class \code{"numeric"} giving the size of 
-      each of the set up samples.}
+    \item{\code{size}:}{A numeric vector giving the size of each of the set up 
+      samples.}
   }
 }
 \section{Accessor methods}{

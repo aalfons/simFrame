@@ -3,42 +3,44 @@
 \alias{runSimulation}
 \alias{runSimulation-methods}
 \alias{runSimulation,ANY,ANY,ANY,missing-method}
-\alias{runSimulation,data.frame,missing,missing,SimControl-method}
-\alias{runSimulation,data.frame,missing,numeric,SimControl-method}
-\alias{runSimulation,data.frame,SampleSetup,missing,SimControl-method}
-\alias{runSimulation,data.frame,VirtualSampleControl,missing,SimControl-method}
-\alias{runSimulation,VirtualDataControl,missing,numeric,SimControl-method}
-\alias{runSimulation,VirtualDataControl,VirtualSampleControl,numeric,SimControl-method}
+\alias{runSimulation,data.frame,ANY,ANY,SimControl-method}
+\alias{runSimulation,data.frame,SampleSetup,ANY,SimControl-method}
+\alias{runSimulation,data.frame,VirtualSampleControl,ANY,SimControl-method}
+\alias{runSimulation,VirtualDataControl,ANY,ANY,SimControl-method}
+\alias{runSimulation,VirtualDataControl,VirtualSampleControl,ANY,SimControl-method}
 
 \title{Run a simulation experiment}
 \description{
 Generic function for running a simulation experiment.
 }
 \usage{
-runSimulation(x, setup, nrep, control, contControl = NULL, 
-              NAControl = NULL, design = character(), fun, 
-              ..., seed, ncores = 1, cl = NULL)
+runSimulation(x, setup = NULL, nrep = 1, control, 
+              contControl = NULL, NAControl = NULL, 
+              design = character(), fun, ..., seed, 
+              ncores = 1, cl = NULL)
 }
 \arguments{
-  \item{x}{a \code{data.frame} (for design-based simulation or simulation based 
-    on real data) or a control object for data generation inheriting from 
-    \code{"VirtualDataControl"} (for model-based simulation or mixed simulation 
-    designs).}
-  \item{setup}{an object of class \code{"SampleSetup"}, containing previously 
-    set up samples, or a control class for setting up samples inheriting 
-    from \code{"VirtualSampleControl"}.}
+  \item{x}{a data frame (for design-based simulation or simulation based on 
+    real data) or a control object for data generation inheriting from 
+    \code{"\linkS4class{VirtualDataControl}"} (for model-based simulation or 
+    mixed simulation designs).}
+  \item{setup}{an object of class \code{"\linkS4class{SampleSetup}"} containing 
+    previously set up samples (for design-based simulation), or a control class 
+    for setting up samples inheriting from 
+    \code{"\linkS4class{VirtualSampleControl}"} (for design-based simulation or 
+    mixed simulation designs).}
   \item{nrep}{a non-negative integer giving the number of repetitions of the 
     simulation experiment (for model-based simulation, mixed simulation designs 
     or simulation based on real data).}
-  \item{control}{a control object of class \code{"SimControl"}}    
+  \item{control}{a control object of class \code{"\linkS4class{SimControl}"}.}    
   \item{contControl}{an optional object of a class inheriting from 
-    \code{"VirtualContControl"}, controlling contamination in the simulation 
-    experiment.}
+    \code{"\linkS4class{VirtualContControl}"}, controlling contamination in the 
+    simulation experiment.}
   \item{NAControl}{an optional object of a class inheriting from 
-    \code{"VirtualNAControl"}, controlling the insertion of missing values in 
-    the simulation experiment.}
-  \item{design}{a character vector specifying variables (columns) to be used 
-    for splitting the data into domains.  The simulations, including 
+    \code{"\linkS4class{VirtualNAControl}"}, controlling the insertion of 
+    missing values in the simulation experiment.}
+  \item{design}{an optional character vector specifying variables (columns) to 
+    be used for splitting the data into domains.  The simulations, including 
     contamination and the insertion of missing values, are then performed on 
     every domain.}
   \item{fun}{a function to be applied in each simulation run.}
@@ -60,40 +62,35 @@ runSimulation(x, setup, nrep, control, contControl = NULL,
   
   There are some requirements for slot \code{fun} of the control object 
   \code{control}.  Most importantly, the function must return a numeric 
-  vector.  A \code{data.frame} is passed to \code{fun} in every simulation 
-  run.  The corresponding argument must be called \code{x}.  If comparisons 
-  with the original data need to be made, e.g., for evaluating the quality of 
-  imputation methods, the function should have an argument called \code{orig}.  
-  If different domains are used in the simulation, the indices of the current 
+  vector.  A data frame is passed to \code{fun} in every simulation run.  The 
+  corresponding argument must be called \code{x}.  If comparisons with the 
+  original data need to be made, e.g., for evaluating the quality of imputation 
+  methods, the function should have an argument called \code{orig}.  If 
+  different domains are used in the simulation, the indices of the current 
   domain can be passed to the function via an argument called \code{domain}.
 
   In every simulation run, \code{fun} is evaluated using \code{try}.  Hence 
   no results are lost if computations fail in any of the simulation runs.
 }
 \value{
-  An object of class \code{"SimResults"}.
+  An object of class \code{"\linkS4class{SimResults}"}.
 }
 \section{Methods}{
   \describe{
   \item{\code{x = "ANY", setup = "ANY", nrep = "ANY", control = "missing"}}{
     convenience wrapper that allows the slots of \code{control} to be supplied 
     as arguments}
-  \item{\code{x = "data.frame", setup = "missing", nrep = "missing", 
-    control = "SimControl"}}{run a simulation experiment based on real data 
-    without repetitions (e.g., for sensitiviy analysis).}
-  \item{\code{x = "data.frame", setup = "missing", nrep = "numeric", 
-    control = "SimControl"}}{run a simulation experiment based on real data 
-    with repetitions.}
-  \item{\code{x = "data.frame", setup = "SampleSetup", nrep = "missing", 
+  \item{\code{x = "data.frame", setup = "ANY", nrep = "ANY", 
+    control = "SimControl"}}{run a simulation experiment based on real data.}
+  \item{\code{x = "data.frame", setup = "SampleSetup", nrep = "ANY", 
     control = "SimControl"}}{run a design-based simulation experiment with 
     previously set up samples.}
-  \item{\code{x = "data.frame", setup = "VirtualSampleControl", 
-    nrep = "missing", control = "SimControl"}}{run a design-based simulation 
-    experiment.}
-  \item{\code{x = "VirtualDataControl", setup = "missing", nrep = "numeric", 
+  \item{\code{x = "data.frame", setup = "VirtualSampleControl", nrep = "ANY", 
+    control = "SimControl"}}{run a design-based simulation experiment.}
+  \item{\code{x = "VirtualDataControl", setup = "ANY", nrep = "ANY", 
     control = "SimControl"}}{run a model-based simulation experiment.}
   \item{\code{x = "VirtualDataControl", setup = "VirtualSampleControl", 
-    nrep = "numeric", control = "SimControl"}}{run a simulation experiment 
+    nrep = "ANY", control = "SimControl"}}{run a simulation experiment 
     using a mixed simulation design.}
   }
 }
@@ -114,8 +111,8 @@ data("eusilcP")  # load data
 
 ## control objects for sampling and contamination
 sc <- SampleControl(size = 100, k = 50, seed = 12345)
-cc <- CARContControl(target = "eqIncome", epsilon = 0.02, 
-    fun = function(x) x * 10)
+cc <- ContControl(target = "eqIncome", epsilon = 0.02, 
+    fun = function(x) x * 10, type = "CAR")
 
 ## function for simulation runs
 sim <- function(x) {
@@ -142,10 +139,10 @@ rgnorm <- function(n, means) {
 
 ## control objects for data generation and contamination
 means <- c(0, 0.25)
-dc <- DataControl(size = 100, distribution = rgnorm, 
+dc <- DataControl(size = 100, fun = rgnorm, 
     dots = list(means = means))
-cc <- CCARContControl(target = "value", 
-    epsilon = 0.02, dots = list(mean = 10))
+cc <- ContControl(target = "value", epsilon = 0.02, 
+    dots = list(mean = 10), type = "CCAR")
 
 ## function for simulation runs
 sim <- function(x) {

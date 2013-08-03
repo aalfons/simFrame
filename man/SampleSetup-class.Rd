@@ -50,7 +50,7 @@ Instead, objects are expected to be created by the function \code{\link{setup}}.
     \item{\code{length}}{\code{signature(x = "SampleSetup")}: get the number of 
       set up samples.}
     \item{\code{runSimulation}}{\code{signature(x = "data.frame", 
-      setup = "SampleSetup", nrep = "missing", control = "SimControl")}: run a 
+      setup = "SampleSetup", nrep = "ANY", control = "SimControl")}: run a 
       simulation experiment.}
     \item{\code{show}}{\code{signature(object = "SampleSetup")}: print set up 
       samples on the \R console.}

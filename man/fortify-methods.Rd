@@ -3,13 +3,13 @@
 \alias{fortify-methods}
 \alias{fortify,SimResults-method}
 
-\title{Convert simulation results into a \code{data.frame} for plotting}
+\title{Convert simulation results into a data frame for plotting}
 \description{
   Extract all necessary information for plotting from simulation results.  It 
-  is thereby possible to construct \code{data.frame}s for box plots, density 
-  plots, as well as plots of the average results against some tuning 
-  parameter.  Although a suitable plot is selected automatically depending on 
-  the structure of the results, the default behavior can be overriden.
+  is thereby possible to construct data frames for box plots, density plots, as 
+  well as plots of the average results against some tuning parameter.  Although 
+  a suitable plot is selected automatically depending on the structure of the 
+  results, the default behavior can be overriden.
 }
 \usage{
 \S4method{fortify}{SimResults}(model, data = NULL, cont = NULL, 
@@ -20,7 +20,7 @@
 }
 \arguments{
   \item{model}{the simulation results to be converted, i.e., an object of class 
-    \code{"SimResults"}.}
+    \code{"\linkS4class{SimResults}"}.}
 
   \item{data}{an optional integer or logical index vector specifying the data 
     configurations for which to convert simulation results.}
@@ -33,10 +33,10 @@
 
   \item{select}{an optional integer, character or logical vector specifying the 
     columns to be converted.  It must specify a subset of the \code{colnames} 
-    slot of \code{x}, which is the default.}
+    slot of the simulation results, which is the default.}
 
   \item{method}{a character string specifying for which plot to construct the 
-    \code{data.frame}.  Possible values are \code{"box"} for a box plot, 
+    data frame.  Possible values are \code{"box"} for a box plot, 
     \code{"density"} for a density plot or \code{"line"} for a plot of the 
     average results against some tuning parameter.  If not specified, a 
     suitable plot is selected automatically.}
@@ -92,9 +92,9 @@ data("eusilcP")  # load data
 
 ## control objects for sampling and contamination
 sc <- SampleControl(size = 100, k = 50, seed = 12345)
-cc <- CARContControl(target = "eqIncome", 
+cc <- ContControl(target = "eqIncome", 
     epsilon = seq(0, 0.05, by = 0.01), 
-    fun = function(x) x * 10)
+    fun = function(x) x * 10, type = "CAR")
 
 ## function for simulation runs
 sim <- function(x) {
@@ -127,11 +127,11 @@ rgnorm <- function(n, means) {
 
 ## control objects for data generation and contamination
 means <- c(0, 0.25)
-dc <- DataControl(size = 100, distribution = rgnorm, 
+dc <- DataControl(size = 100, fun = rgnorm, 
     dots = list(means = means))
-cc <- CCARContControl(target = "value", 
+cc <- ContControl(target = "value", 
     epsilon = seq(0, 0.05, by = 0.01), 
-    dots = list(mean = 10))
+    dots = list(mean = 10), type = "CCAR")
 
 ## function for simulation runs
 sim <- function(x) {
@@ -156,4 +156,3 @@ simPlot(df) + geom_hline(aes(yintercept=mean), data=tv)
 }
 \keyword{methods}
 \keyword{utilities}
-

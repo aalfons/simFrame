@@ -28,14 +28,10 @@ BasicContControl-class
 BasicSampleControl-class
                         Class '"BasicSampleControl"'
 BasicVector-class       Class '"BasicVector"'
-CARContControl-class    Class '"CARContControl"'
-CCARContControl-class   Class '"CCARContControl"'
 ContControl             Create contamination control objects
 ContControl-class       Class '"ContControl"'
 DataControl-class       Class '"DataControl"'
-ListOrDataFrame-class   Class '"ListOrDataFrame"'
 NAControl-class         Class '"NAControl"'
-NumericMatrix-class     Class '"NumericMatrix"'
 OptCall-class           Class '"OptCall"'
 OptCharacter-class      Class '"OptCharacter"'
 OptContControl-class    Class '"OptContControl"'
@@ -47,6 +43,7 @@ OptSampleControl-class
 RandomContControl-class
                         Class '"RandomContControl"'
 SampleControl           Create sample control objects
+SampleControl-class     Class '"SampleControl"'
 SampleSetup-class       Class '"SampleSetup"'
 SimControl-class        Class '"SimControl"'
 SimResults-class        Class '"SimResults"'
@@ -66,7 +63,7 @@ aggregate-methods       Method for aggregating simulation results
 contaminate             Contaminate data
 draw                    Draw a sample
 eusilcP                 Synthetic EU-SILC data
-fortify-methods         Convert simulation results into a 'data.frame'
+fortify-methods         Convert simulation results into a data frame
                         for plotting
 generate                Generate data
 getAux                  Accessor functions for objects

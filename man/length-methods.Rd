@@ -47,8 +47,8 @@
   \item{\code{signature(x = "VirtualDataControl")}}{get the number of data 
     sizes to be used.}
   \item{\code{signature(x = "VirtualNAControl")}}{get the number of missing 
-    value rates to be used (the length in case of a vector in slot 
-    \code{NARate} or the number of rows in case of a matrix).}
+    value rates to be used (i.e., the number of rows of the matrix in slot 
+    \code{NARate}).}
   \item{\code{signature(x = "VirtualSampleControl")}}{get the number of samples 
     to be set up.}
   }
@@ -69,9 +69,9 @@ summary(set)
 length(set)
 
 ## class "ContControl"
-cc <- CCARContControl(target = "eqIncome", 
+cc <- ContControl(target = "eqIncome", 
     epsilon = c(0, 0.0025, 0.005, 0.0075, 0.01), 
-    dots = list(mean = 5e+05, sd = 10000))
+    dots = list(mean = 5e+05, sd = 10000), type = "CCAR")
 length(cc)
 
 ## class "NAControl"

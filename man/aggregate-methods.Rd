@@ -13,22 +13,22 @@
 }
 \arguments{
   \item{x}{the simulation results to be aggregated, i.e., an object of class 
-    \code{"SimResults"}.}
+    \code{"\linkS4class{SimResults}"}.}
   \item{select}{an integer, character or logical vector specifying the columns 
     to be aggregated.  It must specify a subset of the \code{colnames} slot of 
-    \code{x}, which is the default.}
+    the simulation results, which is the default.}
   \item{FUN}{a function to compute the summary statistics (defaults to 
     \code{mean}).}
   \item{\dots}{additional arguments to be passed down to methods.}
 }
 \section{Details}{
   The summary statistics of the simulation results are computed using the 
-  \code{\link[stats]{aggregate}} method for the \code{data.frame} in slot 
+  \code{\link[stats]{aggregate}} method for the data frame in slot 
   \code{values}.
 }
 \value{
-  A \code{data.frame} containing the summary statistics for the different 
-  subsets of the simulation results. 
+  A data frame containing the summary statistics for the different subsets of 
+  the simulation results. 
 }
 \section{Methods}{
   \describe{
@@ -51,8 +51,8 @@ data("eusilcP")  # load data
 
 ## control objects for sampling and contamination
 sc <- SampleControl(size = 100, k = 50, seed = 12345)
-cc <- CARContControl(target = "eqIncome", epsilon = 0.02, 
-    fun = function(x) x * 10)
+cc <- ContControl(target = "eqIncome", epsilon = 0.02, 
+    fun = function(x) x * 10, type = "CAR")
 
 ## function for simulation runs
 sim <- function(x) {
@@ -78,10 +78,10 @@ rgnorm <- function(n, means) {
 
 ## control objects for data generation and contamination
 means <- c(0, 0.25)
-dc <- DataControl(size = 100, distribution = rgnorm, 
+dc <- DataControl(size = 100, fun = rgnorm, 
     dots = list(means = means))
-cc <- CCARContControl(target = "value", 
-    epsilon = 0.02, dots = list(mean = 10))
+cc <- ContControl(target = "value", epsilon = 0.02, 
+    dots = list(mean = 10), type = "CCAR")
 
 ## function for simulation runs
 sim <- function(x) {
