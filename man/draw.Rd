@@ -37,17 +37,17 @@ draw(x, setup, \dots)
 }
 \section{Methods}{
   \describe{
-  \item{\code{x = "data.frame", setup = "character"}}{draw a sample using a 
-    control class specified by the character string \code{setup}.  The slots of 
-    the control object may be supplied as additional arguments.}
-  \item{\code{x = "data.frame", setup = "missing"}}{draw a sample using a 
-    control object constructed by \code{\link{SampleControl}}.  Its slots may 
-    be supplied as additional arguments.}
-  \item{\code{x = "data.frame", setup = "SampleSetup"}}{draw a previously set 
-    up sample.}
-  \item{\code{x = "data.frame", setup = "VirtualSampleControl"}}{draw a sample 
-    using a control object inheriting from class 
-    \code{"\linkS4class{VirtualSampleControl}"}.}
+  \item{\code{signature(x = "data.frame", setup = "character")}}{draw a sample 
+    using a control class specified by the character string \code{setup}.  The 
+    slots of the control object may be supplied as additional arguments.}
+  \item{\code{signature(x = "data.frame", setup = "missing")}}{draw a sample 
+    using a control object constructed by \code{\link{SampleControl}}.  Its 
+    slots may be supplied as additional arguments.}
+  \item{\code{signature(x = "data.frame", setup = "SampleSetup")}}{draw a 
+    previously set up sample.}
+  \item{\code{signature(x = "data.frame", 
+    setup = "VirtualSampleControl")}}{draw a sample using a control object 
+    inheriting from class \code{"\linkS4class{VirtualSampleControl}"}.}
   }
 }
 \author{Andreas Alfons}

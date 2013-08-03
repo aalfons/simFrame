@@ -53,16 +53,19 @@ contaminate(x, control, \dots)
 }
 \section{Methods}{
   \describe{
-  \item{\code{x = "data.frame", control = "character"}}{contaminate data using 
-    a control class specified by the character string \code{control}.  The 
-    slots of the control object may be supplied as additional arguments.}
-  \item{\code{x = "data.frame", control = "missing"}}{contaminate data using a 
-    control object constructed by \code{\link{ContControl}}.  Its slots may be 
-    supplied as additional arguments.}
-  \item{\code{x = "data.frame", control = "BasicContControl"}}{contaminate data 
-    as defined by the control object \code{control}.}
-  \item{\code{x = "data.frame", control = "RandomContControl"}}{contaminate 
-    data as defined by the control object \code{control}.}
+  \item{\code{signature(x = "data.frame", control = "character")}}{contaminate 
+    data using a control class specified by the character string 
+    \code{control}.  The slots of the control object may be supplied as 
+    additional arguments.}
+  \item{\code{signature(x = "data.frame", control = "missing")}}{contaminate data 
+    using a control object constructed by \code{\link{ContControl}}.  Its slots 
+    may be supplied as additional arguments.}
+  \item{\code{signature(x = "data.frame", 
+    control = "BasicContControl")}}{contaminate data as defined by the control 
+    object \code{control}.}
+  \item{\code{signature(x = "data.frame", 
+    control = "RandomContControl")}}{contaminate data as defined by the control 
+    object \code{control}.}
   }
 }
 \author{Andreas Alfons}

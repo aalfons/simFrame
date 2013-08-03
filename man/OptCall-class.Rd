@@ -11,5 +11,11 @@
 \section{Methods}{
 No methods defined with class \code{"OptCall"} in the signature.
 }
+\section{UML class diagram}{
+  A slightly simplified UML class diagram of the framework can be found in 
+  Figure 1 of the package vignette \emph{An Object-Oriented Framework for 
+  Statistical Simulation: The \R Package \code{simFrame}}.  Use 
+  \code{vignette("simFrame-intro")} to view this vignette.
+}
 \author{Andreas Alfons}
 \keyword{classes}

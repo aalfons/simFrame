@@ -46,14 +46,14 @@ generate(control, \dots)
 }
 \section{Methods}{
   \describe{
-  \item{\code{control = "character"}}{generate data using a control class 
-    specified by the character string \code{control}.  The slots of the control 
-    object may be supplied as additional arguments.}
-  \item{\code{control = "missing"}}{generate data using a control object of 
-    class \code{"\linkS4class{DataControl}"}.  Its slots may be supplied as 
-    additional arguments.}
-  \item{\code{control = "DataControl"}}{generate data as defined by the control 
-    object \code{control}.}
+  \item{\code{signature(control = "character")}}{generate data using a control 
+    class specified by the character string \code{control}.  The slots of the 
+    control object may be supplied as additional arguments.}
+  \item{\code{signature(control = "missing")}}{generate data using a control 
+    object of class \code{"\linkS4class{DataControl}"}.  Its slots may be 
+    supplied as additional arguments.}
+  \item{\code{signature(control = "DataControl")}}{generate data as defined by 
+    the control object \code{control}.}
   }
 }
 \author{Andreas Alfons}

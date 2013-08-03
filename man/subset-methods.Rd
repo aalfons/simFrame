@@ -35,7 +35,8 @@
 }
 \section{Methods}{
   \describe{
-  \item{\code{x = "SimResults"}}{extract subsets of simulation results.}
+  \item{\code{signature(x = "SimResults")}}{extract subsets of simulation 
+    results.}
   }
 }
 \author{

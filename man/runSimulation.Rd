@@ -77,21 +77,22 @@ runSimulation(x, setup = NULL, nrep = 1, control,
 }
 \section{Methods}{
   \describe{
-  \item{\code{x = "ANY", setup = "ANY", nrep = "ANY", control = "missing"}}{
-    convenience wrapper that allows the slots of \code{control} to be supplied 
-    as arguments}
-  \item{\code{x = "data.frame", setup = "ANY", nrep = "ANY", 
-    control = "SimControl"}}{run a simulation experiment based on real data.}
-  \item{\code{x = "data.frame", setup = "SampleSetup", nrep = "ANY", 
-    control = "SimControl"}}{run a design-based simulation experiment with 
+  \item{\code{signature(x = "ANY", setup = "ANY", nrep = "ANY", 
+    control = "missing")}}{convenience wrapper that allows the slots of 
+    \code{control} to be supplied as arguments}
+  \item{\code{signature(x = "data.frame", setup = "ANY", nrep = "ANY", 
+    control = "SimControl")}}{run a simulation experiment based on real data.}
+  \item{\code{signature(x = "data.frame", setup = "SampleSetup", nrep = "ANY", 
+    control = "SimControl")}}{run a design-based simulation experiment with 
     previously set up samples.}
-  \item{\code{x = "data.frame", setup = "VirtualSampleControl", nrep = "ANY", 
-    control = "SimControl"}}{run a design-based simulation experiment.}
-  \item{\code{x = "VirtualDataControl", setup = "ANY", nrep = "ANY", 
-    control = "SimControl"}}{run a model-based simulation experiment.}
-  \item{\code{x = "VirtualDataControl", setup = "VirtualSampleControl", 
-    nrep = "ANY", control = "SimControl"}}{run a simulation experiment 
-    using a mixed simulation design.}
+  \item{\code{signature(x = "data.frame", setup = "VirtualSampleControl", 
+    nrep = "ANY", control = "SimControl")}}{run a design-based simulation 
+    experiment.}
+  \item{\code{signature(x = "VirtualDataControl", setup = "ANY", nrep = "ANY", 
+    control = "SimControl")}}{run a model-based simulation experiment.}
+  \item{\code{signature(x = "VirtualDataControl", 
+    setup = "VirtualSampleControl", nrep = "ANY", control = "SimControl")}}{run 
+    a simulation experiment using a mixed simulation design.}
   }
 }
 \author{Andreas Alfons}

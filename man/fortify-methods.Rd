@@ -71,7 +71,7 @@
 }
 \section{Methods}{
   \describe{
-  \item{\code{model = "SimResults"}}{convert simulation results.}
+  \item{\code{signature(model = "SimResults")}}{convert simulation results.}
   }
 }
 \author{

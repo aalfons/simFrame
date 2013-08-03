@@ -32,7 +32,7 @@
 }
 \section{Methods}{
   \describe{
-  \item{\code{x = "SimResults"}}{aggregate simulation results.}
+  \item{\code{signature(x = "SimResults")}}{aggregate simulation results.}
   }
 }
 \author{Andreas Alfons}
