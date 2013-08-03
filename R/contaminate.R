@@ -17,12 +17,20 @@ setMethod(
     if(epsilon == 0 || nrow(x) == 0 || ncol(x) == 0) return(x)  # nothing to do
     target <- getTarget(control)
     if(is.null(target)) target <- getNames(x)
+    type <- getType(control)
     # get indices of observations to be contaminated
     n <- ceiling(epsilon * nrow(x))
     ind <- seq_len(n)
     # get values for contamintated observations
-    dots <- c(list(x[ind, target]), tuning, getDots(control))
-    values <- do.call(getFun(control), dots)
+    if(type == "CCAR") {
+      values <- doCall(getFun(control), n, tuning, getDots(control))
+    } else if(type == "CAR") {
+      values <- doCall(getFun(control), x[ind, target], 
+                       tuning, getDots(control))
+    } else {
+      stop("for user defined contamination control classes, a ", 
+           "method 'contaminate(x, control, i)' needs to be defined")
+    }
     # set contaminated values and return x
     x[ind, target] <- values
     if(".contaminated" %in% names(x)) x[ind, ".contaminated"] <- TRUE
@@ -48,16 +56,11 @@ setMethod(
     if(epsilon == 0 || nrow(x) == 0 || ncol(x) == 0) return(x)  # nothing to do
     target <- getTarget(control)
     if(is.null(target)) target <- getNames(x)
+    type <- getType(control)
     grouping <- getGrouping(control)
-    if(length(grouping) > 1) {
-      stop("'grouping' must not specify more than one variable")
-    }
     aux <- getAux(control)
-    if(length(aux) > 1) {
-      stop("'aux' must not specify more than one variable")
-    }
     useGroup <- as.logical(length(grouping))  # 'grouping' supplied
-    useAux <- as.logical(length(aux))  # 'aux' supplied
+    useAux <- as.logical(length(aux))         # 'aux' supplied
     # get population size and number of 
     # observations or groups to be contaminated
     if(useGroup) {
@@ -68,31 +71,32 @@ setMethod(
         N <- length(split)
       } else {
         uniqueGroups <- unique(groups)  # unique groups
-        N <- length(uniqueGroups)  # number of groups
+        N <- length(uniqueGroups)       # number of groups
       }
     } else N <- nrow(x)
     n <- ceiling(epsilon * N)
-    if(useAux) {  # prepare auxiliary variable
+    if(useAux) {
+      # prepare auxiliary variable
       aux <- x[, aux]
       if(useGroup) {
         # use the group means (much faster than medians)
         aux <- sapply(split, function(i) mean(aux[i]))
       }
       ind <- ups(N, n, prob=aux)  # get indices (unequal prob. sampling)
-    } else ind <- srs(N, n)  # get indices (simple random sampling)
+    } else ind <- srs(N, n)       # get indices (simple random sampling)
     if(useGroup) {
       if(useAux) ind <- unlist(split[ind])
       else ind <- which(groups %in% uniqueGroups[ind])  # row indices
     }
-    if(is(control, "CCARContControl")) {
-      values <- doCall(getDistribution(control), n, tuning, getDots(control))
+    if(type == "CCAR") {
+      values <- doCall(getFun(control), n, tuning, getDots(control))
       if(useGroup) {
-        rep <- unsplit(seq_len(n), getFactor(groups[ind]))  # replication indices
+        rep <- unsplit(seq_len(n), getFactor(groups[ind])) # replication indices
         values <- if(is.null(dim(values))) values[rep] else values[rep,]
       }
-    } else if(is(control, "CARContControl")) {
-      dots <- c(list(x[ind, target]), tuning, getDots(control))
-      values <- do.call(getFun(control), dots)
+    } else if(type == "CAR") {
+      values <- doCall(getFun(control), x[ind, target], 
+                       tuning, getDots(control))
     } else {
       stop("for user defined contamination control classes, a ", 
            "method 'contaminate(x, control, i)' needs to be defined")

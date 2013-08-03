@@ -4,8 +4,8 @@
 \alias{DataControl-class}
 \alias{DataControl}
 \alias{getColnames,DataControl-method}
-\alias{getDistribution,DataControl-method}
 \alias{getDots,DataControl-method}
+\alias{getFun,DataControl-method}
 \alias{getIndices,DataControl-method}
 \alias{getTuning,DataControl-method}
 \alias{show,DataControl-method}
@@ -17,25 +17,23 @@ Objects can be created by calls of the form \code{DataControl(\dots)}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{size}:}{Object of class \code{"numeric"} giving the number of 
-      observations to be generated.}
-    \item{\code{tuning}:}{Object of class \code{"ListOrDataFrame"} giving 
-      tuning parameters for data generation.  Lists are converted to data 
-      frames with \code{\link{expand.grid}} during initialization.}
-    \item{\code{indices}:}{Object of class \code{"NumericMatrix"} in which the 
-      first column contains the indices of the data sizes and the second column 
-      contains the row indices of the tuning parameters for the different data 
-      configurations.}
-    \item{\code{distribution}:}{Object of class \code{"function"} generating 
-      the data, e.g., \code{\link[stats:Normal]{rnorm}} (the default) or 
+    \item{\code{size}:}{A numeric vector giving the data sizes, i.e., the 
+      numbers of observations to be generated.}
+    \item{\code{tuning}:}{A data frame giving tuning parameters for data 
+      generation.  A list is converted to a data frame during initialization 
+      via \code{\link{expand.grid}}.}
+    \item{\code{indices}:}{An integer matrix in which the first column contains 
+      the indices of the data sizes and the second column contains the row 
+      indices of the tuning parameters for the different data configurations.}
+    \item{\code{fun}:}{A function generating the data, e.g., 
+      \code{\link[stats:Normal]{rnorm}} (the default) or 
       \code{\link[mvtnorm:Mvnorm]{rmvnorm}}.  It should take a positive integer 
       as its first argument, giving the number of observations to be generated, 
-      and return an object that can be coerced to a \code{data.frame}.}
-    \item{\code{dots}:}{Object of class \code{"list"} containing additional 
-      arguments to be passed to \code{distribution}.}
-    \item{\code{colnames}:}{Object of class \code{"OptCharacter"} ; a character 
-      vector to be used as column names for the generated \code{data.frame}, or 
-      \code{NULL}.}
+      and return an object that can be coerced to a data frame.}
+    \item{\code{dots}:}{A list containing additional arguments to be passed to 
+      \code{fun}.}
+    \item{\code{colnames}:}{A character vector specifying the column names for 
+      the generated data frame, or \code{NULL}.}
   }
 }
 \section{Extends}{
@@ -51,8 +49,8 @@ Class \code{"\linkS4class{OptDataControl}"}, distance 2.
       \code{tuning}.}
     \item{\code{getIndices}}{\code{signature(x = "DataControl")}: get slot 
       \code{indices}.}
-    \item{\code{getDistribution}}{\code{signature(x = "DataControl")}: get slot 
-      \code{distribution}.}
+    \item{\code{getFun}}{\code{signature(x = "DataControl")}: get slot 
+      \code{fun}.}
     \item{\code{getDots}}{\code{signature(x = "DataControl")}: get slot 
       \code{dots}.}
     \item{\code{getColnames}}{\code{signature(x = "DataControl")}: get slot 
@@ -91,7 +89,7 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 library("mvtnorm")
 mean <- rep(0, 2)
 sigma <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
-dc <- DataControl(size = 10, distribution = rmvnorm, 
+dc <- DataControl(size = 10, fun = rmvnorm, 
     dots = list(mean = mean, sigma = sigma))
 generate(dc)
 }

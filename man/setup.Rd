@@ -17,9 +17,9 @@ setup(x, control, \dots)
 \arguments{
   \item{x}{the data to sample from.}
   \item{control}{a control object inheriting from the virtual class 
-    \code{"VirtualSampleControl"} or a character string specifying such a 
-    control class.  If missing, the constructor \code{\link{SampleControl}} is 
-    called to generate the control object.}
+    \code{"\linkS4class{VirtualSampleControl}"} or a character string 
+    specifying such a control class.  If missing, the constructor 
+    \code{\link{SampleControl}} is called to generate the control object.}
   \item{\dots}{if \code{control} is a character string or missing, the slots of 
     the control object may be supplied as additional arguments.  See 
     \code{"\linkS4class{BasicSampleControl}"} and 
@@ -71,12 +71,12 @@ setup(x, control, \dots)
   \code{setup(x, control)} with signature \code{'data.frame, MySampleControl'}.  
   In order to optimize computational performance, it is necessary to 
   efficiently set up multiple samples.  Thereby the slot \code{k} of 
-  \code{"VirtualSampleControl"} needs to be used to control the number of 
-  samples, and the resulting object must be of class 
+  \code{"\linkS4class{VirtualSampleControl}"} needs to be used to control the 
+  number of samples, and the resulting object must be of class 
   \code{"\linkS4class{SampleSetup}"}.
 }
 \value{
-  An object of class \code{"SampleSetup"}.
+  An object of class \code{"\linkS4class{SampleSetup}"}.
 }
 \section{Methods}{
   \describe{

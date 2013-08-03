@@ -15,11 +15,11 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{k}:}{Object of class \code{"numeric"}, a single positive 
-      integer giving the number of samples to be set up.}
-    \item{\code{seed}:}{Object of class \code{"numeric"} to be used as initial 
-      seed of the random number generator.  If not supplied explicitly, the 
-      seed will be based on the date and time of constrution.}
+    \item{\code{k}:}{A positive integer giving the number of samples to be set 
+      up.}
+    \item{\code{seed}:}{An integer to be used as initial seed of the random 
+      number generator.  If not supplied explicitly, the seed will be based on 
+      the date and time of construction.}
   }
 }
 \section{Extends}{
@@ -29,8 +29,8 @@ Class \code{"\linkS4class{OptSampleControl}"}, directly.
   \describe{
     \item{\code{getK}}{\code{signature(x = "VirtualSampleControl")}: get slot 
       \code{k}.}
-    \item{getSeed}{\code{signature(x = "VirtualSampleControl")}: get slot 
-      \code{seed}.}
+    \item{\code{getSeed}}{\code{signature(x = "VirtualSampleControl")}: get 
+      slot \code{seed}.}
   }
 }
 \section{Methods}{
@@ -41,10 +41,10 @@ Class \code{"\linkS4class{OptSampleControl}"}, directly.
       returns the object itself.}
     \item{\code{length}}{\code{signature(x = "VirtualSampleControl")}: get the 
       number of samples to be set up.}
-    \item{runSimulation}{\code{signature(x = "data.frame", 
+    \item{\code{runSimulation}}{\code{signature(x = "data.frame", 
       setup = "VirtualSampleControl", nrep = "missing", 
       control = "SimControl")}: run a simulation experiment.}
-    \item{runSimulation}{\code{signature(x = "VirtualDataControl", 
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
       setup = "VirtualSampleControl", nrep = "numeric", 
       control = "SimControl")}: run a simulation experiment.}
     \item{\code{show}}{\code{signature(object = "VirtualSampleControl")}: print 

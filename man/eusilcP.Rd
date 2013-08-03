@@ -13,7 +13,7 @@ Union Statistics on Income and Living Conditions) data.
 data("eusilcP")
 }
 \format{
-  A \code{data.frame} with 58 654 observations on the following 28 variables:
+  A data frame with 58 654 observations on the following 28 variables:
   \describe{
     \item{\code{hid}}{integer; the household ID.}
     \item{\code{region}}{factor; the federal state in which the household is 

@@ -16,13 +16,6 @@ checkError <- function(x) {
   else logical()
 }
 
-# check if data is numeric
-checkNumericMatrix <- function(x) {
-  if(is(x, "numeric")) TRUE 
-  else if(is(x, "matrix")) mode(x) == "numeric"
-  else FALSE  # other classes
-}
-
 # check for errors or empty vectors in a list (for simulation results)
 checkOK <- function(x) {
   if(length(x) > 0) {
@@ -38,11 +31,7 @@ checkStage <- function(stage) {
 }
 
 # get NA rate for simulation results
-convertNARate <- function(x) {
-  if(is(x, "numeric")) x
-  else if(is(x, "matrix")) seq_len(nrow(x))
-  else numeric()  # other classes
-}
+convertNARate <- function(x) if(ncol(x) == 1) x[, 1] else seq_len(nrow(x)) 
 
 ## get matrix of indices in a vector and a data frame with tuning parameters
 convertToIndices <- function(x, tuning, checkZero = TRUE) {
@@ -80,9 +69,9 @@ convertTuning <- function(x) if(ncol(x) == 1) x[, 1] else seq_len(nrow(x))
 doCall <- function(fun, first, tuning, dots = list()) {
   if(nrow(tuning) == 0) {
     if(length(dots) == 0) fun(first)
-    else do.call(fun, c(first, dots))
-  } else if(length(dots) == 0) do.call(fun, c(first, tuning))
-  else do.call(fun, c(first, tuning, dots))
+    else do.call(fun, c(list(first), dots))
+  } else if(length(dots) == 0) do.call(fun, c(list(first), tuning))
+  else do.call(fun, c(list(first), tuning, dots))
 }
 
 # function to expand a vector according to groups
@@ -92,6 +81,15 @@ expand <- function(x, groups, unique) {
   names(x) <- as.character(unique)
   x <- x[as.character(groups)]
   unname(x)
+}
+
+# expand list of parameters to data frame containing all combinations
+expandTuning <- function(x) {
+  if(is(x, "list")) {
+    x$stringsAsFactors <- FALSE
+    x <- do.call(expand.grid, x)
+  }
+  x
 }
 
 # get character eqivalent of a selection vector
@@ -131,14 +129,14 @@ getSelectionLength <- function(x) {
 # get result of one simulation run in the correct format
 getSimResult <- function(x) {
   if(is(x, "numeric")) x
-  else if(is(x, "list")) x$values  # for backwards compatibility (deprecated)
+  else if(is(x, "list")) x$values  # for backwards compatibility
   else stop("'fun' must return a numeric vector")
 }
 
 # get result for one stratified simulation run
 getSimResultByDomain <- function(x, legend) {
   if(is(x[[1]], "list")) {
-    x <- lapply(x, "[[", "values")  # for backwards compatibility (deprecated)
+    x <- lapply(x, "[[", "values")  # for backwards compatibility
   }
   cbind(legend, do.call(rbind, x))
 }

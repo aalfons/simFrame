@@ -19,14 +19,14 @@ Instead, objects are expected to be created by the function \code{\link{setup}}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{indices}:}{Object of class \code{"list"}; each list element 
-      contains the indices of the sampled observations.}
-    \item{\code{prob}:}{Object of class \code{"numeric"} giving the 
-      inclusion probabilities.}
-    \item{\code{control}:}{Object of class \code{"VirtualSampleControl"}; the 
-      control object used to set up the samples.}
-    \item{\code{call}:}{Object of class \code{"OptCall"}; the function call 
-      used to set up the samples, or \code{NULL}.}
+    \item{\code{indices}:}{A list in which each component contains the indices 
+      of the sampled observations.}
+    \item{\code{prob}:}{An optional numeric vector giving the inclusion 
+      probabilities.}
+    \item{\code{control}:}{The control object (inheriting from class 
+      \code{"\linkS4class{VirtualSampleControl}"}) used to set up the samples.}
+    \item{\code{call}:}{The function call used to set up the samples, or 
+      \code{NULL}.}
   }
 }
 \section{Accessor methods}{

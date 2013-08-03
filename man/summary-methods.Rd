@@ -45,7 +45,7 @@
     object itself.}
   \item{\code{signature(x = "SimResults")}}{produces a summary of the 
     simulation results by calling the method of \code{\link[base]{summary}} 
-    for the \code{data.frame} in slot \code{values}.}
+    for the data frame in slot \code{values}.}
   \item{\code{signature(x = "VirtualContControl")}}{currently returns the 
     object itself.}
   \item{\code{signature(x = "VirtualDataControl")}}{currently returns the 

@@ -29,8 +29,9 @@ setGeneric(
 #' @export
 setGeneric(
   "runSimulation",
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
+           NAControl = NULL, design = character(), fun, ..., seed, 
+           ncores = 1, cl = NULL) {
     # initializations
     call <- match.call()
     # call method and store call
@@ -87,9 +88,6 @@ setGeneric("getControl", function(x, ...) standardGeneric("getControl"))
 setGeneric("getDesign", function(x) standardGeneric("getDesign"))
 
 #' @export
-setGeneric("getDistribution", function(x) standardGeneric("getDistribution"))
-
-#' @export
 setGeneric("getDots", function(x, ...) standardGeneric("getDots"))
 
 #' @export
@@ -136,26 +134,18 @@ setGeneric("getTarget", function(x) standardGeneric("getTarget"))
 setGeneric("getTuning", function(x) standardGeneric("getTuning"))
 
 #' @export
+setGeneric("getType", function(x) standardGeneric("getType"))
+
+#' @export
 setGeneric("getValues", function(x) standardGeneric("getValues"))
 
 
 ## private mutator functions
 
 setGeneric("setCall", function(x, call) standardGeneric("setCall"))
-
-setGeneric("setDistribution", 
-           function(x, distribution) standardGeneric("setDistribution"))
-
-setGeneric("setFun", function(x, fun, ...) standardGeneric("setFun"))
-
-setGeneric("setIndices", function(x, ...) standardGeneric("setIndices"))
-
+setGeneric("setIndices", function(x, indices) standardGeneric("setIndices"))
 setGeneric("setK", function(x, k) standardGeneric("setK"))
-
 setGeneric("setSeed", function(x, seed) standardGeneric("setSeed"))
-
-setGeneric("setTuning", function(x, tuning) standardGeneric("setTuning"))
-
 setGeneric("setValues", function(x, values) standardGeneric("setValues"))
 
 
@@ -170,8 +160,6 @@ setGeneric("autoplot")
 
 #' @import ggplot2
 #' @export
-# setGeneric("fortify", 
-#            function(model, data = NULL, ...) standardGeneric("fortify"))
 setGeneric("fortify")
 
 #' @export

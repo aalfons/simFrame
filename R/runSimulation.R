@@ -7,8 +7,9 @@
 setMethod(
   "runSimulation", 
   signature(x = "ANY", setup = "ANY", nrep = "ANY", control = "missing"),
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
+           NAControl = NULL, design = character(), fun, ..., seed, 
+           ncores = 1, cl = NULL) {
     # construct control object
     if(missing(seed)) {
       control <- SimControl(contControl=contControl, NAControl=NAControl, 
@@ -19,14 +20,7 @@ setMethod(
                             seed=seed)
     }
     # call other method
-    if(missing(setup)) {
-      if(missing(nrep)) runSimulation(x, control=control, ncores=ncores, cl=cl)
-      else runSimulation(x, nrep=nrep, control=control, ncores=ncores, cl=cl)
-    } else {
-      if(missing(nrep)) runSimulation(x, setup, control=control, 
-                                      ncores=ncores, cl=cl)
-      else runSimulation(x, setup, nrep, control, ncores=ncores, cl=cl)
-    }
+    runSimulation(x, setup, nrep, control, ncores=ncores, cl=cl)
   })
 
 
@@ -34,15 +28,17 @@ setMethod(
 
 setMethod(
   "runSimulation", 
-  signature(x = "VirtualDataControl", setup = "missing", 
-            nrep = "numeric", control = "SimControl"),
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+  signature(x = "VirtualDataControl", setup = "ANY", 
+            nrep = "ANY", control = "SimControl"),
+  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
+           NAControl = NULL, design = character(), fun, ..., seed, 
+           ncores = 1, cl = NULL) {
     # initializations
     ndata <- length(x)
-    if(length(nrep) == 0) stop("'nrep' must be a non-negative integer")
-    else if(length(nrep) > 1) nrep <- nrep[1]
-    if(nrep == 0) {  # nothing to do
+    nrep <- rep(as.integer(nrep), length.out=1)
+    if(is.na(nrep) || nrep < 0) nrep <- 1
+    if(nrep == 0) {
+      # nothing to do
       return(SimResults(dataControl=x, nrep=nrep, control=control))
     }
     r <- rep.int(seq_len(ndata), nrep)
@@ -81,9 +77,10 @@ modelSimulation <- function(i, x, control) {
 setMethod(
   "runSimulation", 
   signature(x = "data.frame", setup = "VirtualSampleControl", 
-            nrep = "missing", control = "SimControl"),
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+            nrep = "ANY", control = "SimControl"),
+  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
+           NAControl = NULL, design = character(), fun, ..., seed, 
+           ncores = 1, cl = NULL) {
     # seed of the random number is first set by generic function 'setup'
     setup <- setup(x, setup)
     # seed is reset in the next method of 'runSimulation' (unless parallel 
@@ -94,12 +91,14 @@ setMethod(
 setMethod(
   "runSimulation", 
   signature(x = "data.frame", setup = "SampleSetup", 
-            nrep = "missing", control = "SimControl"),
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+            nrep = "ANY", control = "SimControl"),
+  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
+           NAControl = NULL, design = character(), fun, ..., seed, 
+           ncores = 1, cl = NULL) {
     # initializations
     nsamp <- length(setup)
-    if(nsamp == 0) {  # nothing to do
+    if(nsamp == 0) {
+      # nothing to do
       return(SimResults(sampleControl=getControl(setup), control=control))
     }
     s <- seq_len(nsamp)
@@ -138,13 +137,14 @@ designSimulation <- function(i, x, setup, control) {
 setMethod(
   "runSimulation", 
   signature(x = "VirtualDataControl", setup = "VirtualSampleControl", 
-            nrep = "numeric", control = "SimControl"),
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+            nrep = "ANY", control = "SimControl"),
+  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
+           NAControl = NULL, design = character(), fun, ..., seed, 
+           ncores = 1, cl = NULL) {
     # initializations
     ndata <- length(x)
-    if(length(nrep) == 0) stop("'nrep' must be a non-negative integer")
-    else if(length(nrep) > 1) nrep <- nrep[1]
+    nrep <- rep(as.integer(nrep), length.out=1)
+    if(is.na(nrep) || nrep < 0) nrep <- 1
     nsamp <- length(setup)
     setSeed(setup, integer())  # do not reset random seed when drawing samples
     if(nrep == 0 || nsamp == 0) {
@@ -190,17 +190,18 @@ mixedSimulation <- function(i, x, setup, control) {
 ## simulation with repetitions based on (possibly) real data
 setMethod(
   "runSimulation",
-  signature(x = "data.frame", setup = "missing", 
-            nrep = "numeric", control = "SimControl"),
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
+  signature(x = "data.frame", setup = "ANY", 
+            nrep = "ANY", control = "SimControl"),
+  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
+           NAControl = NULL, design = character(), fun, ..., seed, 
+           ncores = 1, cl = NULL) {
     # initializations
-    if(length(nrep) == 0) stop("'nrep' must be a non-negative integer")
-    else if(length(nrep) > 1) nrep <- nrep[1]
-    design <- getDesign(control)
+    nrep <- rep(as.integer(nrep), length.out=1)
+    if(is.na(nrep) || nrep < 0) nrep <- 1
     if(nrep == 0) {  # nothing to do
       return(SimResults(nrep=nrep, control=control))
     }
+    design <- getDesign(control)
     seed <- getSeed(control)
     # set up cluster for parallel computing if requested
     cl <- startCluster(ncores, cl)
@@ -238,17 +239,6 @@ setMethod(
     }
     # construct results
     getSimResults(tmp, nrep=nrep, control=control)
-  })
-
-
-## no samples, no repetitions (for sensitiviy analysis)
-setMethod(
-  "runSimulation",
-  signature(x = "data.frame", setup = "missing", 
-            nrep = "missing", control = "SimControl"),
-  function(x, setup, nrep, control, contControl = NULL, NAControl = NULL, 
-           design = character(), fun, ..., seed, ncores = 1, cl = NULL) {
-    runSimulation(x, nrep=1, control=control)
   })
 
 

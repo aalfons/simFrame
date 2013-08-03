@@ -43,17 +43,22 @@ setMethod(
     print(getK(object))
   })
 
+setMethod(
+  "show", "SampleControl", 
+  function(object) {
+    callNextMethod()
+    design <- getDesign(object)
+    if(length(design) > 0) {
+      cat("\nDesign variable(s) for stratified sampling:\n")
+      print(design)
+    }
+  })
+
 # single-stage sampling
 setMethod(
   "show", "BasicSampleControl", 
   function(object) {
     callNextMethod()
-    design <- getDesign(object)
-    haveDesign <- length(design) > 0
-    if(haveDesign) {
-      cat("\nDesign variable(s) for stratified sampling:\n")
-      print(design)
-    }
     group <- getGrouping(object)
     if(length(group) > 0) {
       cat("\nGrouping variable giving sampling units:\n")
@@ -62,7 +67,8 @@ setMethod(
     size <- getSize(object)
     if(!is.null(size)) {
       tmp <- "\nSize of the resulting samples"
-      if(haveDesign) {
+      design <- getDesign(object)
+      if(length(design) > 0) {
         if(length(size) == 1) tmp <- paste(tmp, "for each stratum")
         else tmp <- paste(tmp, "by stratum")
       }
@@ -76,12 +82,6 @@ setMethod(
   "show", "TwoStageSampleControl", 
   function(object) {
     callNextMethod()
-    design <- getDesign(object)
-    haveDesign <- length(design) > 0
-    if(haveDesign) {
-      cat("\nDesign variable(s) for stratified sampling:\n")
-      print(design)
-    }
     group <- getGrouping(object)
     haveSSUs <- length(group) > 1
     if(haveSSUs) {
@@ -91,7 +91,8 @@ setMethod(
     size <- getSize(object, stage=1)
     if(!is.null(size)) {
       tmp <- "\nNumber of PSUs to be sampled"
-      if(haveDesign) {
+      design <- getDesign(object)
+      if(length(design) > 0) {
         if(length(size) == 1) tmp <- paste(tmp, "for each stratum")
         else tmp <- paste(tmp, "by stratum")
       }

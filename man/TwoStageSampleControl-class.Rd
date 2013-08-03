@@ -3,8 +3,6 @@
 \docType{class}
 \alias{TwoStageSampleControl-class}
 \alias{TwoStageSampleControl}
-\alias{getDesign,TwoStageSampleControl-method}
-\alias{getGrouping,TwoStageSampleControl-method}
 \alias{show,TwoStageSampleControl-method}
 
 \title{Class \code{"TwoStageSampleControl"}}
@@ -12,41 +10,39 @@
   Class for controlling the setup of samples using a two-stage procedure.
 }
 \section{Objects from the Class}{
-Objects can be created via the constructor \code{TwoStageControl} or by calls 
-of the form \code{SampleControl(\dots, type = "Basic")}.
+Objects can be created via the constructor \code{TwoStageSampleControl} or by 
+calls of the form \code{SampleControl(\dots, sub = "TwoStage")}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{design}:}{Object of class \code{"BasicVector"} specifying 
-      variables (columns) to be used for stratified sampling in the first 
-      stage.}
-    \item{\code{grouping}:}{Object of class \code{"BasicVector"} specifying 
+    \item{\code{design}:}{An optional character, integer or logical vector 
+      specifying variables (columns) to be used for stratified sampling in 
+      the first stage.}
+    \item{\code{grouping}:}{An character, integer or logical vector specifying 
       grouping variables (columns) to be used for sampling primary sampling 
       units (PSUs) and secondary sampling units (SSUs), respectively.}
-    \item{\code{fun}:}{Object of class \code{"list"}; a list of length two 
-      containing the functions to be used for sampling in the first and second 
-      stage, respectively (defaults to \code{\link{srs}} for both stages).  The 
-      functions should return a vector containing the indices of the sampled 
-      items.}
-    \item{\code{size}:}{Object of class \code{"list"}; a list of length two, 
-      where each component contains an optional non-negative integer giving the 
-      number of items to sample in the first and second stage, respectively.  
-      In case of stratified sampling in the first stage, a vector of 
-      non-negative integers, each giving the number of PSUs to sample from the 
-      corresponding stratum, may be supplied.  For the second stage, a vector 
-      of non-negative integers giving the number of items to sample from each 
-      PSU may be used.}
-    \item{\code{prob}:}{Object of class \code{"list"}; a list of length two, 
-      with components optionally specifying variables (columns) that contain 
-      probability weights for the first and second stage, respectively.}
-    \item{\code{dots}:}{Object of class \code{"list"}; a list of length two, 
-      where each component is again a list containing additional arguments to 
-      be passed to the corresponding function for sampling in \code{fun}.}
-    \item{\code{k}:}{Object of class \code{"numeric"}; a single positive 
-      integer giving the number of samples to be set up.}
-    \item{\code{seed}:}{Object of class \code{"numeric"} to be used as initial 
-      seed of the random number generator.  If not supplied explicitly, the 
-      seed will be based on the date and time of constrution.}
+    \item{\code{fun}:}{A list of length two containing the functions to be used 
+      for sampling in the first and second stage, respectively (defaults to 
+      \code{\link{srs}} for both stages).  The functions should return a vector 
+      containing the indices of the sampled items.}
+    \item{\code{size}:}{A list of length two, in which each component contains 
+      an optional non-negative integer giving the number of items to sample in 
+      the first and second stage, respectively.  In case of stratified sampling 
+      in the first stage, a vector of non-negative integers, each giving the 
+      number of PSUs to sample from the corresponding stratum, may be 
+      supplied.  For the second stage, a vector of non-negative integers giving 
+      the number of items to sample from each PSU may be used.}
+    \item{\code{prob}:}{A list of length two, with components optionally 
+      specifying variables (columns) that contain probability weights for the 
+      first and second stage, respectively.}
+    \item{\code{dots}:}{A list of length two, in which each component is again 
+      a list containing additional arguments to be passed to the corresponding 
+      function for sampling in \code{fun}.}
+    \item{\code{k}:}{A positive integer giving the number of samples to be set 
+      up.}
+    \item{\code{seed}:}{An integer to be used as initial seed of the random 
+      number generator.  If not supplied explicitly, the seed will be based on 
+      the date and time of construction.}
   }
 }
 \usage{
@@ -78,28 +74,25 @@ TwoStageSampleControl(\dots, fun1 = srs, fun2 = srs,
   There are some restrictions on the argument names of the functions for 
   sampling in \code{fun}.  If the sampling method needs population data as 
   input, the corresponding argument should be called \code{x} and should expect 
-  a \code{data.frame}.  If it only needs the population size as input, the 
-  argument should be called \code{N}.  Note that the function is not expected 
-  to have both \code{x} and \code{N} as arguments, and that the latter is 
-  typically much faster.  Furthermore, if the function has arguments for sample 
-  size and probability weights, they should be called \code{size} and 
-  \code{prob}, respectively.  Note that a function with \code{prob} as its only 
-  argument is perfectly valid (for probability proportional to size sampling).  
-  Further arguments may be supplied as a list via the slot \code{dots}.
+  a data frame.  If it only needs the population size as input, the argument 
+  should be called \code{N}.  Note that the function is not expected to have 
+  both \code{x} and \code{N} as arguments, and that the latter is typically 
+  much faster.  Furthermore, if the function has arguments for sample size and 
+  probability weights, they should be called \code{size} and \code{prob}, 
+  respectively.  Note that a function with \code{prob} as its only argument is 
+  perfectly valid (for probability proportional to size sampling).  Further 
+  arguments may be supplied as a list via the slot \code{dots}.
 }
 \section{Extends}{
-Class \code{"\linkS4class{VirtualSampleControl}"}, directly.
-Class \code{"\linkS4class{OptSampleControl}"}, distance 2.
+Class \code{"\linkS4class{SampleControl}"}, directly.
+Class \code{"\linkS4class{VirtualSampleControl}"}, distance 2.
+Class \code{"\linkS4class{OptSampleControl}"}, distance 3.
 }
 \section{Accessor methods}{
   The following accessor methods are available in addition to the inherited 
   ones:
   
   \describe{
-    \item{\code{getDesign}}{\code{signature(x = "TwoStageControl")}: get slot 
-      \code{design}.}
-    \item{\code{getGrouping}}{\code{signature(x = "TwoStageControl")}: get slot 
-      \code{grouping}.}
     \item{\code{getCollect}}{\code{signature(x = "TwoStageControl")}: get slot 
       \code{collect}.}
     \item{\code{getFun}}{\code{signature(x = "TwoStageControl")}: get slot 
@@ -116,7 +109,7 @@ Class \code{"\linkS4class{OptSampleControl}"}, distance 2.
   The following methods are available in addition to the inherited ones:
   
   \describe{
-    \item{setup}{\code{signature(x = "data.frame", 
+    \item{\code{setup}}{\code{signature(x = "data.frame", 
       control = "TwoStageSampleControl")}: set up multiple samples.}
     \item{\code{show}}{\code{signature(object = "TwoStageSampleControl")}: 
       print the object on the \R console.}

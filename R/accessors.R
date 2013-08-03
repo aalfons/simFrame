@@ -11,75 +11,26 @@
 
 ## data generation
 
-setMethod(
-  "getSize", "VirtualDataControl", 
-  function(x) slot(x, "size"))
-# setMethod(
-#   "setSize", "VirtualDataControl", 
-#   function(x, size) {
-#     eval.parent(substitute(slot(x, "size") <- size, env=parent.frame()), n=2)
-#   })
-
-setMethod(
-  "getDistribution", "DataControl", 
-  function(x) slot(x, "distribution"))
-setMethod(
-  "setDistribution", "DataControl", 
-  function(x, distribution) {
-    eval.parent(substitute(slot(x, "distribution") <- distribution))
-  })
-
-setMethod(
-  "getTuning", "DataControl", 
-  function(x) slot(x, "tuning"))
-setMethod(
-  "setTuning", "DataControl", 
-  function(x, tuning) {
-    if(is.list(tuning)) {
-      tuning$stringsAsFactors <- FALSE
-      tuning <- do.call(expand.grid, tuning)
-    }
-    eval.parent(substitute(slot(x, "tuning") <- tuning))
-  })
-
-setMethod(
-  "getIndices", "DataControl", 
-  function(x) slot(x, "indices"))
-setMethod(
-  "setIndices", "DataControl", 
-  function(x, size, tuning) {
-    eval.parent(substitute(slot(x, "indices") <- convertToIndices(size, tuning, checkZero=FALSE), 
-                           env=parent.frame()), n=2)
-  })
-
-setMethod(
-  "getDots", "DataControl", 
-  function(x) slot(x, "dots"))
-# setMethod(
-#   "setDots", "DataControl", 
-#   function(x, dots) {
-#     eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
-#   })
-
-setMethod(
-  "getColnames", "DataControl", 
-  function(x) slot(x, "colnames"))
-# setMethod(
-#   "setColnames", "DataControl", 
-#   function(x, colnames) {
-#     eval.parent(substitute(slot(x, "colnames") <- colnames))
-#   })
+setMethod("getSize", "VirtualDataControl", function(x) slot(x, "size"))
+setMethod("getFun", "DataControl", function(x) slot(x, "fun"))
+setMethod("getTuning", "DataControl", function(x) slot(x, "tuning"))
+setMethod("getIndices", "DataControl", function(x) slot(x, "indices"))
+setMethod("getDots", "DataControl", function(x) slot(x, "dots"))
+setMethod("getColnames", "DataControl", function(x) slot(x, "colnames"))
 
 
 ## sampling
 
-setMethod(
-  "getK", "VirtualSampleControl", function(x) slot(x, "k"))
+# public accessors (getters)
+setMethod("getK", "VirtualSampleControl", function(x) slot(x, "k"))
+setMethod("getSeed", "VirtualSampleControl", function(x) slot(x, "seed"))
+setMethod("getDesign", "SampleControl", function(x) slot(x, "design"))
+setMethod("getGrouping", "SampleControl", function(x) slot(x, "grouping"))
+
+# private mutators (setters)
 setMethod(
   "setK", "VirtualSampleControl", 
   function(x, k) eval.parent(substitute(slot(x, "k") <- k)))
-
-setMethod("getSeed", "VirtualSampleControl", function(x) slot(x, "seed"))
 setMethod(
   "setSeed", "VirtualSampleControl", 
   function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
@@ -87,77 +38,14 @@ setMethod(
 
 # basic sampling designs
 
-setMethod(
-  "getDesign", "BasicSampleControl", function(x) slot(x, "design"))
-# setMethod(
-#   "setDesign", "BasicSampleControl", 
-#   function(x, design) eval.parent(substitute(slot(x, "design") <- design)))
-
-setMethod(
-  "getGrouping", "BasicSampleControl", function(x) slot(x, "grouping"))
-# setMethod(
-#   "setGrouping", "BasicSampleControl", 
-#   function(x, grouping) {
-#     eval.parent(substitute(slot(x, "grouping") <- grouping))
-#   })
-
-setMethod(
-  "getCollect", "BasicSampleControl", function(x) slot(x, "collect"))
-# setMethod(
-#   "setCollect", "BasicSampleControl", 
-#   function(x, collect) eval.parent(substitute(slot(x, "collect") <- collect)))
-
-setMethod(
-  "getFun", "BasicSampleControl", function(x) slot(x, "fun"))
-setMethod(
-  "setFun", "BasicSampleControl", 
-  function(x, fun) {
-    eval.parent(substitute(slot(x, "fun") <- fun, env=parent.frame()), n=2)
-  })
-
-setMethod(
-  "getSize", "BasicSampleControl", function(x) slot(x, "size"))
-# setMethod(
-#   "setSize", "BasicSampleControl", 
-#   function(x, size) {
-#     eval.parent(substitute(slot(x, "size") <- size, env=parent.frame()), n=2)
-#   })
-
-setMethod(
-  "getProb", "BasicSampleControl", function(x) slot(x, "prob"))
-# setMethod(
-#   "setProb", "BasicSampleControl", 
-#   function(x, prob) {
-#     eval.parent(substitute(slot(x, "prob") <- prob, env=parent.frame()), n=2)
-#   })
-
-setMethod(
-  "getDots", "BasicSampleControl", function(x) slot(x, "dots"))
-# setMethod(
-#   "setDots", "BasicSampleControl", 
-#   function(x, dots) {
-#     eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
-#   })
+setMethod("getCollect", "BasicSampleControl", function(x) slot(x, "collect"))
+setMethod("getFun", "BasicSampleControl", function(x) slot(x, "fun"))
+setMethod("getSize", "BasicSampleControl", function(x) slot(x, "size"))
+setMethod("getProb", "BasicSampleControl", function(x) slot(x, "prob"))
+setMethod("getDots", "BasicSampleControl", function(x) slot(x, "dots"))
 
 
 # two-stage sampling designs
-
-setMethod(
-  "getDesign", "TwoStageSampleControl", function(x) slot(x, "design"))
-# setMethod(
-#   "setDesign", "TwoStageSampleControl", 
-#   function(x, design) eval.parent(substitute(slot(x, "design") <- design)))
-
-setMethod(
-  "getGrouping", "TwoStageSampleControl", function(x) slot(x, "grouping"))
-# setMethod(
-#   "setGrouping", "TwoStageSampleControl", 
-#   function(x, grouping) {
-#     eval.parent(substitute(slot(x, "grouping") <- grouping))
-#   })
-
-# in the following mutators: 'stage' is not available in the environment of 
-# the generic function and needs to be extracted from the additional arguments
 
 setMethod(
   "getFun", "TwoStageSampleControl", 
@@ -170,18 +58,6 @@ setMethod(
     }
   })
 setMethod(
-  "setFun", "TwoStageSampleControl", 
-  function(x, fun, stage = NULL) {
-    pf <- parent.frame()  # environment of generic function
-    if(is.null(stage)) expr <- substitute(slot(x, "fun") <- fun, pf)
-    else {
-      checkStage(stage)
-      expr <- substitute(slot(x, "fun")[[list(...)$stage]] <- fun, pf)
-    }
-    eval.parent(expr, n=2)  # evaluate expression
-  })
-
-setMethod(
   "getSize", "TwoStageSampleControl", 
   function(x, stage = NULL) {
     size <- slot(x, "size")
@@ -191,18 +67,6 @@ setMethod(
       size[[stage]]
     }
   })
-# setMethod(
-#   "setSize", "TwoStageSampleControl", 
-#   function(x, size, stage = NULL) {
-#     pf <- parent.frame()  # environment of generic function
-#     if(is.null(stage)) expr <- substitute(slot(x, "size") <- size, pf)
-#     else {
-#       checkStage(stage)
-#       expr <- substitute(slot(x, "size")[[list(...)$stage]] <- size, pf)
-#     }
-#     eval.parent(expr, n=2)  # evaluate expression
-#   })
-
 setMethod(
   "getProb", "TwoStageSampleControl", 
   function(x, stage = NULL) {
@@ -213,18 +77,6 @@ setMethod(
       prob[[stage]]
     }
   })
-# setMethod(
-#   "setProb", "TwoStageSampleControl", 
-#   function(x, prob, stage = NULL) {
-#     pf <- parent.frame()  # environment of generic function
-#     if(is.null(stage)) expr <- substitute(slot(x, "prob") <- prob, pf)
-#     else {
-#       checkStage(stage)
-#       expr <- substitute(slot(x, "prob")[[list(...)$stage]] <- prob, pf)
-#     }
-#     eval.parent(expr, n=2)  # evaluate expression
-#   })
-
 setMethod(
   "getDots", "TwoStageSampleControl", 
   function(x, stage = NULL) {
@@ -235,20 +87,9 @@ setMethod(
       dots[[stage]]
     }
   })
-# setMethod(
-#   "setDots", "TwoStageSampleControl", 
-#   function(x, dots, stage = NULL) {
-#     pf <- parent.frame()  # environment of generic function
-#     if(is.null(stage)) expr <- substitute(slot(x, "dots") <- dots, pf)
-#     else {
-#       checkStage(stage)
-#       expr <- substitute(slot(x, "dots")[[list(...)$stage]] <- dots, pf)
-#     }
-#     eval.parent(expr, n=2)  # evaluate expression
-#   })
 
 
-# set-up samples
+## set-up samples
 
 # public accessors (getters)
 setMethod("getIndices", "SampleSetup", function(x) slot(x, "indices"))
@@ -259,10 +100,7 @@ setMethod("getCall", "SampleSetup", function(x) slot(x, "call"))
 # private mutators (setters)
 setMethod(
   "setIndices", "SampleSetup", 
-  function(x, indices) {
-    eval.parent(substitute(slot(x, "indices") <- indices, env=parent.frame()), 
-                n=2)
-  })
+  function(x, indices) eval.parent(substitute(slot(x, "indices") <- indices)))
 setMethod(
   "setCall", "SampleSetup", 
   function(x, call) eval.parent(substitute(slot(x, "call") <- call)))
@@ -273,149 +111,26 @@ setMethod("getSize", "SummarySampleSetup", function(x) slot(x, "size"))
 
 ## contamination
 
-setMethod(
-  "getTarget", "VirtualContControl", 
-  function(x) slot(x, "target"))
-# setMethod(
-#   "setTarget", "VirtualContControl", 
-#   function(x, target) eval.parent(substitute(slot(x, "target") <- target)))
-
-setMethod(
-  "getEpsilon", "VirtualContControl", 
-  function(x) slot(x, "epsilon"))
-# setMethod(
-#   "setEpsilon", "VirtualContControl", 
-#   function(x, epsilon) eval.parent(substitute(slot(x, "epsilon") <- epsilon)))
-
-setMethod(
-  "getTuning", "ContControl", 
-  function(x) slot(x, "tuning"))
-setMethod(
-  "setTuning", "ContControl", 
-  function(x, tuning) {
-    if(is.list(tuning)) {
-      tuning$stringsAsFactors <- FALSE
-      tuning <- do.call(expand.grid, tuning)
-    }
-    eval.parent(substitute(slot(x, "tuning") <- tuning))
-  })
-
-setMethod(
-  "getIndices", "ContControl", 
-  function(x) slot(x, "indices"))
-setMethod(
-  "setIndices", "ContControl", 
-  function(x, epsilon, tuning) {
-    eval.parent(substitute(slot(x, "indices") <- convertToIndices(epsilon, tuning, checkZero=TRUE), 
-                           env=parent.frame()), n=2)
-  })
-
-setMethod(
-  "getFun", "BasicContControl", 
-  function(x) slot(x, "fun"))
-setMethod(
-  "setFun", "BasicContControl", 
-  function(x, fun) {
-    eval.parent(substitute(slot(x, "fun") <- fun, env=parent.frame()), n=2)
-  })
-
-setMethod(
-  "getDots", "BasicContControl", 
-  function(x) slot(x, "dots"))
-
-setMethod(
-  "getGrouping", "RandomContControl", 
-  function(x) slot(x, "grouping"))
-# setMethod(
-#   "setGrouping", "RandomContControl", 
-#   function(x, grouping) {
-#     eval.parent(substitute(slot(x, "grouping") <- grouping))
-#   })
-
-setMethod(
-  "getAux", "RandomContControl", 
-  function(x) slot(x, "aux"))
-# setMethod(
-#   "setAux", "RandomContControl", 
-#   function(x, aux) eval.parent(substitute(slot(x, "aux") <- aux)))
-
-setMethod(
-  "getDistribution", "CCARContControl", 
-  function(x) slot(x, "distribution"))
-setMethod(
-  "setDistribution", "CCARContControl", 
-  function(x, distribution) {
-    eval.parent(substitute(slot(x, "distribution") <- distribution))
-  })
-
-setMethod(
-  "getDots", "CCARContControl", 
-  function(x) slot(x, "dots"))
-# setMethod(
-#   "setDots", "CCARContControl", 
-#   function(x, dots) {
-#     eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
-#   })
-
-setMethod(
-  "getFun", "CARContControl", 
-  function(x) slot(x, "fun"))
-setMethod(
-  "setFun", "CARContControl", 
-  function(x, fun) {
-    eval.parent(substitute(slot(x, "fun") <- fun, env=parent.frame()), n=2)
-  })
-
-setMethod(
-  "getDots", "CARContControl", 
-  function(x) slot(x, "dots"))
-# setMethod(
-#   "setDots", "CARContControl", 
-#   function(x, dots) {
-#     eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
-#   })
+setMethod("getTarget", "VirtualContControl", function(x) slot(x, "target"))
+setMethod("getEpsilon", "VirtualContControl", function(x) slot(x, "epsilon"))
+setMethod("getTuning", "ContControl", function(x) slot(x, "tuning"))
+setMethod("getIndices", "ContControl", function(x) slot(x, "indices"))
+setMethod("getFun", "ContControl", function(x) slot(x, "fun"))
+setMethod("getDots", "ContControl", function(x) slot(x, "dots"))
+setMethod("getType", "ContControl", function(x) slot(x, "type"))
+setMethod("getGrouping", "RandomContControl", function(x) slot(x, "grouping"))
+setMethod("getAux", "RandomContControl", function(x) slot(x, "aux"))
 
 
 ## missing values
 
-setMethod(
-  "getTarget", "VirtualNAControl", 
-  function(x) slot(x, "target"))
-# setMethod(
-#   "setTarget", "VirtualNAControl", 
-#   function(x, target) eval.parent(substitute(slot(x, "target") <- target)))
-
-setMethod(
-  "getNARate", "VirtualNAControl", 
-  function(x) slot(x, "NARate"))
-# setMethod(
-#   "setNARate", "VirtualNAControl", 
-#   function(x, NARate) eval.parent(substitute(slot(x, "NARate") <- NARate)))
-
-setMethod(
-  "getGrouping", "NAControl", 
-  function(x) slot(x, "grouping"))
-# setMethod(
-#   "setGrouping", "NAControl", 
-#   function(x, grouping) {
-#     eval.parent(substitute(slot(x, "grouping") <- grouping))
-#   })
-
-setMethod(
-  "getAux", "NAControl", 
-  function(x) slot(x, "aux"))
-# setMethod(
-#   "setAux", "NAControl", 
-#   function(x, aux) eval.parent(substitute(slot(x, "aux") <- aux)))
-
+setMethod("getTarget", "VirtualNAControl", function(x) slot(x, "target"))
+setMethod("getNARate", "VirtualNAControl", function(x) slot(x, "NARate"))
+setMethod("getGrouping", "NAControl", function(x) slot(x, "grouping"))
+setMethod("getAux", "NAControl", function(x) slot(x, "aux"))
 setMethod(
   "getIntoContamination", "NAControl", 
   function(x) slot(x, "intoContamination"))
-# setMethod(
-#   "setIntoContamination", "NAControl", 
-#   function(x, intoContamination) {
-#     eval.parent(substitute(slot(x, "intoContamination") <- intoContamination))
-#   })
 
 
 ## class "SimControl"
@@ -426,44 +141,18 @@ setMethod(
     which <- match.arg(which)
     slot(x, paste(which, "Control", sep=""))
   })
-
 setMethod("getDesign", "SimControl", function(x) slot(x, "design"))
-# setMethod("setDesign", "SimControl", 
-#           function(x, design) eval.parent(substitute(slot(x, "design") <- design)))
-
 setMethod("getFun", "SimControl", function(x) slot(x, "fun"))
-# setMethod("setFun", "SimControl", 
-#           function(x, fun) {
-#             eval.parent(substitute(slot(x, "fun") <- fun, env=parent.frame()), n=2)
-#           })
-
 setMethod("getDots", "SimControl", function(x) slot(x, "dots"))
-# setMethod("setDots", "SimControl", 
-#           function(x, dots) {
-#             eval.parent(substitute(slot(x, "dots") <- dots, env=parent.frame()), n=2)
-#           })
-
 setMethod("getSeed", "SimControl", function(x) slot(x, "seed"))
-setMethod(
-  "setSeed", "SimControl", 
-  function(x, seed) eval.parent(substitute(slot(x, "seed") <- seed)))
 
 
 ## class "SimResults"
 
 # public accessors (getters)
 setMethod("getValues", "SimResults", function(x) slot(x, "values"))
-# setMethod("getDesign", "SimResults", function(x) slot(x, "design"))
 setMethod("getColnames", "SimResults", function(x) slot(x, "colnames"))
 setMethod("getInfo", "SimResults", function(x) slot(x, "info"))
-# setMethod("getEpsilon", "SimResults", function(x) slot(x, "epsilon"))
-# setMethod(
-#   "getTuning", "SimResults", 
-#   function(x, which = c("data", "cont")) {
-#     which <- match.arg(which)
-#     slot(x, paste(which, "Tuning", sep=""))
-#   })
-# setMethod("getNARate", "SimResults", function(x) slot(x, "NARate"))
 setMethod("getNrep", "SimResults", function(x) slot(x, "nrep"))
 setMethod(
   "getControl", "SimResults", 

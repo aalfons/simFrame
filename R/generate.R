@@ -15,11 +15,9 @@ generateS3 <- function(control, i = 1) {
     size <- size[indices[i, 1]]
     tuning <- tuning[indices[i, 2], , drop=FALSE]
   }
-  distribution <- getDistribution(control)
-  dots <- getDots(control)
   nam <- getColnames(control)
   # generate data
-  values <- doCall(distribution, size, tuning, dots)
+  values <- doCall(getFun(control), size, tuning, getDots(control))
   # set column names
   if(is.null(dim(values)) && is.null(nam)) nam <- "V1" 
   values <- as.data.frame(values)

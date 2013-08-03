@@ -18,12 +18,4 @@ setMethod("length", "VirtualContControl", function(x) length(getEpsilon(x)))
 setMethod("length", "ContControl", function(x) nrow(getIndices(x)))
 
 ## NA control
-setMethod("length", "VirtualNAControl", function(x) getLength(getNARate(x)))
-
-
-## internal S3 function
-getLength <- function(x) {
-  if(is(x, "numeric")) length(x) 
-  else if(is(x, "matrix")) nrow(x)
-  else NA  # other classes
-}
+setMethod("length", "VirtualNAControl", function(x) nrow(getNARate(x)))

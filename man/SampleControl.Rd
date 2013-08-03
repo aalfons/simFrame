@@ -2,26 +2,27 @@
 \alias{SampleControl}
 \title{Create sample control objects}
 \usage{
-  SampleControl(..., type = c("Basic", "TwoStage"))
+  SampleControl(..., sub = c("Basic", "TwoStage"))
 }
 \arguments{
   \item{\dots}{arguments passed to the constructor of the
-  class determined by \code{type}.}
+  class determined by \code{sub}.}
 
-  \item{type}{a character string specifying whether a
-  control object of class \code{"BasicSampleControl"} or
-  \code{"TwoStageSampleControl"} should be created.}
+  \item{sub}{a character string specifying whether to
+  create a control object of the subclass
+  \code{"\linkS4class{BasicSampleControl}"} or
+  \code{"\linkS4class{TwoStageSampleControl}"}.}
 }
 \value{
-  An object of class determined by \code{type}.
+  An object of class determined by \code{sub}.
 }
 \description{
   Create objects of a class inheriting from
-  \code{"VirtualSampleControl"}.
+  \code{"\linkS4class{SampleControl}"}.
 }
 \examples{
 data("eusilcP")
-bsc <- SampleControl(size = 20, type = "Basic")
+bsc <- SampleControl(size = 20, sub = "Basic")
 draw(eusilcP[, c("id", "eqIncome")], bsc)
 }
 \author{

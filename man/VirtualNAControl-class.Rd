@@ -16,16 +16,15 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{target}:}{Object of class \code{"OptCharacter"}; a character 
-      vector specifying the variables (columns) in which missing values should 
-      be inserted, or \code{NULL} to insert missing values in all variables 
-      (except the additional ones generated internally).}
-    \item{\code{NARate}:}{Object of class \code{"NumericMatrix"} giving the 
-      missing value rates, which may be selected individually for the target 
-      variables. In case of a vector, the same missing value rates are used for 
-      all target variables. In case of a matrix, on the other hand, the missing 
-      value rates to be used for each target variable are given by the 
-      respective column.}
+    \item{\code{target}:}{A character vector specifying the variables (columns) 
+      into which missing values should be inserted, or \code{NULL} to insert 
+      missing values into all variables (except additional ones generated 
+      internally).}
+    \item{\code{NARate}:}{A numeric matrix giving the missing value rates.  In 
+      case of only one column, the same missing value rates are used for all 
+      target variables.  Otherwise the missing value rates to be used for each 
+      target variable are given by the respective column.  A vector is 
+      converted to a matrix during initialization.}
   }
 }
 \section{Extends}{
@@ -44,8 +43,7 @@ Class \code{"\linkS4class{OptNAControl}"}, directly.
     \item{\code{head}}{\code{signature(x = "VirtualNAControl")}: currently 
       returns the object itself.}
     \item{\code{length}}{\code{signature(x = "VirtualNAControl")}: get the 
-      number of missing value rates to be used (the length in case of a vector 
-      or the number of rows in case of a matrix).}
+      number of missing value rates to be used (i.e., the number of rows).}
     \item{\code{show}}{\code{signature(object = "VirtualNAControl")}: print the 
       object on the \R console.}
     \item{\code{summary}}{\code{signature(object = "VirtualNAControl")}: 

@@ -12,12 +12,18 @@
 \section{Objects from the Class}{
   A virtual Class: No objects may be created from it.
 }
+\section{Slots}{
+  \describe{
+    \item{\code{size}:}{A numeric vector giving the data sizes, i.e., the 
+      numbers of observations to be generated.}
+  }
+}
 \section{Extends}{
 Class \code{"\linkS4class{OptDataControl}"}, directly.
 }
 \section{Accessor methods}{
   \describe{
-    \item{\code{getSize}}{\code{signature(x = "DataControl")}: get slot 
+    \item{\code{getSize}}{\code{signature(x = "VirtualDataControl")}: get slot 
       \code{size}.}
   }
 }

@@ -15,12 +15,10 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{target}:}{Object of class \code{"OptCharacter"}; a character 
-      vector specifying specifying the variables (columns) to be contaminated, 
-      or \code{NULL} to contaminate all variables  (except the additional ones 
-      generated internally).}
-    \item{\code{epsilon}:}{Object of class \code{"numeric"} giving the 
-      contamination levels.}
+    \item{\code{target}:}{A character vector specifying specifying the 
+      variables (columns) to be contaminated, or \code{NULL} to contaminate 
+      all variables (except additional ones generated internally).}
+    \item{\code{epsilon}:}{A numeric vector giving the contamination levels.}
   }
 }
 \section{Extends}{
@@ -63,8 +61,7 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 }
 \seealso{
   \code{"\linkS4class{BasicContControl}"}, 
-  \code{"\linkS4class{CCARContControl}"}, 
-  \code{"\linkS4class{CARContControl}"}, 
+  \code{"\linkS4class{RandomContControl}"}, 
   \code{\link{contaminate}}
 }
 \keyword{classes}

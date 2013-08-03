@@ -10,14 +10,10 @@ setMethod(
     target <- getTarget(control)
     if(is.null(target)) target <- getNames(x)
     lengthTarget <- length(target)
-    NARate <- getNARate(control)
-    if(is(NARate, "numeric")) NARate <- NARate[i]
-    else NARate <- rep(NARate[i,], length.out=lengthTarget)
+    NARate <- getNARate(control)[i,]
+    if(length(NARate) > 1) NARate <- rep(NARate, length.out=lengthTarget)
     if(all(NARate == 0) || any(dim(x) == 0)) return(x)  # nothing to do
     grouping <- getGrouping(control)
-    if(length(grouping) > 1) {
-      stop("'grouping' must not specify more than one variable")
-    }
     useGroup <- as.logical(length(grouping))  # 'grouping' supplied
     aux <- getAux(control)
     if(length(aux) > 1) aux <- rep(aux, length.out=lengthTarget)
@@ -36,7 +32,7 @@ setMethod(
         N <- length(split)
       } else {
         uniqueGroups <- unique(groups)  # unique groups
-        N <- length(uniqueGroups)  # number of groups
+        N <- length(uniqueGroups)       # number of groups
       }
       if(isContaminated) {
         # don't set to NA if any in the group is contaminated
@@ -50,10 +46,8 @@ setMethod(
       aux <- x[, aux]
       if(useGroup) {
         # use the group means (much faster than medians)
-        if(lengthAux == 1) {
-          #aux <- sapply(split, function(i) median(aux[i]))
-          aux <- sapply(split, function(i) mean(aux[i]))
-        } else {
+        if(lengthAux == 1) aux <- sapply(split, function(i) mean(aux[i]))
+        else {
           aux <- aggregate(aux, list(getFactor(groups)), mean)[, -1]
           names(aux) <- auxNames
         }

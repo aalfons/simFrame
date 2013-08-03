@@ -48,7 +48,7 @@
     object itself.}
   \item{\code{signature(x = "SimResults")}}{returns the first parts of 
     simulation results.  The method of \code{\link[utils]{head}} for the 
-    \code{data.frame} in slot \code{values} is thereby called.}
+    data frame in slot \code{values} is thereby called.}
   \item{\code{signature(x = "VirtualContControl")}}{currently returns the 
     object itself.}
   \item{\code{signature(x = "VirtualDataControl")}}{currently returns the 

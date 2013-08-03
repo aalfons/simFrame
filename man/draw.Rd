@@ -18,22 +18,22 @@ draw(x, setup, \dots)
 }
 \arguments{
   \item{x}{the data to sample from.}
-  \item{setup}{an object of class \code{"SampleSetup"} containing previously 
-    set up samples, a control object inheriting from the virtual class 
-    \code{"VirtualSampleControl"} or a character string specifying such a 
-    control class.  If missing, the constructor \code{\link{SampleControl}} is 
-    called to generate the control object.}
-  \item{i}{an integer specifying which one of the previously set up samples 
-    should be drawn.}
+  \item{setup}{an object of class \code{"\linkS4class{SampleSetup}"} containing 
+    previously set up samples, a control object inheriting from class 
+    \code{"\linkS4class{VirtualSampleControl}"} or a character string 
+    specifying such a control class.  If missing, the constructor 
+    \code{\link{SampleControl}} is called to generate the control object.}
+  \item{i}{an integer specifying which one of the previously set up samples to 
+    draw.}
   \item{\dots}{if \code{setup} is a character string or missing, the slots of 
     the control object may be supplied as additional arguments.  See 
     \code{"\linkS4class{BasicSampleControl}"} and 
     \code{"\linkS4class{TwoStageSampleControl}"} for details on the slots.}
 }
 \value{
-  A \code{data.frame} containing the sampled observations.  In addition, the 
-  column \code{".weight"}, which consists of the sample weights, is added to 
-  the \code{data.frame}.
+  A data frame containing the sampled observations.  In addition, the column 
+  \code{".weight"}, which consists of the sample weights, is added to the data 
+  frame.
 }
 \section{Methods}{
   \describe{
@@ -46,8 +46,8 @@ draw(x, setup, \dots)
   \item{\code{x = "data.frame", setup = "SampleSetup"}}{draw a previously set 
     up sample.}
   \item{\code{x = "data.frame", setup = "VirtualSampleControl"}}{draw a sample 
-    using a control object inheriting from the virtual class 
-    \code{"VirtualSampleControl"}.}
+    using a control object inheriting from class 
+    \code{"\linkS4class{VirtualSampleControl}"}.}
   }
 }
 \author{Andreas Alfons}

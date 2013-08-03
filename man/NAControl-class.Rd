@@ -18,28 +18,27 @@ Objects can be created by calls of the form \code{NAControl(\dots)}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{target}:}{Object of class \code{"OptCharacter"}; a character 
-      vector specifying the variables (columns) in which missing values should 
-      be inserted, or \code{NULL} to insert missing values in all variables 
-      (except the additional ones generated internally).}
-    \item{\code{NARate}:}{Object of class \code{"NumericMatrix"} giving the 
-      missing value rates, which may be selected individually for the target 
-      variables. In case of a vector, the same missing value rates are used for 
-      all target variables. In case of a matrix, on the other hand, the missing 
-      value rates to be used for each target variable are given by the 
-      respective column.}
-    \item{\code{grouping}:}{Object of class \code{"character"} specifying a 
-      grouping variable (column) to be used for setting whole groups to 
-      \code{NA} rather than individual values.}
-    \item{\code{aux}:}{Object of class \code{"character"} specifying auxiliary 
+    \item{\code{target}:}{A character vector specifying the variables (columns) 
+      into which missing values should be inserted, or \code{NULL} to insert 
+      missing values into all variables (except additional ones generated 
+      internally).}
+    \item{\code{NARate}:}{A numeric matrix giving the missing value rates.  In 
+      case of only one column, the same missing value rates are used for all 
+      target variables.  Otherwise the missing value rates to be used for each 
+      target variable are given by the respective column.  A vector is 
+      converted to a matrix during initialization.}
+    \item{\code{grouping}:}{An optional character string specifying a grouping 
+      variable (column) to be used for setting whole groups to \code{NA} rather 
+      than individual values.}
+    \item{\code{aux}:}{An optional character vector specifying auxiliary 
       variables (columns) whose values are used as probability weights for 
-      selecting the values to be set to \code{NA} in the respective target 
+      selecting the items to be set to \code{NA} in the respective target 
       variables.  If only one variable (column) is specified, it is used for 
       all target variables.}
-    \item{\code{intoContamination}:}{Object of class \code{"logical"} 
-      indicating whether missing values should also be inserted into 
-      contaminated observations.  The default is to insert missing values only 
-      into non-contaminated observations.}
+    \item{\code{intoContamination}:}{A logical indicating whether missing 
+      values should also be inserted into contaminated observations.  The 
+      default is to insert missing values only into non-contaminated 
+      observations.}
   }
 }
 \section{Extends}{
@@ -90,15 +89,15 @@ data("eusilcP")
 eusilcP$age[eusilcP$age < 0] <- 0  # this actually occurs
 sam <- draw(eusilcP[, c("id", "age", "eqIncome")], size = 20)
 
-## missing completely at random
+# missing completely at random
 mcarc <- NAControl(target = "eqIncome", NARate = 0.2)
 setNA(sam, mcarc)
 
-## missing at random
+# missing at random
 marc <- NAControl(target = "eqIncome", NARate = 0.2, aux = "age")
 setNA(sam, marc)
 
-## missing not at random
+# missing not at random
 mnarc <- NAControl(target = "eqIncome", 
     NARate = 0.2, aux = "eqIncome")
 setNA(sam, mnarc)

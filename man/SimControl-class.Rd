@@ -30,7 +30,7 @@ Objects can be created by calls of the form \code{SimControl(\dots)}.
       arguments to be passed to \code{fun}.}
     \item{\code{seed}:}{Object of class \code{"numeric"} to be used as initial 
       seed of the random number generator.  If not supplied explicitly, the 
-      seed will be based on the date and time of constrution.}
+      seed will be based on the date and time of construction.}
   }
 }
 \section{Details}{
