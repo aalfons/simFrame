@@ -167,6 +167,12 @@ setMethod("getCall", "SimResults", function(x) slot(x, "call"))
 setMethod(
   "setValues", "SimResults", 
   function(x, values) eval.parent(substitute(slot(x, "values") <- values)))
+# setMethod(
+#   "setColnames", "SimResults", 
+#   function(x, colnames) {
+#     eval.parent(substitute(slot(x, "values") <- renameValues(x, colnames)))
+#     eval.parent(substitute(slot(x, "colnames") <- colnames))
+#   })
 setMethod(
   "setCall", "SimResults", 
   function(x, call) eval.parent(substitute(slot(x, "call") <- call)))

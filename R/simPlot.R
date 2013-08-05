@@ -21,9 +21,13 @@ setMethod(
 setMethod(
   "simPlot", "data.frame", 
   function(object, mapping = attr(object, "mapping"), 
-           facets = attr(object, "facets"), ...) {
-    # create selected plot
+           facets = attr(object, "facets"), 
+           labels = NULL, ...) {
+    # initializations
     method <- attr(object, "method")
+    # change factor levels of method column to change labels in the plot
+    if(!is.null(labels)) levels(object$Method) <- labels
+    # create selected plot
     if(method == "box") boxPlot(object, mapping, facets, ...)
     else if(method == "density") densityPlot(object, mapping, facets, ...)
     else linePlot(object, mapping, facets, ...)

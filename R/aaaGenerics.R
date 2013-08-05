@@ -143,6 +143,7 @@ setGeneric("getValues", function(x) standardGeneric("getValues"))
 ## private mutator functions
 
 setGeneric("setCall", function(x, call) standardGeneric("setCall"))
+# setGeneric("setColnames", function(x, colnames) standardGeneric("setColnames"))
 setGeneric("setIndices", function(x, indices) standardGeneric("setIndices"))
 setGeneric("setK", function(x, k) standardGeneric("setK"))
 setGeneric("setSeed", function(x, seed) standardGeneric("setSeed"))

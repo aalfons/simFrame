@@ -219,6 +219,14 @@ getStratumSizes <- function(x, design, USE.NAMES = TRUE) {
   sapply(x, length, USE.NAMES=USE.NAMES)
 }
 
+# # rename columns of simulation results
+# renameValues <- function(object, colnames) {
+#   values <- getValues(object)
+#   info <- setdiff(names(values), getColnames(object))
+#   names(values) <- c(info, colnames)
+#   values
+# }
+
 # evaluate calls to sample methods with stratification and group sampling
 simEval <- function(call, split, groups, unique) {
   if(!missing(split)) {

@@ -22,7 +22,8 @@
         se = TRUE, \dots)
 
 \S4method{simPlot}{data.frame}(object, mapping = attr(object, "mapping"), 
-        facets = attr(object, "facets"), \dots)
+        facets = attr(object, "facets"), 
+        labels = NULL, \dots)
 
 \S4method{autoplot}{SimResults}(object, \dots)
 
@@ -69,6 +70,9 @@
     supplied, \code{\link[ggplot2]{facet_wrap}} or 
     \code{\link[ggplot2]{facet_grid}} is called depending on whether the 
     formula is one-sided or two-sided.}
+
+  \item{labels}{an optional character vector specifying specifying labels for 
+    the simulation results to be used in the plot instead of the column names.}
 
   \item{\dots}{additional arguments to be passed down, eventually to the 
     function drawing the visual representation (see 
