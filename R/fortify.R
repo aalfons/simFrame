@@ -196,32 +196,17 @@ setMethod(
     cond <- info[ninfo > 1]
     if(method == "box") {
       attr(values, "mapping") <- aes_string(x="Method", y="Value")
-      attr(values, "geom") <- geom_boxplot
     } else if(method == "density") {
       attr(values, "mapping") <- aes_string(x="Value", color="Method")
-      attr(values, "geom") <- geom_density
     } else {
       xvars <- setdiff(cond, design)
       whichMax <- which.max(ninfo[xvars])
-      xvar <- cond[whichMax]
-      cond <- cond[-whichMax]
-      if(isTRUE(se)) {
-        attr(values, "mapping") <- aes_string(x=xvar, y="Value", ymin="Lower", 
-                                              ymax="Upper", color="Method", 
-                                              fill="Method")
-        attr(values, "geom") <- function(..., stat) geom_smooth(..., 
-                                                                stat="identity")
-      } else {
-        attr(values, "mapping") <- aes_string(x=xvar, y="Value", color="Method")
-        attr(values, "geom") <- geom_line
-      }
+      attr(values, "mapping") <- aes_string(x=xvars[whichMax], y="Value", 
+                                            ymin="Lower", ymax="Upper", 
+                                            color="Method", fill="Method")
     }
     # add facetting formula
-    if(length(cond) > 0) {
-      if(length(cond) == 2) f <- paste(cond, collapse="~")
-      else f <- paste("~", paste(cond, collapse="+"))
-      attr(values, "facets") <- as.formula(f)
-    }
+    attr(values, "facets") <- convertToFacets(cond)
     ## return data
     attr(values, "method") <- method
     values

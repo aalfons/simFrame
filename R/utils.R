@@ -33,7 +33,15 @@ checkStage <- function(stage) {
 # get NA rate for simulation results
 convertNARate <- function(x) if(ncol(x) == 1) x[, 1] else seq_len(nrow(x)) 
 
-## get matrix of indices in a vector and a data frame with tuning parameters
+# convert character vector to facetting formula
+convertToFacets <- function(x) {
+  if(length(x) == 0) return(NULL)
+  if(length(x) == 2) f <- paste(x, collapse="~")
+  else f <- paste("~", paste(x, collapse="+"))
+  as.formula(f)
+}
+
+# get matrix of indices in a vector and a data frame with tuning parameters
 convertToIndices <- function(x, tuning, checkZero = TRUE) {
   # obtain indices
   nTuning <- nrow(tuning)
@@ -58,7 +66,7 @@ convertToIndices <- function(x, tuning, checkZero = TRUE) {
 # get tuning parameters for simulation results
 convertTuning <- function(x) if(ncol(x) == 1) x[, 1] else seq_len(nrow(x)) 
 
-## call a function by either
+# call a function by either
 # 1) simply evaluating a supplied function for the first argument if there are
 #    no additional arguments in list format
 # 2) evaluating a supplied function with 'do.call' if there are additional 
@@ -99,7 +107,7 @@ getCharacter <- function(x, names) {
   else character()  # other classes
 }
 
-## get empty results
+# get empty results
 getEmptyResults <- function(control) {
   neps <- length(getControl(control, which="cont"))
   if(neps == 0) neps <- 1
@@ -217,6 +225,15 @@ getStrataTable <- function(x, design) {
 getStratumSizes <- function(x, design, USE.NAMES = TRUE) {
   if(is(x, "data.frame")) x <- getStrataSplit(x, design)
   sapply(x, length, USE.NAMES=USE.NAMES)
+}
+
+# remove variables from facetting formula
+removeFacets <- function(x, which) {
+  # convert everything to character vectors
+  x <- all.vars(x)
+  which <- as.character(which)
+  # remove specified variables and construct new facetting formula
+  convertToFacets(setdiff(x, which))      
 }
 
 # # rename columns of simulation results
