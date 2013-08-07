@@ -85,12 +85,13 @@ linePlot <- function(data, mapping, facets = NULL, main = NULL,
   if(is.null(ylab)) ylab <- "Simulation results"
   # define the function to draw the visual representation depending on whether 
   # a confidence band is specified in the aesthetic mapping
-  if(is.null(mapping$ymin) || is.null(mapping$ymax)) geom <- geom_line
-  else if(is.null(mapping$colour)) {
-    geom <- function(..., col = "black", stat) {
-      geom_smooth(..., col=col, stat="identity")
-    }
-  } else geom <- function(..., stat) geom_smooth(..., stat="identity")
+  geom <- 
+    if(is.null(mapping$ymin) || is.null(mapping$ymax)) geom_line
+    else if(is.null(mapping$colour)) {
+      function(..., col = "black", stat) {
+        geom_smooth(..., col=col, stat="identity")
+      }
+    } else function(..., stat) geom_smooth(..., stat="identity")
   # drop x-variable from facetting formula
   facets <- removeFacets(facets, mapping$x)
   # generate plot

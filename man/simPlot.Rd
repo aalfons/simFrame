@@ -18,8 +18,7 @@
 \S4method{simPlot}{SimResults}(object, data = NULL, cont = NULL, 
         miss = NULL, select = NULL, 
         method = c("box", "density", "line"), 
-        average = c("mean", "median"), 
-        se = TRUE, \dots)
+        average = c("mean", "median"), \dots)
 
 \S4method{simPlot}{data.frame}(object, mapping = attr(object, "mapping"), 
         facets = attr(object, "facets"), 
@@ -59,9 +58,6 @@
     specifying how the averages should be computed.  Possible values are 
     \code{"mean"} for the mean (the default) or \code{"median"} for the 
     median.}
-
-  \item{se}{if \code{method} is \code{"line"}, a logical indicating whether 
-    to display an approximate confidence interval (defaults to \code{FALSE}).}
 
   \item{mapping}{an aesthetic mapping to override the default behavior (see 
     \code{\link[ggplot2]{aes}} or \code{\link[ggplot2]{aes_string}}).}

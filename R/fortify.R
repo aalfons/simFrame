@@ -7,7 +7,7 @@ setMethod(
   "fortify", "SimResults", 
   function(model, data, cont = NULL, miss = NULL, select = NULL, 
            method = c("box", "density", "line"), average = c("mean", "median"), 
-           se = TRUE, ...) {
+           ...) {
     ## initializations (generic function has no default for 'data')
     if(missing(data)) data <- NULL
     # take the requested subset of the results
