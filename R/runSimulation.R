@@ -60,15 +60,23 @@ setMethod(
 
 # 'i' as first argument is necessary for parallel computing with 'parLapply'
 modelSimulation <- function(i, x, control) {
+  # generate data
   md <- try(generate(x, i))
   if(class(md) == "try-error") return(getEmptyResults(control))
+  # tuning parameters to be passed to the function for simulation runs
+  if(is(x, "DataControl")) {
+    indices <- getIndices(x)
+    tuning <- getTuning(x)
+    if(nrow(indices)) tuning <- tuning[indices[i, 2], , drop=FALSE]
+  } else tuning <- list()
+  # run simulations for current data
   design <- getDesign(control)
   if(length(design)) {
     spl <- getStrataSplit(md, design, USE.NAMES=FALSE)
     leg <- getStrataLegend(md, design)
     mdSpl <- lapply(spl, function(s, x) x[s, , drop=FALSE], md)
-    manageSimulationByDomain(mdSpl, spl, control, leg)
-  } else manageSimulation(md, control)
+    manageSimulationByDomain(mdSpl, spl, control, leg, tuning)
+  } else manageSimulation(md, control, tuning)
 }
 
 
@@ -119,16 +127,18 @@ setMethod(
   })
 
 # internal function also used for parallel computing with 'parLapply'
-designSimulation <- function(i, x, setup, control) {
+designSimulation <- function(i, x, setup, control, tuning = list()) {
+  # draw sample
   sam <- drawS3(x, setup, i)
   if(nrow(sam) == 0) return(getEmptyResults(control))
+  # run simulations for current sample
   design <- getDesign(control)
   if(length(design)) {
     spl <- getStrataSplit(sam, design, USE.NAMES=FALSE)
     leg <- getStrataLegend(sam, design)
     samSpl <- lapply(spl, function(s, x) x[s, , drop=FALSE], sam)
-    manageSimulationByDomain(samSpl, spl, control, leg)
-  } else manageSimulation(sam, control)
+    manageSimulationByDomain(samSpl, spl, control, leg, tuning)
+  } else manageSimulation(sam, control, tuning)
 }
 
 
@@ -179,11 +189,17 @@ mixedSimulation <- function(i, x, setup, control) {
     # return empty results for each sample
     return(replicate(nsamp, getEmptyResults(control), simplify=FALSE))
   }
+  # tuning parameters to be passed to the function for simulation runs
+  if(is(x, "DataControl")) {
+    indices <- getIndices(x)
+    tuning <- getTuning(x)
+    if(nrow(indices)) tuning <- tuning[indices[i, 2], , drop=FALSE]
+  } else tuning <- list()
   # set up samples (empty vector in case of error in one iteration)
   setup <- setup(md, setup)
   # run design-based simulations on the generated data with the set up samples
   s <- seq_len(nsamp)
-  lapply(s, designSimulation, md, setup, control)
+  lapply(s, designSimulation, md, setup, control, tuning)
 }
 
 
@@ -243,14 +259,16 @@ setMethod(
 
 
 ## workhorse function for simulations
-manageSimulation <- function(x, control) {
+manageSimulation <- function(x, control, tuning = list()) {
   # initializations
   contControl <- getControl(control, which="cont")
   neps <- length(contControl)
   NAControl <- getControl(control, which="NA")
   nNA <- length(NAControl)
   fun <- getFun(control)
-  useOrig <- "orig" %in% argNames(fun)
+  nam <- argNames(fun)
+  useOrig <- "orig" %in% nam
+  tuning <- tuning[names(tuning) %in% nam]
   dots <- getDots(control)
   # get results
   if(neps) {
@@ -263,7 +281,7 @@ manageSimulation <- function(x, control) {
                       lapply(seq_len(nNA), 
                              function(n) try({
                                nx <- setNA(cx, NAControl, n)
-                               ca <- as.call(c(fun, dots))
+                               ca <- as.call(c(fun, tuning, dots))
                                ca$x <- nx
                                if(useOrig) ca$orig <- x
                                getSimResult(eval(ca))
@@ -275,7 +293,7 @@ manageSimulation <- function(x, control) {
       lapply(seq_len(neps), 
              function(e) try({
                cx <- contaminate(x, contControl, e)
-               ca <- as.call(c(fun, dots))
+               ca <- as.call(c(fun, tuning, dots))
                ca$x <- cx
                if(useOrig) ca$orig <- x
                getSimResult(eval(ca))
@@ -287,7 +305,7 @@ manageSimulation <- function(x, control) {
       lapply(seq_len(nNA), 
              function(n) try({
                nx <- setNA(x, NAControl, n)
-               ca <- as.call(c(fun, dots))
+               ca <- as.call(c(fun, tuning, dots))
                ca$x <- nx
                if(useOrig) ca$orig <- x
                getSimResult(eval(ca))
@@ -295,7 +313,7 @@ manageSimulation <- function(x, control) {
     } else {
       # no contamination, no missings
       try({
-        ca <- as.call(c(fun, dots))
+        ca <- as.call(c(fun, tuning, dots))
         ca$x <- x
         if(useOrig) ca$orig <- x
         getSimResult(eval(ca))
@@ -306,7 +324,8 @@ manageSimulation <- function(x, control) {
 
 
 ## workhorse function for simulations broken down by domain
-manageSimulationByDomain <- function(xs, indices, control, legend) {
+manageSimulationByDomain <- function(xs, indices, control, legend, 
+                                     tuning = list()) {
   # initializations
   contControl <- getControl(control, which="cont")
   neps <- length(contControl)
@@ -316,6 +335,7 @@ manageSimulationByDomain <- function(xs, indices, control, legend) {
   nam <- argNames(fun)
   useOrig <- "orig" %in% nam
   useDomain <- "domain" %in% nam
+  tuning <- tuning[names(tuning) %in% nam]
   dots <- getDots(control)
   # get results
   if(neps) {
@@ -331,7 +351,7 @@ manageSimulationByDomain <- function(xs, indices, control, legend) {
                                  tmp <- mapply(
                                    function(cx, x, i) {
                                      nx <- setNA(cx, NAControl, n)
-                                     ca <- as.call(c(fun, dots))
+                                     ca <- as.call(c(fun, tuning, dots))
                                      ca$x <- nx
                                      if(useOrig) ca$orig <- x
                                      if(useDomain) ca$domain <- i
@@ -351,7 +371,7 @@ manageSimulationByDomain <- function(xs, indices, control, legend) {
                  tmp <- mapply(
                    function(x, i) {
                      cx <- contaminate(x, contControl, e)
-                     ca <- as.call(c(fun, dots))
+                     ca <- as.call(c(fun, tuning, dots))
                      ca$x <- cx
                      if(useOrig) ca$orig <- x
                      if(useDomain) ca$domain <- i
@@ -371,7 +391,7 @@ manageSimulationByDomain <- function(xs, indices, control, legend) {
                  tmp <- mapply(
                    function(x, i) {
                      nx <- setNA(x, NAControl, n)
-                     ca <- as.call(c(fun, dots))
+                     ca <- as.call(c(fun, tuning, dots))
                      ca$x <- nx
                      if(useOrig) ca$orig <- x
                      if(useDomain) ca$domain <- i
@@ -386,7 +406,7 @@ manageSimulationByDomain <- function(xs, indices, control, legend) {
       try({
         tmp <- mapply(
           function(x, i) {
-            ca <- as.call(c(fun, dots))
+            ca <- as.call(c(fun, tuning, dots))
             ca$x <- x
             if(useOrig) ca$orig <- x
             if(useDomain) ca$domain <- i
