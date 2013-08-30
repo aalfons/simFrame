@@ -1,0 +1,1726 @@
+% \documentclass[article]{jss}
+\documentclass[article,shortnames,nojss]{jss}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Andreas Alfons\\Erasmus University Rotterdam \And Matthias Templ\\Vienna University of\\Technology,\\Statistics Austria \And Peter Filzmoser\\Vienna University of\\Technology}
+\title{An Object-Oriented Framework for Statistical Simulation: The \proglang{R} Package \pkg{simFrame}}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Andreas Alfons, Matthias Templ, Peter Filzmoser} %% comma-separated
+\Plaintitle{An Object-Oriented Framework for Statistical Simulation: The R Package simFrame} %% without formatting
+\Shorttitle{An Object-Oriented Framework for Statistical Simulation} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{
+This package vignette is based on \citet{alfons10d} (published in 
+the \emph{Journal of Statistical Software}), but has been updated to reflect 
+changes in the package.
+
+Simulation studies are widely used by statisticians to gain insight into the 
+quality of developed methods. Usually some guidelines regarding, e.g., 
+simulation designs, contamination, missing data models or evaluation criteria 
+are necessary in order to draw meaningful conclusions. The \proglang{R} package 
+\pkg{simFrame} is an object-oriented framework for statistical simulation, 
+which allows researchers to make use of a wide range of simulation designs with 
+a minimal effort of programming. Its object-oriented implementation provides 
+clear interfaces for extensions by the user. Since statistical simulation is an 
+embarrassingly parallel process, the framework supports parallel computing 
+to increase computational performance. Furthermore, an appropriate plot method 
+is selected automatically depending on the structure of the simulation results. 
+In this paper, the implementation of \pkg{simFrame} is discussed in great 
+detail and the functionality of the framework is demonstrated in examples for 
+different simulation designs.
+}
+\Keywords{\proglang{R}, statistical simulation, outliers, missing values, parallel computing}
+\Plainkeywords{R, statistical simulation, outliers, missing values, parallel computing} %% without formatting
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{13}
+%% \Issue{9}
+%% \Month{September}
+%% \Year{2004}
+%% \Submitdate{2004-09-29}
+%% \Acceptdate{2004-09-29}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Andreas Alfons\\
+  Erasmus School of Economics\\ 
+  Erasmus University Rotterdam\\
+  Burgemeester Oudlaan 50\\
+  3062PA Rotterdam, The Netherlands\\
+  E-mail: \email{alfons@ese.eur.nl}\\
+  URL: \url{http://people.few.eur.nl/alfons/}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/1/31336-5053
+%% Fax: +43/1/31336-734
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave}
+
+%%\VignetteIndexEntry{An Object-Oriented Framework for Statistical Simulation: The R Package simFrame}
+%%\VignetteDepends{simFrame}
+%%\VignetteKeywords{R, statistical simulation, outliers, missing values, parallel computing}
+%%\VignettePackage{simFrame}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+
+%% style of code examples in minipages
+%\lstset{frame=trbl,basicstyle=\small\tt,stepnumber=2,numbers=left}
+\lstset{frame=trbl,basicstyle=\small\tt,numbers=none}
+
+
+
+\begin{document}
+
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+
+
+%% load package 'simFrame'
+<<echo=FALSE, results=hide>>=
+options(prompt = "R> ", continue = "+  ", width = 75, useFancyQuotes = FALSE)
+library("simFrame")
+set.seed(1234)
+@
+
+%% specify folder and name for Sweave graphics
+%\SweaveOpts{prefix.string=figures-intro/fig}
+
+
+%% ----------
+%% introduction
+%% ----------
+
+\section{Introduction}
+Due to the complexity of modern statistical methods, obtaining analytical 
+results about their properties is often virtually impossible. Therefore, 
+simulation studies are widely used by statisticians as data-based, 
+computer-intensive alternatives for gaining insight into the quality of 
+developed methods. However, research projects commonly involve many scientists, 
+often from different institutions, each focusing on different aspects of the 
+project. If these researchers use different simulation designs, the results may 
+be incomparable, which in turn makes it impossible to draw meaningful 
+conclusions. Hence simulation studies in such research projects require a 
+precise outline.
+
+The \proglang{R} package \pkg{simFrame} \citep{alfons10c} is an 
+object-oriented framework for statistical simulation addressing this problem. 
+Its implementation follows an object-oriented approach based on \proglang{S4} 
+classes and methods \citep{chambers98, chambers08}. A key feature is that 
+statisticians can make use of a wide range of simulation designs with a minimal 
+effort of programming. The object-oriented implementation gives maximum control 
+over input and output, while at the same time providing clear interfaces for 
+extensions by user-defined classes and methods.
+
+Comprehensive literature exists on statistical simulation, but is mainly 
+focused on technical aspects \citep[e.g.,][]{morgan84,ripley87,johnson87}. 
+Unfortunately, hardly any publications are available regarding the conceptual 
+elements and general design of modern simulation experiments. To name some 
+examples, \citet{muennich03a} and \citet{alfons09} describe how 
+close-to-reality simulations may be performed in survey statistics, while 
+\citet{burton06} address applications in medical statistics. Furthermore, while 
+simulation studies are widely used in scientific articles, they are often 
+described only briefly and without sufficient details on all the processes 
+involved. Having a framework with different simulation designs ready at hand 
+may help statisticians to plan simulation studies for their needs.
+
+Statistical simulation is frequently divided into two categories: 
+\emph{design-based} and \emph{model-based} simulation. Design-based simulation 
+is popular in survey statistics, as samples are drawn repeatedly from a finite 
+population. The close-to-reality approach thereby uses the true sampling 
+designs for real-life surveys such as EU-SILC (European Union Statistics 
+on Income and Living Conditions). In every iteration, certain estimators such 
+as indicators are computed or other statistical procedures such as imputation 
+are applied. The obtained values can then be compared to the true population 
+values where appropriate. Nevertheless, since real population data is only in 
+few cases available to researchers, synthetic populations may be generated from 
+existing samples \citep[see, e.g.,][]{muennich03a, muennich03b, raghunathan03, 
+alfons10a}. Such synthetic populations must reflect the structure of the 
+underlying sample regarding dependencies among the variables and heterogeneity. 
+For household surveys, population data can be generated using the \proglang{R} 
+package \pkg{simPopulation} \citep{kraft10}. In model-based simulation, on the 
+other hand, data sets are generated repeatedly from a distributional model or a 
+mixture of distributions. In every iteration, certain methods are applied and 
+quantities of interest are computed for comparison. Where appropriate, 
+reference values can be obtained from the underlying theoretical distribution.
+\emph{Mixed} simulation designs constitute a combination of the two approaches, 
+in which samples are drawn repeatedly from each generated data set.
+
+The package \pkg{simFrame} is intended to be as general as possible, but has 
+initially been developed for close-to-reality simulation studies in survey 
+statistics. Moreover, it is focused on simulations involving typical data 
+problems such as outliers and missing values. Therefore, certain proportions of 
+the data may be contaminated or set as missing in order to investigate the 
+quality and behavior of, e.g., robust estimators or imputation methods. In 
+addition, an appropriate plot method for the simulation results is selected 
+automatically depending on their structure. Note that statistical simulation is 
+a very loose concept, though, and that the application of \pkg{simFrame} may 
+be subject to limitations in certain scenarios.
+
+Section~\ref{sec:S4} gives a brief introduction to the basic concepts of 
+object-oriented programming and the \proglang{S4} system. In 
+Section~\ref{sec:design}, the design of the framework is motivated and 
+Section~\ref{sec:imp} describes the implementation in great detail. 
+Section~\ref{sec:parallel} then provides details about parallel computing with 
+\pkg{simFrame}. The use of the package for different simulation designs is 
+demonstrated in Section~\ref{sec:use}. Additional examples for design-based 
+simulation are given in a supplementary paper. How to extend the framework is 
+outlined in Section~\ref{sec:ext}. Finally, Section~\ref{sec:conclusion} 
+contains concluding remarks and gives an outlook on future developments.
+
+\paragraph{}
+
+
+%% ----------
+%% object-oriented programming
+%% ----------
+
+\section[Object-oriented programming and S4]{Object-oriented programming and \proglang{S4}}
+\label{sec:S4}
+The object-oriented paradigm states that problems are formulated using 
+interacting objects rather than a set of functions. The properties of these 
+objects are defined by \emph{classes} and their behavior and interactions are 
+modeled with \emph{generic functions} and \emph{methods}. One of the most 
+important concepts of object-oriented programming is \emph{class inheritance}, 
+i.e., \emph{subclasses} inherit properties and behavior from their 
+\emph{superclasses}. Thus code can be shared for related classes, which is the 
+main advantage of inheritance. In addition, subclasses may have additional 
+properties and behavior, so in this sense they \emph{extend} their 
+superclasses. In \textsf{S4} \citep{chambers98, chambers08}, properties of 
+objects are stored in \emph{slots} and can be accessed or modified with 
+the~\code{@} operator or the \code{slot()} function. 
+However, \emph{accessor} methods are supposed to be used to access properties 
+of objects in \pkg{simFrame} (see Section~\ref{sec:accessors}). \emph{Virtual 
+classes} are special classes from which no objects can be created. They exist 
+for the sole reason of sharing code. Furthermore, \emph{class unions} are 
+special virtual classes with no slots.
+
+Generic functions define the formal arguments that are evaluated in a function 
+call in order to select the actual method to be used. These methods are defined 
+by their \emph{signatures}, which assign classes to the formal arguments. In 
+short, generic functions define \emph{what} should be done and methods define 
+\emph{how} this should be done for different (combinations of) classes. 
+As an example, the generic function \code{setNA()} is used in \pkg{simFrame} to 
+insert missing values into a data set. These are the available methods:
+
+<<>>=
+showMethods("setNA")
+@
+
+Even though a simple object-oriented mechanism was introduced in \proglang{S3} 
+\citep{chambers92}, it is not sufficient for the purpose of implementing a 
+flexible framework for statistical simulation. Only \proglang{S4} offers 
+consequent implementations of advanced object-oriented techniques such as 
+inheritance, object validation and method signatures. In \proglang{S3}, 
+inheritance is realized by simply using a vector for the \code{class} 
+attribute, hence there is no way to guarantee that the subclass contains all 
+properties of the superclass. It should be noted that the tradeoff of these 
+advanced programming techniques is a slightly increased computational overhead. 
+Nevertheless, with modern computing power, this is not a substantial issue.
+
+
+%% ----------
+%% design
+%% ----------
+
+\section{Design of the framework} \label{sec:design}
+
+Statistical simulation in \proglang{R} \citep{R10} is often done using bespoke 
+use-once-and-throw-away scripts, which is perfectly fine when only a handful of 
+simulation studies need to be done for a specific purpose such as a paper. But 
+when a research project is based on extensive simulation studies with many 
+different simulation designs, this approach has its limitations since 
+substantial changes may need to be applied to the \proglang{R} scripts for
+each design. In addition, if many partners are involved in the project and each 
+of them writes their own scripts, they need to be very well coordinated so that 
+the implemented simulation designs are similar, otherwise the obtained results 
+may not be comparable.
+
+The fundamental design principle of \pkg{simFrame} is that the behavior of
+functions is determined by \emph{control objects}. A collection of such control 
+objects, including a function to be applied in each iteration, is simply 
+plugged into a generic function called \code{runSimulation()}, which then 
+performs the simulation experiment. This allows to easily switch from one 
+simulation design to another by just plugging in different control objects. 
+Note that the user does not have to program any loops for iterations or collect 
+the results in a suitable data structure, the framework takes care of this. 
+Furthermore, by using the package as a common framework for simulation in 
+research projects, guidelines for simulation studies may be defined by 
+selecting specific control classes and parameter settings. If the researchers 
+decide on a set of control objects to be used in the simulation studies, this 
+ensures comparability of the obtained results and avoids problems with drawing 
+conclusions from the project. Defining control objects thereby requires only a 
+few lines of code, and storing them as \code{RData} files in order to 
+distribute them among partners is much easier than ensuring that a large number 
+of \proglang{R} scripts with big chunks of bespoke code are comparable.
+
+As a motivational example, consider a research project in which researchers~A 
+and~B investigate a specific survey such as EU-SILC (European Union 
+Statistics on Income and Living Conditions). Researcher~A focuses on robust 
+estimation of certain indicators, while researcher~B tries to improve the data 
+quality with more suitable imputation and outlier detection methods. The aim of 
+the project is to evaluate the developed methods with extensive simulation 
+studies. In order to be as realistic as possible, design-based simulation 
+studies are performed, where samples are drawn repeatedly from (synthetic) 
+population data. Let the survey of interest in real life be conducted in many 
+countries with different sampling designs. Then A and B could each define some 
+control objects for the most common sampling designs and exchange them so that 
+they can plug each of them into the function \code{runSimulation()} along with 
+the population data. 
+
+Since imputation methods and outlier detection methods typically make some 
+theoretical assumptions about the data, B could also carry out model-based 
+simulation studies, in which the data are repeatedly generated from a certain 
+theoretical distribution. All B needs to change is to define a control object 
+to generate the data and supply it to \code{runSimulation()} instead of the 
+population data and the control object for sampling.
+
+Both researchers in this example investigate robust methods. It may be of 
+interest to explore the behavior of these methods under different contamination 
+models (the term \emph{contamination} is used in a technical sense in this 
+paper, see Section~\ref{sec:imp-cont} for a definition). This can again be done 
+by defining and exchanging a set of control objects. In addition, B can define 
+various control objects for inserting missing values into the data in order to 
+study the performance of imputation methods. Switching from one contamination 
+model or missing data mechanism to another is simply done by replacing the 
+respective control object in the call to \code{runSimulation()}. B could also 
+supply a control object for inserting contamination and one for inserting 
+missing values to investigate robust imputation methods or outlier detection 
+methods for incomplete data.
+
+One example for such research projects is the project AMELI (Advanced 
+Methodology of European Laeken Indicators,
+\url{http://ameli.surveystatistics.net}), in the course of which the package 
+\pkg{simFrame} has been developed.
+
+
+\subsection{UML class diagram}
+The Unified Modeling Language (UML) \citep{fowler03} is a standardized modeling 
+language used in software engineering. It provides a set of graphical tools to 
+model object-oriented programs. A \emph{class diagram} visualizes the structure 
+of a software system by showing classes, attributes, and relationships between 
+the classes. Figure~\ref{fig:UML} shows a slightly simplified \proglang{UML} 
+class diagram of \pkg{simFrame}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{UML}
+\caption{Slightly simplified \proglang{UML} class diagram of \pkg{simFrame}.}
+\label{fig:UML}
+\end{center}
+\end{figure}
+
+In this example, classes are represented by boxes with two parts. The top part 
+contains the name of the class and the bottom part lists its slots. Class 
+names in italics thereby indicate virtual classes. Furthermore, each 
+slot is followed by the name of its class, which can be a basic \proglang{R} 
+data type such as \code{numeric}, \code{character}, \code{logical}, 
+\code{list} or \code{function}, but also an \proglang{S4} class.
+
+Lines or arrows of different forms represent class relationships. Inheritance 
+is denoted by an arrow with an empty triangular head pointing to the 
+superclass. Composition, i.e., a class having another class as a slot, is 
+depicted by an arrow with a solid black diamond on the side of the composed 
+class. 
+A solid line indicates an \emph{association} between two classes. Here an 
+association signals that there is a method with one class as primary input and 
+the other class as output. Last but not least, a dashed line denotes an 
+\emph{association class}, which in the case of \pkg{simFrame} is a control 
+class that is not the primary input of the corresponding method but 
+nevertheless determines its behavior.
+
+
+\subsection{Naming conventions}
+In order to facilitate the usage of the framework, the following naming rules 
+are introduced:
+\begin{itemize}
+  \item Names of classes, slots, functions and methods are alphanumeric in 
+  mixed case, where the first letter of each internal word is capitalized.
+  \item Class names start with an uppercase letter.
+  \item Functions, methods and slots start with a lowercase letter. 
+  Exceptions are functions that initialize a class, which are called 
+  \emph{constructors} and have the same name as the class.
+  \item Violate the above rules whenever necessary to maintain compatibility.
+\end{itemize}
+These rules are based on code conventions for the programming language 
+\proglang{Java} \citep[e.g.,][]{arnold05}, see 
+\url{http://java.sun.com/docs/codeconv/}.  Some \proglang{R} packages, e.g., 
+\pkg{rrcov} \citep{todorov09, todorov10}, use similar rules.
+
+
+\subsection{Accessor methods} \label{sec:accessors}
+In object-oriented programming languages, \emph{accessor} and \emph{mutator} 
+methods are typically used to retrieve and change the properties of a class, 
+respectively. The idea behind this concept is to hide information about the 
+actual implementation of a class (e.g., what data structures are used) from the 
+user. In \pkg{simFrame}, accessors are named \code{getFoo()}, where \code{foo} 
+typically is the name of a slot. 
+This naming convention is common in \proglang{Java} and is also used in some 
+\proglang{R} packages (e.g., \pkg{rrcov}). 
+
+The use of accessor methods in \pkg{simFrame} is illustrated with the class 
+\code{NAControl}, which handles the insertion of missing values into a data set 
+(see Section~\ref{sec:imp-NA}). Its slot \code{NARate} controls the 
+proportion of missing values to be inserted.
+ 
+<<>>=
+nc <- NAControl(NARate = 0.05)
+getNARate(nc)
+@
+
+Note that mutator methods are not available since objects are not supposed to 
+be modified directly by the user. For changes in simulation designs, users are 
+expected to create new control objects rather than modifying existing ones. 
+However, as already mentioned in Section~\ref{sec:S4}, \proglang{R} allows 
+every slot to be modified with the~\code{@} operator or the \code{slot()} 
+function.
+
+
+%% ----------
+%% implementation
+%% ----------
+
+\section{Implementation} \label{sec:imp}
+
+The open-source statistical environment \proglang{R} has become the main 
+framework for computing in statistics research. One of its main advantages is 
+that it includes a well-developed programming language and provides interfaces 
+to many others, including the fast low-level languages \proglang{C} and 
+\proglang{Fortran}. The \proglang{S4} system \citep{chambers98, chambers08} 
+complies with all requirements for an object-oriented framework for statistical 
+simulation. Thus most of \pkg{simFrame} is implemented as \proglang{S4} classes 
+and methods, except some utility functions and some \proglang{C++} code. 
+
+Method selection for generic functions is based on \emph{control classes}, 
+which in most cases provides the interfaces for extensions by developers (see 
+Section~\ref{sec:ext}). Most of these generic functions are not expected to be 
+called by the user directly. The idea of the framework is rather to define a 
+number of control objects and to supply them to the function 
+\code{runSimulation()}, which performs the whole simulation experiment and 
+calls the other functions internally (see Section~\ref{sec:run} or the examples 
+in Section~\ref{sec:use}).
+
+
+\subsection{Data handling} \label{sec:imp-data}
+In \proglang{R}, data are typically stored in a data frame, and 
+\pkg{simFrame} is no exception. However, when samples are taken from a finite 
+population in design-based simulation studies, each observation in the sample 
+represents a number of observations in the population, given by the sample 
+weights. Unless a basic sampling procedure such as simple random sampling is 
+used, the weights are in general not equal for all sampled observations and 
+need to be considered to obtain unbiased estimates. But even if the weights are 
+equal for all observations, they may be needed for the estimation of population 
+totals (e.g., the total turnover of all businesses in a country). In practice, 
+the initial weights are also frequently modified by calibration 
+\citep[e.g.,][]{deville93}, which for simple random sampling is done after 
+post-stratification \citep[e.g.,][]{cochran77}. Therefore, the sample weights 
+need to be stored. 
+
+In addition, the package has been designed with special emphasis on simulations 
+involving typical data problems such as outliers and missing values. It offers 
+mechanisms to contaminate the data and insert missing values so that the 
+influence of these data problems on statistical methods can be investigated, or 
+that outlier detection or imputation methods can be evaluated. The term 
+\emph{contamination} is used in a technical sense here (see 
+Section~\ref{sec:imp-cont} for a definition). Information on which observations 
+are contaminated is often required, both for the user running simulations and 
+for internal use. Since it cannot be retrieved from the data otherwise, it 
+needs to be saved. 
+
+As a result, additional variables are added to the data set in these 
+situations. The names of the additional variables are \code{".weight"} and 
+\code{".contaminated"}, respectively. Hence these column names should be 
+avoided (which is why they start with a dot), or else the corresponding columns 
+will be overwritten.
+
+Statistical methods often make assumptions about the distribution of the data, 
+e.g., outlier detection methods in multivariate statistics usually assume that 
+the majority of the data follow a multivariate normal distribution. 
+Consequently, such methods are typically tested in simulations on data coming 
+from a certain theoretical distribution. The generation of data from a 
+distributional model is handled by control classes inheriting from the virtual 
+class \code{VirtualDataControl}. This virtual class is available so that the 
+framework can be extended by the user (see Section~\ref{sec:ext-data}) and 
+consists of only one slot (see Figure~\ref{fig:UML}):
+\begin{description}
+  \item[\code{size}:] A numeric vector giving the data sizes, i.e., different 
+  numbers of observations to be generated in the simulation.
+\end{description}
+
+A simple control class already implemented in \pkg{simFrame} is 
+\code{DataControl}. It contains among others the following additional 
+slots (see also Figure~\ref{fig:UML}):
+
+\begin{description}
+  \item[\code{fun}:] A function for generating the data, e.g., 
+  \code{rmvnorm} in package \pkg{mvtnorm} \citep{genz09, genz10} for data 
+  following a multivariate normal distribution. It should take a positive 
+  integer as its first argument and return an object that can be coerced 
+  to a data frame.
+  \item[\code{tuning}:] A data frame containing different values of tuning 
+  parameters for data generation, with column names corresponding to arguments 
+  of \code{fun}. If a list is supplied, a data frame containing all 
+  combinations of the list elements is constructed during initialization.
+  \item[\code{dots}:] A list of additional arguments to be passed to \code{fun}.
+\end{description}
+
+The following example demonstrates how to define a control object for 
+generating data from a multivariate normal distribution.
+
+<<>>=
+library("mvtnorm")
+dots <- list(mean = rep(0, 2), sigma = matrix(c(1, 0.5, 0.5, 1), 2, 2))
+dc <- DataControl(size = 10, fun = rmvnorm, dots = dots)
+@
+
+In a model-based simulation study, such a control object is then used by the 
+framework in repeated internal calls of the generic function 
+\code{generate(control, ...)}.
+
+<<>>=
+foo <- generate(dc)
+foo
+@
+
+While the function \code{generate()} is designed to be called internally by the 
+simulation framework, it is possible to use it as a general wrapper function 
+for data generation in other contexts. 
+For convenience, the name of the control class may then also be passed to 
+\code{generate()} as a character string (the default is \code{"DataControl"}), 
+in which case the slots may be supplied as arguments. Nevertheless, it might be 
+simpler for the user to call the underlying function from the slot 
+\code{fun} directly in such applications.
+
+Memory-efficient storage of data frames has recently been added to package 
+\pkg{ff} \citep{adler10}, which might be useful for design-based simulation 
+with large population data. The incorporation into \pkg{simFrame} may therefore 
+be investigated as a future task.
+
+
+\subsection{Sampling}
+A fundamental design principle of \pkg{simFrame} in the case of design-based 
+simulation studies is that the sampling procedure is separated from the 
+simulation procedure. Two main advantages arise from \emph{setting up} all 
+samples in advance. 
+
+First, the repeated sampling reduces overall computation time dramatically in 
+certain situations, since computer-intensive tasks like stratification need to 
+be performed only once. This is particularly relevant for large population 
+data. As an example, consider the AMELI project that has been mentioned in 
+Section~\ref{sec:design}. In the close-to-reality simulation studies carried 
+out in this project, up to $10\,000$ samples are drawn from a population of 
+more than $8\,000\,000$ individuals with stratified sampling or even more 
+complex sampling designs. For such large data sets, stratification takes a 
+considerable amount of time and is a very memory-intensive task. 
+If the samples are taken on-the-fly, i.e., in every simulation run one sample 
+is drawn, the function to take the stratified sample would typically split the 
+population into the different strata in each of the $10\,000$ iterations.
+If all samples are drawn in advance, on the other 
+hand, the population data need to be split only once and all $10\,000$ samples 
+can be taken from the respective strata together.
+
+Second, the samples can be stored permanently, which simplifies the 
+reproduction of simulation results and may help to maximize comparability of 
+results obtained by different partners in a research project. Consider again 
+the AMELI project, where one group of researchers investigates robust 
+semiparametric approaches to improve the estimation of certain indicators 
+\citep[i.e., a distribution is fitted to parts of the data; see][]{alfons10f}, 
+while another group is focused on nonparametric methods \citep[e.g., trimming 
+or M-estimators; see][]{hulliger09a}. The aim of this project is to evaluate 
+these methods in realistic settings, therefore the most commonly used sampling 
+designs in real life are applied in the simulation studies. If the two groups 
+use not only the same population data, but also the same previously set up 
+samples, their results are highly comparable. In addition, the same samples may 
+be used for other close-to-reality simulation studies within the project, e.g., 
+in order to evaluate imputation or outlier detection methods. This is useful 
+in particular for large population data, when complex sampling techniques 
+may be very time-consuming.
+
+In \pkg{simFrame}, the generic function \code{setup(x, control, ...)} is 
+available to set up multiple samples. It returns an object of class 
+\code{SampleSetup}, which contains the following slots (among others, all 
+slots are shown in Figure~\ref{fig:UML}):
+ 
+\begin{description}
+  \item[\code{indices}:] A list containing the indices of the sampled 
+  observations.
+  \item[\code{prob}:] A numeric vector giving the inclusion probabilities for 
+  every observation of the population. These are necessary to compute the 
+  sample weights.
+\end{description}
+
+The function \code{setup()} may be called by the user to permanently store the 
+samples, but it may also be called internally by the framework if this is not 
+necessary. In any case, methods are selected according to control classes 
+extending \code{VirtualSampleControl}, which is a virtual class with the 
+following slots and provides the interface for extensions by the user (see 
+Section~\ref{sec:ext-sampling}):
+
+\begin{description}
+  \item[\code{k}:] The number of samples to be set up.
+  \item[\code{seed}:] Optional initial seed of the random number generator.
+\end{description}
+
+If a seed of the random number generator is stored in the control object, 
+setting up samples is reproducible whenever the same control object is used. 
+
+One implemented control class is \code{BasicSampleControl}. It is highly 
+flexible and covers the most frequently used sampling designs in survey 
+statistics:
+\begin{itemize}
+  \item Sampling of individual observations with a basic sampling method such 
+  as simple random sampling or unequal probability sampling.
+  \item Sampling of whole groups (e.g., households) with a specified sampling 
+  method. 
+  There are two common approaches towards sampling of groups:
+  \begin{itemize}
+  \item Groups are sampled directly. This is usually referred to as 
+  \emph{cluster sampling}. However, here the term \emph{cluster} is avoided in 
+  the context of sampling to prevent confusion with computer clusters for 
+  parallel computing (see Section~\ref{sec:parallel} and the example in 
+  Section~\ref{sec:use-parallel}).
+  \item In a first step, individuals are sampled. Then all individuals that 
+  belong to the same group as any of the sampled individuals are collected and 
+  added to the sample.
+  \end{itemize}
+  \item Stratified sampling using one of the above procedures in each stratum.
+\end{itemize}
+In addition to the inherited slots, the class \code{BasicSampleControl} 
+consists of the following slots (see also Figure~\ref{fig:UML}):
+
+\begin{description}
+  \item[\code{design}:] An optional vector specifying variables to be used for 
+  stratification.
+  \item[\code{grouping}:] An optional character string, single integer or 
+  logical vector specifying a variable to be used for grouping.
+  \item[\code{collect}:] A logical indicating whether groups should be 
+  collected after sampling individuals or sampled directly. The default is to 
+  sample groups directly.
+  \item[\code{fun}:] A function to be used for sampling (the default is simple 
+  random sampling). For stratified sampling, this function is applied to each 
+  stratum.
+  \item[\code{size}:] The sample size. For stratified sampling, this should be 
+  a numeric vector.
+  \item[\code{prob}:] An optional character, integer or logical vector 
+  specifying a variable that contains probability weights.
+  \item[\code{dots}:] Additional arguments to be passed to \code{fun}.
+\end{description}
+
+Currently, \pkg{simFrame} offers the functions \code{srs()} for simple random sampling, as well as \code{brewer()}, \code{midzuno()} and \code{tille()} for 
+unequal probability sampling according to \citet{brewer75}, \citet{midzuno52} 
+and \citet{tille96}, respectively. However, the framework can easily be 
+extended with user-defined sampling methods (see 
+Section~\ref{sec:ext-sampling}). Note that the sampling method is evaluated 
+using \code{try()}. Hence, if an error occurs in obtaining one sample, the 
+others are not lost. This is particularly useful for complex and time-consuming 
+sampling procedures, as the whole process of setting up all samples does not 
+have to be repeated.
+
+Another implemented control class is \code{TwoStageSampleControl}, which allows 
+for two-stage sampling designs. It extends the virtual class 
+\code{VirtualSampleControl} by the following slots (see also 
+Figure~\ref{fig:UML}):
+
+\begin{description}
+  \item[\code{design}:] An optional vector specifying variables to be used for 
+  stratification.
+  \item[\code{grouping}:] A character, integer or logical vector specifying 
+  grouping variables that define primary sampling units (PSUs) and, optionally, 
+  secondary sampling units (SSUs).
+  \item[\code{fun}:] A list containing the functions to be used for sampling 
+  in the first and second stage, respectively (the default is simple random 
+  sampling for both stages).
+  \item[\code{size}:] A list containing the number of items to sample in the 
+  first and second stage, respectively. In case of stratified sampling in the 
+  first stage, a vector of non-negative integers, each giving the number of 
+  PSUs to sample from the corresponding stratum, may be supplied. For the 
+  second stage, a vector of non-negative integers giving the number of items to 
+  sample from each PSU may be used.
+  \item[\code{prob}:] A list with components optionally specifying variables 
+  that contain probability weights for the first and second stage, respectively.
+  \item[\code{dots}:] A list in which each component is again a list containing 
+  additional arguments to be passed to the corresponding function for sampling 
+  in \code{fun}.
+\end{description}
+
+For ease-of-use, control objects of classes \code{BasicSampleControl} and 
+\code{TwoStageSampleControl} can both be generated with the constructor 
+\code{SampleControl()}.
+
+The control class for \code{setup()} may be specified as a character string, 
+which allows the slots to be supplied as arguments. If missing, the constructor 
+\code{SampleControl()} is called to generate the control object.
+
+To actually draw one of the previously set up samples from the population, the
+generic function \code{draw(x, setup, ...)} is used internally by the framework 
+in the simulation runs.
+It is important to note that the column \code{".weight"}, which contains the 
+sample weights, is added to the resulting data set. When sampling from finite 
+populations, storing the sample weights is essential. In general, the weights 
+are not equal for all sampled observations, depending on the inclusion 
+probabilities. Hence the sample weights need to be considered in order to 
+obtain unbiased estimates. But even for simple random sampling, when all 
+weights are equal, each observation in the sample represents a number of 
+observations in the population. For the estimation of population totals (e.g., 
+the total turnover of all businesses in a country), the sample weights are thus 
+still necessary. Moreover, the initial sample weights are in practice 
+often modified by calibration \citep[e.g.,][]{deville93}. In the case of 
+simple random sampling, this is done after post-stratification 
+\citep[e.g.,][]{cochran77}.
+
+In the following illustrative example, two samples from synthetic EU-SILC 
+population data are set up and stored in an object of class \code{SampleSetup}. 
+EU-SILC is a well-known survey on income and living conditions conducted in 
+European countries (see Section~\ref{sec:use-design} for more information and a 
+more detailed example). Afterwards, the first of the two set up samples is 
+drawn from the population.
+
+<<>>=
+data("eusilcP")
+set <- setup(eusilcP, size = 10, k = 2)
+summary(set)
+set
+draw(eusilcP[, c("id", "eqIncome")], set, i = 1)
+@
+
+
+\subsection{Contamination} \label{sec:imp-cont}
+When evaluating robust statistical methods in simulation studies, a certain 
+part of the data needs to be contaminated, so that the influence of these 
+outliers on the robust estimators (and possibly their classical counterparts) 
+can be studied. The term \emph{contamination} is thereby used in a technical 
+sense in this paper. In robust statistics, the distribution $F$ of contaminated 
+data is typically modeled as a mixture of distributions
+\begin{equation}
+F = (1 - \varepsilon) G + \varepsilon H,
+\end{equation}
+where $\varepsilon$ denotes the \emph{contamination level}, $G$ is the 
+distribution of the non-contaminated part of the data and $H$ is the 
+distribution of the contamination \citep[e.g.,][]{maronna06}. Consequently, 
+outliers may be modeled by a two-step process in simulation studies 
+\citep{beguin08, hulliger09b}:
+\begin{enumerate}
+  \item Select the observations to be contaminated. The probabilities of  
+  selection may or may not depend on any other information in the data 
+  set.
+  \item Model the distribution of the outliers. The distribution may or may not 
+  depend on the original values of the selected observations.
+\end{enumerate}
+A more detailed mathematical notation of this process with respect to an 
+earlier implementation in \pkg{simFrame} can be found in \citet{alfons10e}.
+
+Even though this is a rather simple concept, taking advantage of 
+object-oriented programming techniques such as inheritance allows for a 
+flexible implementation that can be extended by the user with custom 
+contamination models. In \pkg{simFrame}, contamination is implemented based on 
+control classes inheriting from \code{VirtualContControl}. For extensions of 
+the framework, the user may define subclasses of this virtual class (see 
+Section~\ref{sec:ext-cont}). Figure~\ref{fig:UML} displays the full hierarchy 
+of the available control classes for contamination. The basic virtual class 
+contains the following slots:
+
+\begin{description}
+  \item[\code{target}:] A character vector defining the variables to be 
+  contaminated, or \code{NULL} to contaminate all variables (except the 
+  additional ones generated internally).
+  \item[\code{epsilon}:] A numeric vector giving the contamination levels to be 
+  used in the simulation.
+\end{description}
+
+With the contamination control classes available in \pkg{simFrame}, it is 
+possible to specify different values of tuning parameters, as well as to supply 
+a function to generate the values of the contaminated data. In order to share 
+these properties, another virtual class called \code{ContControl} is 
+implemented. It contains the following additional slots: 
+
+\begin{description}
+  \item[\code{fun}:] A function for generating the values of the contaminated 
+  data. As its first argument, it should expect either the number of 
+  observations to be generated or the data to be modified (depending on whether 
+  the contamination should depend on the original values as determined by 
+  \code{type}). Furthermore, it should return an object that can be coerced to 
+  a data frame.
+  \item[\code{tuning}:] A data frame containing different values of tuning 
+  parameters for the contamination, with column names corresponding to 
+  arguments of \code{fun}. If a list is supplied, a data frame containing all 
+  combinations of the list elements is constructed during initialization.
+  \item[\code{dots}:] A list of additional arguments to be passed to \code{fun}.
+  \item[\code{type}:] A character string specifying whether the values of the 
+  outliers should be independent from the original values (\code{"CCAR"}, the 
+  default), or whether the original values should be modified (\code{"CAR"}). 
+  CCAR and CAR thereby stand for \emph{contaminated completely at random} and 
+  \emph{contaminated at random}, respectively.
+\end{description}
+
+Two control classes extending the virtual class \code{ContControl} are 
+implemented in \code{simFrame}, which differ mainly in how the observations to 
+be contaminated are selected. With control class \code{BasicContControl}, the 
+first observations are selected as outliers. This basic control class does not 
+contain any additional slots. With control class \code{RandomContControl}, the 
+items to be contaminated are randomly selected. The probabilities for selection 
+thereby may depend on an auxiliary variable. In addition, it is possible to 
+contaminate whole groups (e.g., households) rather than individual observations. 
+These are the additional slots: 
+
+\begin{description}
+  \item[\code{grouping}:] A character string specifying a variable to be used 
+  for grouping.
+  \item[\code{aux}:] A character string specifying an auxiliary variable whose 
+  values are used as probability weights for selecting the items (observations 
+  or groups) to be contaminated.
+\end{description}
+
+If the outliers are contaminated completely at random and a variable for 
+grouping is specified, the same value is used for all observations in the 
+same group.
+
+For convenience, the constructor \code{ContControl()} can also be used to 
+generate control objects of both classes \code{BasicContControl} and 
+\code{RandomControl}.
+
+In the following example, a control object of class \code{RandomContControl} is 
+defined. The contamination level is set to $20\%$ and the specified function 
+multiplies the original values from variable \code{"V2"} of the observations to 
+be contaminated by a factor 100.
+
+<<keep.source=TRUE>>=
+cc <- RandomContControl(target = "V2", epsilon = 0.2, 
+    fun = function(x) x * 100, type = "CAR")
+@
+
+If a control object for contamination is supplied, the framework calls the 
+generic function \code{contaminate(x, control, ...)} in the simulation runs 
+internally to add the contamination.
+In many applications, it is necessary to know which observations were 
+contaminated, e.g., to evaluate outlier detection methods. 
+Hence a logical variable, which is called \code{".contaminated"} and indicates 
+the contaminated observations, is added to the resulting data set. As an 
+example, the data generated in Section~\ref{sec:imp-data} is contaminated below.
+
+<<>>=
+bar <- contaminate(foo, cc)
+bar
+@
+
+Despite being designed for internal use in the simulation procedure, 
+\code{contaminate()} also allows the control class to be specified as a 
+character string, in which case the slots may be supplied as arguments. If 
+missing, the control object is generated via the constructor 
+\code{ContControl()}.
+
+
+\subsection{Insertion of missing values} \label{sec:imp-NA}
+Missing values are included in many data sets, in particular survey data hardly 
+ever contain complete information. In practice, missing values often need to be 
+imputed, which results in additional uncertainty in further statistical 
+analysis \citep[e.g.,][]{little02}. This additional variability needs to be considered when computing 
+variance estimates or confidence intervals. In simulation studies, it may 
+therefore be of interest to study the properties of different imputation 
+methods or to investigate the influence of missing values on point and variance 
+estimates. 
+
+Three mechanisms generating missing values are commonly distinguished in the 
+literature addressing missing data \citep[e.g.,][]{little02}:
+\begin{itemize}
+  \item Missing completely at random (MCAR): The probability of 
+  missingness does not depend on any observed or missing information.
+  \item Missing at random (MAR): The probability of missingness depends 
+  on the observed information.
+  \item Missing not at random (MNAR): The probability of missingness 
+  depends on the missing information itself and may also depend on the observed 
+  information.
+\end{itemize}
+
+Similar to the implementation of the functionality for contamination, the 
+insertion of missing data is handled by control classes extending 
+\code{VirtualNAControl} (the hierarchy of the control classes is shown in 
+Figure~\ref{fig:UML}). This virtual class is the basis for extensions by the 
+user (see Section~\ref{sec:ext-NA}). It consists of the following slots:
+
+\begin{description}
+  \item[\code{target}:] A character vector specifying the variables into which 
+  missing values should be inserted, or \code{NULL} to insert missing values 
+  into all variables (except the additional ones generated internally).
+  \item[\code{NARate}:] A numeric vector or matrix giving the missing value 
+  rates to be used in the simulation.
+\end{description}
+
+It should be noted that missing value rates may be selected individually for 
+the target variables. The same missing value rates are used for all target 
+variables if they are specified as a vector. If a matrix is supplied, on the 
+other hand, the missing value rates to be used for each target variable are 
+given by the respective column.
+
+Extending \code{VirtualNAControl}, the control class \code{NAControl} allows 
+whole groups to be set as missing rather than individual values. 
+To account for MAR or MNAR situations instead of MCAR, an auxiliary variable of 
+probability weights may be specified for each target variable. Furthermore, 
+when studying robust methods for the analysis or imputation of incomplete data, 
+it is sometimes desired to insert missing values only into non-contaminated 
+observations. In other situations, a more realistic scenario in which missing 
+values are also inserted into contaminated observations may be preferred. Both 
+scenarios are implemented in the framework. These are the additional slots of 
+\code{NAControl}:
+
+\begin{description}
+  \item[\code{grouping}:] A character string specifying a variable to be used 
+  for grouping.
+  \item[\code{aux}:] A character vector specifying auxiliary variables whose 
+  values are used as probability weights for selecting the values to be set as 
+  missing in the respective target variables.
+  \item[\code{intoContamination}:] A logical indicating whether missing values 
+  should also be inserted into contaminated observations. The default is to 
+  insert missings only into non-contaminated observations.
+\end{description}
+
+The following example shows how to define a control object of class 
+\code{NAControl} that corresponds to an MCAR situation. For all variables, 
+$30\%$ of the values will be set as missing. However, missing values will only 
+be inserted into non-contaminated observations.
+
+<<>>=
+nc <- NAControl(NARate = 0.3)
+@
+
+If a control object for missing data is supplied, the generic function 
+\code{setNA(x, control, ...)} is called internally by the framework in the 
+simulation runs to set the missing values. Below, missing values are inserted 
+into the contaminated data from the previous section.
+
+<<>>=
+setNA(bar, nc)
+@
+
+As \code{contaminate()}, the function \code{setNA()} is designed for internal 
+use in the simulation procedure. Nevertheless, it is possible to supply the 
+name of the control class as a character string (the default is 
+\code{"NAControl"}), which allows the slots to be supplied as arguments. 
+
+
+\subsection{Running simulations} \label{sec:run}
+The central component of the simulation framework is the generic function 
+\code{runSimulation()}, which combines all the elements of the package into one 
+convenient interface for running simulation studies. Based on a collection of 
+control objects, it allows to perform even complex simulation experiments with 
+just a few lines of code. Switching between simulation designs is possible with 
+minimal programming effort as well, only some control objects need to be 
+defined or replaced. 
+For design-based simulation, population data and a control object for sampling 
+or previously set up samples may be passed to \code{runSimulation()}. For 
+model-based simulation, on the other hand, a control object for data generation 
+and the number of replications may be supplied.
+
+In addition, the control class \code{SimControl} determines how the simulation 
+runs are performed. These are the slots of \code{SimControl} (see also 
+Figure~\ref{fig:UML}):
+
+\begin{description}
+  \item[\code{contControl}:] A control object for contamination.
+  \item[\code{NAControl}:] A control object for inserting missing values.
+  \item[\code{design}:] A character vector specifying variables to be used for 
+  splitting the data into domains and performing the simulations on every 
+  domain.
+  \item[\code{fun}:] The function to be applied in the simulation runs.
+  \item[\code{dots}:] Additional arguments to be passed to \code{fun}.
+  \item[\code{seed}:] The initial seed of the random number generator. If not 
+  supplied explicitly, the seed will be based on the date and time of 
+  construction of the control object.
+\end{description}
+
+Most importantly, the function to be applied in the simulation runs needs to be 
+defined. There are some requirements for the function: 
+
+\begin{itemize}
+  \item It must return a numeric vector containing the results from the 
+  simulation run.
+  \item A data frame is passed to \code{fun} in every simulation run. 
+  The corresponding argument must be called \code{x}.
+  \item If comparisons with a tuning parameter from data generation need to 
+  made, the function should have an argument of the same name as the tuning 
+  parameter.
+  \item If comparisons with the original data need to be made, e.g., for 
+  evaluating the quality of imputation methods, the function should have an 
+  argument called \code{orig}.
+  \item If different domains are used in the simulation, the indices of the 
+  current domain can be passed to the function via an argument called 
+  \code{domain}.
+\end{itemize}
+
+One of the most important features of \pkg{simFrame} is that the supplied 
+function is evaluated using \code{try()}. Therefore, if computations fail in 
+one of the simulation runs, \code{runSimulation()} simply continues with the 
+next run. The results from previous runs are not lost and the computation time 
+has not been spent in vain.
+
+Furthermore, control classes for adding contamination and missing values may 
+be specified. In design-based simulations, contamination and nonresponse are 
+added to the samples rather than the population, for maximum control over the 
+amount of outliers or missing values \citep[cf.][]{alfons09}. Another useful 
+feature is that the data may be split into different domains. The simulations, 
+including contamination and the insertion of missing values, are then performed 
+on every domain separately. Last but not least, storing the seed of the random number generator in the control object ensures the simulation experiment is 
+reproducible whenever the same control object is used.
+
+For user convenience, the slots of the \code{SimControl} object may also be 
+supplied as arguments. After running the simulations, the results of the 
+individual simulation runs are combined and packed into an object of class 
+\code{SimResults}. The most important slot is \code{values}, which contains a 
+data frame of the simulation results. Other slots store the used control 
+objects to keep track of the details of the simulation design (see 
+Figure~\ref{fig:UML} for a complete list).
+
+An illustrative example for the use of \code{runSimulation()} is given in the 
+following design-based simulation experiment. The synthetic EU-SILC example 
+data of the package is thereby used as population data. It contains information 
+about household income, but data is  also available on the personal level (see 
+Section~\ref{sec:use-design} for more information on the data). From this data 
+set, 50 samples of 500 persons are drawn with simple random sampling. In 
+addition, the equivalized income of $2\%$ of the sampled persons are multiplied 
+by a factor 25. In every simulation run, the population mean income is 
+estimated with the mean and the $2\%$~trimmed mean of the sample. With the 
+following commands, control objects for sampling and contamination are defined, 
+along with the function for the simulation. In the call to 
+\code{runSimulation()}, the seed of the random number generator is set for 
+reproducibility of the results.
+
+<<keep.source=TRUE>>=
+data("eusilcP")
+sc <- SampleControl(size = 500, k = 50)
+cc <- RandomContControl(target = "eqIncome", epsilon = 0.02, 
+    fun = function(x) x * 25, type = "CAR")
+sim <- function(x) {
+    c(mean = mean(x$eqIncome), trimmed = mean(x$eqIncome, trim = 0.02))
+}
+results <- runSimulation(eusilcP, sc, contControl = cc, 
+    fun = sim, seed = 12345)
+@
+
+Methods for several frequently used generic functions are available to inspect 
+the simulation results. Besides \code{head()}, \code{tail()} and 
+\code{summary()} methods, a method for \code{aggregate()} is implemented. The 
+latter can be used to calculate summary statistics of the results. By default, 
+the mean is used as summary statistic. Depending on the simulation design, the 
+summary statistics are are computed for different subsets of the results. These 
+subsets are thereby given by the different combinations of data configurations 
+(for model-based simulations), contamination settings (if contamination is 
+used), missing value settings (if missing values are inserted) and domains (if 
+the simulations are performed on different domains of the data). 
+
+Below, the first parts of the simulation results are returned using 
+\code{head()} and the average results are computed with \code{aggregate()}.
+For comparison, the true population mean is computed afterwards.
+
+<<>>=
+head(results)
+aggregate(results)
+tv <- mean(eusilcP$eqIncome)
+tv
+@
+
+Various plots for simulation results are implemented in the framework, as 
+discussed in the following section. In Figure~\ref{fig:mean}, the results for 
+this illustrative example are displayed by box plots and kernel density plots. 
+The plots show the well-known fact that the mean is highly influenced by 
+outliers. While the trimmed mean is not influenced by the contamination and has 
+much smaller variance, there is still some bias. Since the outliers in this 
+example are only in the upper tail of the data, the remaining bias results from 
+trimming the lower part as well.
+
+Section~\ref{sec:use} contains more elaborate examples for design-based and 
+model-based simulation with detailed step-by-step instructions, as well as some 
+motivation and interpretation.
+
+
+\subsection{Visualization}
+Visualization methods for the simulation results are based on \pkg{ggplot2} 
+\citep{wickham09, wickham13}. If the simulation study has been divided 
+into several domains, the results for each domain are displayed in a separate 
+panel. Box plots, kernel density plots and plots of the average results against some tuning parameter are implemented in the function \code{simPlot()}. If the 
+type of plot is not specified explicitly via the \code{method} argument, a 
+suitable graphical representation of the simulation results is selected 
+automatically. Additionally, methods for \code{plot()} and \code{autoplot()} 
+are implemented as wrappers for \code{simPlot()}. Reference lines for the true 
+values can easily be added with standard \pkg{ggplot2} functionality.
+
+Figure~\ref{fig:mean} shows the default plot and kernel density plots for the 
+simulation results from the simple illustrative example in the previous 
+section. Further examples for the visualization of simulation results are given 
+in Section~\ref{sec:use}.
+
+\begin{figure}[t!]
+\begin{center}
+\setkeys{Gin}{width=0.45\textwidth}
+<<eval=FALSE>>=
+plot(results) + geom_hline(yintercept=tv)
+plot(results, method = "density") + geom_vline(xintercept=tv)
+@
+<<fig=TRUE, echo=FALSE, width=3.5, height=3.5>>=
+plot(results) + geom_hline(yintercept=tv)
+@
+<<fig=TRUE, echo=FALSE, width=3.5, height=3.5>>=
+plot(results, method = "density") + geom_vline(xintercept=tv)
+@
+\caption{Simulation results from the simple illustrative example. \emph{Left}: 
+  Default plot of results from a simulation study with one contamination level. 
+  \emph{Right}: Kernel density plots of the simulation results.}
+\label{fig:mean}
+\end{center}
+\end{figure}
+
+
+%% ----------
+%% parallel computing
+%% ----------
+
+\section{Parallel computing} \label{sec:parallel}
+Statistical simulation is \emph{embarrassingly parallel}, hence computational 
+performance can be increased by parallel computing. 
+In \pkg{simFrame}, parallel computing is implemented using the package 
+\pkg{parallel}, which is part of the \proglang{R} base distribution since 
+version 2.14.0 and builds upon work done for the contributed packages 
+\pkg{multicore} \citep{urbanek09} and \pkg{snow} \citep{rossini07, tierney08, 
+tierney09}. The latter was recommended by \citet{schmidberger09} in an analysis 
+of the then state-of-the-art in parallel computing with \proglang{R}. 
+All the user needs to do to take advantage of parallel computing is to pass the 
+number of processor cores to be used to \code{runSimulation()} via the 
+\code{ncores} argument, or a \pkg{parallel} cluster via the \code{cl} argument. 
+If the latter is supplied, it is preferred over the former. An example for 
+parallel computing is presented in Section~\ref{sec:use-parallel}.
+
+In order to ensure reproducibility of the simulation results, random number 
+streams are used. For this purpose, \pkg{parallel} contains an \proglang{R} 
+re-implementation of the \proglang{C} library \pkg{RngStreams} 
+\citep{lecuyer02}. 
+It should be noted that the packages \pkg{rlecuyer} \citep{sevcikova09} and 
+\pkg{rstream} \citep{lecuyer05, leydold10} provide interfaces to the 
+\proglang{C} library by \cite{lecuyer02}.
+
+
+%% ----------
+%% using the framework
+%% ----------
+
+\section{Using the framework} \label{sec:use}
+In this section, the use of \pkg{simFrame} is demonstrated on examples for 
+design-based and model-based simulation. An example for parallel computing is 
+included as well. Note that the only purpose of these examples is to illustrate 
+the use of the package. It is not the aim of this section to provide a thorough 
+analysis of the presented methodology, as this is beyond the scope of this 
+paper.
+
+
+\subsection{Design-based simulation} \label{sec:use-design}
+The Laeken indicators are a set of indicators used to measure social cohesion 
+in member states of the European Union and other European countries 
+\citep[cf.][]{atkinson02}. Most of the Laeken indicators are computed from 
+EU-SILC (European Union Statistics on Income and Living Conditions) 
+survey data. Synthetic EU-SILC data based on the Austrian sample from 2006 is 
+included in \pkg{simFrame}. 
+This data set was generated using the synthetic data generation framework by 
+\citet{alfons10a} from package \pkg{simPopulation} \citep{kraft10}. It consists 
+of $25\,000$ households with data available on the personal level, and is used 
+as population data in this example. Note that this is an illustrative example, 
+as the data set does not represent the true population sizes of Austria and its 
+regions.
+
+While only being a secondary Laeken indicator, the \emph{Gini coefficient} is a 
+frequently used measure of inequality and is widely studied in the literature. 
+In the case of EU-SILC, the Gini coefficient is calculated based on an 
+equivalized household income. In this example, the standard estimation method 
+\citep{EU-SILC04} is compared to two semiparametric approaches, which fit a 
+Pareto distribution \citep[e.g.,][]{kleiber03} to the upper tail of the data. 
+\citet{hill75} introduced the maximum-likelihood estimator, which is thus 
+referred to as Hill estimator. The partial density component (PDC) estimator 
+\citep{vandewalle07}, on the other hand, follows a robust approach. These 
+methods are available in the \proglang{R} package \pkg{laeken} 
+\citep{alfons10b}. A more detailed discussion on Pareto tail modeling with 
+application to selected Laeken indicators can be found in \citet{alfons10f}.
+
+First, the required package and the data set need to be loaded.
+
+<<results=hide>>=
+library("laeken")
+data("eusilcP")
+@
+
+Next, a control object for $100$ samples of 1500 households is constructed. 
+Stratified sampling by regions combined with sampling of whole households 
+rather than individuals can be achieved with one command.
+
+<<>>=
+sc <- SampleControl(eusilcP, design = "region", grouping = "hid", 
+    size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
+@
+
+Since a robust method is going to be compared to two classical ones, a control 
+object for contamination is defined. 
+EU-SILC data typically contain a very low amount of outliers, therefore the 
+equivalized household income of $0.5\%$ of the households is contaminated. In 
+addition, the contamination is generated by a normal distribution 
+$\mathcal{N}(\mu, \sigma^{2})$ with mean \mbox{$\mu = 500\,000$} and standard 
+deviation $\sigma = 10\,000$.
+
+<<>>=
+cc <- RandomContControl(target = "eqIncome", epsilon = 0.005, 
+    grouping = "hid", dots = list(mean = 500000, sd = 10000))
+@
+
+The function for the simulation runs is quite simple as well. Its argument 
+\code{k} determines the number of households whose income is modeled by a 
+Pareto distribution.
+
+<<>>=
+sim <- function(x, k) {
+    g <- gini(x$eqIncome, x$.weight)$value
+    eqIncHill <- fitPareto(x$eqIncome, k = k, 
+        method = "thetaHill", groups = x$hid)
+    gHill <- gini(eqIncHill, x$.weight)$value
+    eqIncPDC <- fitPareto(x$eqIncome, k = k, 
+        method = "thetaPDC", groups = x$hid)
+    gPDC <- gini(eqIncPDC, x$.weight)$value
+    c(standard = g, Hill = gHill, PDC = gPDC)
+}
+@
+
+With all necessary objects available, running the simulation experiment is only 
+one more command. Note that simulations are performed separately for each 
+gender. The value of \code{k} for the Pareto distribution is thereby set to 
+125. Furthermore, the seed of the random number generator is set for 
+reproducibility of the results.
+
+<<>>=
+results <- runSimulation(eusilcP, sc, contControl = cc, 
+    design = "gender", fun = sim, k = 125, seed = 12345)
+@
+
+The \code{head()} and \code{aggregate()} methods are used to take a look at the 
+simulation results. In this case, \code{aggregate()} computes the average 
+results for each subset.
+
+<<>>=
+head(results)
+aggregate(results)
+@
+
+For comparison with the simulation results, the true values of the Gini 
+coefficient need to be computed. These can be added as reference lines to the 
+plot of the simulation results (see Figure~\ref{fig:Gini}).
+
+<<>>=
+tv <- aggregate(eusilcP[, "eqIncome"], eusilcP[, "gender", drop=FALSE], 
+    function(x) gini(x)$value)
+tv
+@
+
+\begin{figure}[t!]
+\begin{center}
+\setkeys{Gin}{width=0.9\textwidth}
+<<fig=TRUE, width=7, height=4>>=
+plot(results, ylab = "Gini coefficient") + 
+    geom_hline(aes(yintercept=x), data=tv)
+@
+\caption{Default plot of results from a simulation study with one contamination 
+  level and different domains.}
+\label{fig:Gini}
+\end{center}
+\end{figure}
+
+Figure~\ref{fig:Gini} shows that even a small proportion of outliers completely 
+corrupts the standard estimation of the Gini coefficient. Also fitting the 
+Pareto distribution with the Hill estimator is highly influenced by 
+contamination, whereas the robust PDC estimator leads to excellent results. But 
+most importantly, this example shows that even complex simulation designs 
+require only a few lines of code.
+
+Further examples for design-based simulation that demonstrate the strengths
+of the framework can be found in a supplementary paper. This supplementary 
+paper is also included in \pkg{simFrame} as a package vignette 
+\citep{leisch03}.
+
+
+\subsection{Model-based simulation}
+In this section, model-based simulation is demonstrated using an example for 
+compositional data. An observation $\boldsymbol{x} = (x_{1}, \ldots, x_{D})$ is 
+by definition a $D$\emph{-part composition} if, and only if, $x_{i} > 0$, $i = 
+1, \ldots, D$, and all relevant information is contained in the ratios between 
+the components \citep{aitchison86}. Consequently, compositional data contain 
+only relative information. The information is essentially the same if an 
+observation is multiplied with a positive constant. But if the value of one 
+component changes, the other components need to change accordingly. Examples 
+for compositional data are element concentrations in chemical analysis of a 
+sample material or monthly household expenditures on different spending 
+categories such as housing, food or leisure activities. 
+
+It is important to note that compositional data have no direct representation 
+in the Euclidean space and that their geometry is entirely different 
+\citep[see][]{aitchison86}. The sample space of $D$-part compositions is called 
+the \emph{simplex} and a suitable distance measure is the \emph{Aitchison 
+distance} $d_{\mathrm{A}}$ \citep{aitchison92, aitchison00}. 
+Fortunately, there exists an isometric transformation from the $D$-dimensional 
+simplex to $\mathbb{R}^{D-1}$, which is called the \emph{isometric logratio} 
+(ilr) transformation \citep{egozcue03}. With this transformation, the Aitchison 
+distance can be expressed as
+\begin{equation}
+d_{\mathrm{A}}(\boldsymbol{x}, \boldsymbol{y}) = d_{\mathrm{E}}(\mathrm{ilr}
+(\boldsymbol{x}), \mathrm{ilr}(\boldsymbol{y})),
+\end{equation}
+where $d_{\mathrm{E}}$ denotes the Euclidean distance.
+
+\citet{hron10} introduced imputation methods for compositional data, which are 
+implemented in the \proglang{R} package \pkg{robCompositions} \citep{templ09, 
+templ10}. While the package is focused on robust methods, only classical 
+imputation methods are used in this example. The first method is a modification 
+of $k$-nearest neighbor ($k$nn) imputation \citep{troyanskaya01}, the second 
+follows an iterative model-based approach using least squares (LS) regression.
+
+Before any computations are performed, the required packages are loaded.
+
+<<results=hide>>=
+library("robCompositions")
+library("mvtnorm")
+@
+
+The data in this example are generated by a \emph{normal distribution on the 
+simplex}, denoted by $\mathcal{N}_{\mathcal{S}}^{D}(\boldsymbol{\mu}, 
+\boldsymbol{\Sigma})$ \citep[e.g.,][]{mateu-figueras08}. A random composition 
+$\boldsymbol{x} = (x_{1}, \ldots, x_{D})$ follows this distribution if, and 
+only if, the vector of ilr transformed variables follows a multivariate normal 
+distribution on $\mathbb{R}^{D-1}$ with mean vector $\boldsymbol{\mu}$ and 
+covariance matrix $\boldsymbol{\Sigma}$. The following commands create a 
+control object for generating $150$ realizations of a random variable 
+\mbox{$\boldsymbol{X} \sim \mathcal{N}_{\mathcal{S}}^{4}(\boldsymbol{\mu}, 
+\boldsymbol{\Sigma})$} with 
+\begin{displaymath}
+\boldsymbol{\mu} = \left(
+\begin{array}{c}
+  0 \\
+  2 \\
+  3
+\end{array} \right)
+\qquad \mathrm{and} \qquad 
+\boldsymbol{\Sigma} = \left(
+\begin{array}{ccc}
+  1    & -0.5 & 1.4 \\
+  -0.5 & 1    & -0.6 \\
+  1.4  & -0.6 & 2
+\end{array} \right).
+\end{displaymath}
+
+<<keep.source=TRUE>>=
+crnorm <- function(n, mean, sigma) isomLRinv(rmvnorm(n, mean, sigma))
+sigma <- matrix(c(1, -0.5, 1.4, -0.5, 1, -0.6, 1.4, -0.6, 2), 3, 3)
+dc <- DataControl(size = 150, fun = crnorm, 
+    dots = list(mean = c(0, 2, 3), sigma = sigma))
+@
+
+Furthermore, a control object for inserting missing values needs to be created. 
+In every variable, $5\%$ of the observations are set as missing completely at 
+random.
+
+<<>>=
+nc <- NAControl(NARate = 0.05)
+@
+
+For the two selected imputation methods, the \emph{relative Aitchison distance} 
+between the original and the imputed data \citep[cf. the simulation study 
+in][]{hron10} is computed in every simulation run.
+
+<<>>=
+sim <- function(x, orig) {
+    i <- apply(x, 1, function(x) any(is.na(x)))
+    ni <- length(which(i))
+    xKNNa <- impKNNa(x)$xImp
+    xLS <- impCoda(x, method = "lm")$xImp
+    c(knn = aDist(xKNNa, orig)/ni, LS = aDist(xLS, orig)/ni)
+}
+@
+
+The simulation can then be run with the following command, where the seed of 
+the random number generator is set for reproducibility:
+
+<<>>=
+results <- runSimulation(dc, nrep = 50, NAControl = nc, 
+    fun = sim, seed = 12345)
+@
+
+As in the previous example, the results are inspected using \code{head()} and 
+\code{aggregate()}.
+
+<<>>=
+head(results)
+aggregate(results)
+@
+
+
+\begin{figure}[t!]
+\begin{center}
+\setkeys{Gin}{width=0.45\textwidth}
+<<eval=FALSE>>=
+plot(results, ylab = "Relative Aitchison distance")
+plot(results, method = "density", xlab = "Relative Aitchison distance")
+@
+<<fig=TRUE, echo=FALSE, width=3.5, height=3.5>>=
+plot(results, ylab = "Relative Aitchison distance")
+@
+<<fig=TRUE, echo=FALSE, width=3.5, height=3.5>>=
+plot(results, method = "density", xlab = "Relative Aitchison distance")
+@
+\caption{\emph{Left}: Default plot of results from a simulation study with one 
+  missing value rate. \emph{Right}: Kernel density plots of the simulation 
+  results.}
+\label{fig:model-based}
+\end{center}
+\end{figure}
+
+Box plots and kernel density plots of the simulation results are presented in 
+Figure~\ref{fig:model-based}. Since the imputation methods in this example are 
+evaluated in terms of a relative distance measure, values closer to 0 indicate 
+better performance. Clearly, the iterative model-based procedure leads to 
+better results than the modified $k$nn approach with respect to the relative 
+Aitchison distance. This is not a surprising result, as the latter is used as a 
+starting point in the iterative procedure. For serious evaluation of the 
+imputation methods, however, also other criteria need to be taken into account 
+\citep[e.g., how well the variability of the multivariate data is reflected; 
+see][]{hron10}.
+
+
+\subsection{Parallel computing} \label{sec:use-parallel}
+Using parallel computing, computation time may be significantly decreased in 
+statistical simulation. In this section, the example for model-based simulation 
+from before is extended to more than one missing value rate. Hence some of the 
+objects are already defined above, but in order to provide a complete 
+description on how to perform parallel computing with \pkg{simFrame}, these 
+definitions are repeated here.
+
+Control objects for data generation and the insertion of missing values, as 
+well as the function for the simulation runs are defined as in the previous 
+section. The only difference is that multiple missing value rates ($1\%$, 
+$3\%$, $5\%$, $7\%$ and $9\%$) are used in this example.
+
+<<keep.source=TRUE>>=
+crnorm <- function(n, mean, sigma) isomLRinv(rmvnorm(n, mean, sigma))
+sigma <- matrix(c(1, -0.5, 1.4, -0.5, 1, -0.6, 1.4, -0.6, 2), 3, 3)
+dc <- DataControl(size = 150, fun = crnorm, 
+    dots = list(mean = c(0, 2, 3), sigma = sigma))
+nc <- NAControl(NARate = c(0.01, 0.03, 0.05, 0.07, 0.09))
+sim <- function(x, orig) {
+    i <- apply(x, 1, function(x) any(is.na(x)))
+    ni <- length(which(i))
+    xKNNa <- impKNNa(x)$xImp
+    xLS <- impCoda(x, method = "lm")$xImp
+    c(knn = aDist(xKNNa, orig)/ni, LS = aDist(xLS, orig)/ni)
+}
+@
+
+To take advantage of parallel computing, it suffices to specify the number of processor cores in the command for running the simulation. For reproducibility 
+of the results, the seed for the random number streams is set.
+
+<<>>=
+results <- runSimulation(dc, nrep = 50, NAControl = nc, 
+    fun = sim, seed = 12345, ncores = 4)
+@
+
+After the parallel computations have finished, the simulation results can be 
+inspected as usual. In this example, the \code{aggregate()} method returns the 
+average results of the relative distances for each missing value rate.
+
+<<>>=
+head(results)
+aggregate(results)
+@
+
+\begin{figure}[t!]
+\begin{center}
+\setkeys{Gin}{width=0.45\textwidth}
+<<eval=FALSE>>=
+plot(results, ylab = "Relative Aitchison distance")
+plot(results, method = "density", miss = 4, 
+    xlab = "Relative Aitchison distance")
+@
+<<fig=TRUE, echo=FALSE, width=3.5, height=3.5>>=
+plot(results, ylab = "Relative Aitchison distance")
+@
+<<fig=TRUE, echo=FALSE, width=3.5, height=3.5>>=
+plot(results, method = "density", miss = 4, 
+    xlab = "Relative Aitchison distance")
+@
+\caption{\emph{Left}: Default plot of results from a simulation study with 
+  multiple missing value rates. \emph{Right}: Kernel density plots of 
+  the simulation results for a specified missing value rate ($7\%$).}
+\label{fig:parallel}
+\end{center}
+\end{figure}
+
+Figure~\ref{fig:parallel} visualizes the simulation results. On the left hand 
+side, the average relative Aitchison distances are plotted against the missing 
+value rates together with confidence bands. On the right hand side, kernel 
+density plots for a specified missing value rate ($7\%$) is shown. The results 
+are not much different from those in the previous section. Note that the 
+difference of the average results for the two methods remains quite constant in 
+this simulation example.
+
+
+%% ----------
+%% extending the framework
+%% ----------
+
+\section{Extending the framework} \label{sec:ext}
+One of the main advantages of the \proglang{S4} implementation of 
+\pkg{simFrame} is that it provides clear interfaces for user-defined 
+extensions. 
+With the available control classes for data generation, sampling, contamination 
+and the insertion of missing data, the framework is highly flexible and can be 
+used for a wide range of simulation designs. Nevertheless, extensions may 
+sometimes be desired for specialized functionality. In order to extend the 
+framework, developers can implement custom control classes and the 
+corresponding methods.
+
+
+\subsection{Model-based data} \label{sec:ext-data}
+The control class \code{DataControl} available in \pkg{simFrame} is quite 
+simple but general. For user-defined data generation models, it often suffices 
+to implement a function and use it as the \code{fun} slot in the 
+\code{DataControl} object. This function should have the number of observations 
+to be generated as its first argument, as illustrated in the code skeleton in 
+Figure~\ref{fig:mdc}~(\emph{top}). The name of the argument is thereby not 
+important. Furthermore, the function should return an object that can be 
+coerced to a data frame.
+
+%\begin{figure}
+%  \centering
+%  \begin{minipage}{0.98\textwidth}
+%    \lstinputlisting{snippets/myDataGeneration.R}
+%  \end{minipage}
+%  \caption{Code skeleton for a data generation method.}
+%  \label{fig:generation}
+%\end{figure}
+
+However, if more specialized data generation models are required, the framework 
+can be extended by defining a control class extending \code{VirtualDataControl} 
+and the corresponding method for the generic function \code{generate()}. If, 
+e.g., a specific distribution or mixture of distributions is frequently used 
+in simulation experiments, a distinct control class may be more convenient for 
+the user. Figure~\ref{fig:mdc}~(\emph{bottom}) contains the code skeleton for 
+such an extension.
+
+%\begin{figure}
+%  \centering
+%  \begin{minipage}{0.98\textwidth}
+%    \lstinputlisting{snippets/MyDataControl.R}
+%  \end{minipage}
+%  \caption{Code skeleton for extending model-based data generation.}
+%  \label{fig:mdc}
+%\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{minipage}{0.98\textwidth}
+    \lstinputlisting{snippets/myDataGeneration.R}
+  \end{minipage}
+  \begin{minipage}{0.98\textwidth}
+    \lstinputlisting{snippets/MyDataControl.R}
+  \end{minipage}
+  \caption{\emph{Top:} Code skeleton for a user-defined data generation method.
+  \emph{Bottom:} Code skeleton for extending model-based data generation with a 
+  custom control class and the corresponding method for \code{generate()}.}
+  \label{fig:mdc}
+\end{figure}
+
+
+\subsection{Sampling} \label{sec:ext-sampling}
+In \pkg{simFrame}, the control classes \code{BasicSampleControl} and 
+\code{TwoStageSampleControl} are highly flexible and allows stratified sampling, 
+sampling of whole groups rather than individuals or two-stage sampling with 
+specified sampling methods. Hence it is often sufficient to implement the 
+desired sampling method for the simple non-stratified case to extend the 
+existing framework. However, there are some restrictions on the argument names 
+of the function, which should return a vector containing the indices of the 
+sampled observations. 
+
+\begin{itemize}
+\item If the sampling method needs population data as input, the corresponding 
+  argument should be called \code{x} and should expect a data frame.
+\item If it only needs the population size as input, the argument should be 
+  called \code{N}.
+\item If necessary, the argument for the sample size should be called 
+  \code{size}.
+\item If necessary, the argument for the probability weights should be 
+  called \code{prob}.
+\end{itemize}
+
+Note that the function is not expected to have both \code{x} and \code{N} as 
+arguments, and that the latter is much faster for stratified sampling or group 
+sampling. Furthermore, a function with \code{prob} as its only argument is 
+perfectly valid (for probability proportional to size sampling). 
+Figure~\ref{fig:sc}~(\emph{top}) shows an example for Poisson sampling using 
+the implementation in package \pkg{sampling} \citep{tille09}.
+
+%\begin{figure}
+%  \centering
+%  \begin{minipage}{0.98\textwidth}
+%    \lstinputlisting{snippets/myPoisson.R}
+%  \end{minipage}
+%  \caption{User-defined function for Poisson sampling.}
+%  \label{fig:poisson}
+%\end{figure}
+
+Nevertheless, for very complex sampling procedures, it is possible to define 
+a control class extending \code{VirtualSampleControl} and the corresponding 
+\code{setup()} method. The code skeleton for such an extension is shown in 
+Figure~\ref{fig:sc}~(\emph{bottom}). In order to optimize computational 
+performance, it is necessary to efficiently set up multiple samples. Thereby 
+the slot \code{k} of \code{VirtualSampleControl} needs to be used to control 
+the number of samples, and the resulting object must be of class 
+\code{SampleSetup}. 
+
+%\begin{figure}
+%  \centering
+%  \begin{minipage}{0.98\textwidth}
+%    \lstinputlisting{snippets/MySampleControl.R}
+%  \end{minipage}
+%  \caption{Code skeleton for user-defined setup of multiple samples.}
+%  \label{fig:sc}
+%\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{minipage}{0.98\textwidth}
+    \lstinputlisting{snippets/myPoisson.R}
+  \end{minipage}
+  \begin{minipage}{0.98\textwidth}
+    \lstinputlisting{snippets/MySampleControl.R}
+  \end{minipage}
+  \caption{\emph{Top:} User-defined function for Poisson sampling.
+  \emph{Bottom:} Code skeleton for user-defined setup of multiple samples with 
+  a custom control class and the corresponding method for \code{setup()}.}
+  \label{fig:sc}
+\end{figure}
+
+
+\subsection{Contamination} \label{sec:ext-cont}
+A wide range of contamination models is covered by the control classes 
+\code{BasicContControl} and \code{RandomContControl}. However, other 
+contamination models can be added by defining a control class inheriting from 
+\code{VirtualContControl} and the corresponding method for \code{contaminate()} 
+(see the code skeleton in Figure~\ref{fig:cc}). Note that 
+\code{VirtualContControl} contains the slots \code{target} and \code{epsilon} 
+for selecting the target variable(s) and contamination level(s), respectively. 
+In case the contaminated observations need to be identified at a later stage 
+of the simulation, e.g., if conflicts with inserting missing values should be 
+avoided, a logical indicator variable \code{".contaminated"} should be added to 
+the returned data set.
+
+\begin{figure}
+  \centering
+  \begin{minipage}{0.98\textwidth}
+    \lstinputlisting{snippets/MyContControl.R}
+  \end{minipage}
+  \caption{Code skeleton for a user-defined control class for contamination 
+  and the corresponding method for \code{contamintate()}.}
+  \label{fig:cc}
+\end{figure}
+
+
+\subsection{Insertion of missing values} \label{sec:ext-NA}
+Similar to extending the framework for model-based data generation and 
+contamination, user-defined missing value models can be added by 
+defining a control class extending the virtual class \code{VirtualNAControl} 
+and the corresponding method for the generic function \code{setNA()} (see 
+the code skeleton in Figure~\ref{fig:nc}). The slots \code{target} and 
+\code{NARate} for selecting the target variable(s) and missing value rate(s), 
+respectively, are inherited from \code{VirtualNAControl}. 
+
+\begin{figure}
+  \centering
+  \begin{minipage}{0.98\textwidth}
+    \lstinputlisting{snippets/MyNAControl.R}
+  \end{minipage}
+  \caption{Code skeleton for a user-defined control class for the insertion of 
+  missing values and the corresponding method for \code{setNA()}.}
+  \label{fig:nc}
+\end{figure}
+
+
+%% ----------
+%% conclusions
+%% ----------
+
+\section{Conclusions and outlook} \label{sec:conclusion}
+The flexible, object-oriented implementation of \pkg{simFrame} allows 
+researchers to make use of a wide range of simulation designs with a minimal 
+effort of programming. Control classes are used to handle data generation, 
+sampling, contamination and the insertion of missing values. 
+Due to the use of control objects, switching from one simulation design to 
+another requires only minimal programming effort. Developers can easily extend 
+the existing framework with user-defined classes and methods. Guidelines for 
+simulation studies in research projects can therefore be established by 
+selecting or implementing control classes and agreeing upon parameter values, 
+thus ensuring comparable results from different researchers. Based on the 
+structure of the simulation results, an appropriate plot method is selected 
+automatically. Hence \pkg{simFrame} is widely applicable for gaining insight 
+into the quality of statistical methods. Furthermore, since the workload in 
+statistical simulation is embarrassingly parallel, \pkg{simFrame} supports 
+parallel computing using the package \pkg{parallel} to increase computational 
+performance.
+
+Future plans include to further develop the model-based data generation 
+facilities, as well as to extend the framework with different sampling methods 
+and more specialized contamination and missing data models. 
+Concerning large data sets, the incorporation of the package \pkg{ff} for 
+memory-efficient storage may be investigated.
+
+
+%% ----------
+%% computational details
+%% ----------
+
+%\section*{Computational details}
+%All computations in this paper were performed using \pkg{Sweave} 
+%\citep{leisch02a, leisch02b} with \proglang{R} version~\Sexpr{getRversion()} 
+%and \pkg{simFrame} version~\Sexpr{sessionInfo()$otherPkgs$simFrame$Version}. 
+%%Nevertheless, the package is continuously being developed, it is recommended 
+%%to use the most recent version.
+%The most recent version of the package is always available from CRAN (the 
+%Comprehensive \proglang{R} Archive Network, \url{http://cran.R-project.org}), 
+%and (a slightly modified and up-to-date version of) this paper is also included 
+%as a package vignette \citep{leisch03}.
+
+
+%% ----------
+%% acknowledgments
+%% ----------
+
+\section*{Acknowledgments}
+This work was partly funded by the European Union (represented by the European
+Commission) within the 7$^{\mathrm{th}}$ framework programme for research
+(Theme~8, Socio-Economic Sciences and Humanities, Project AMELI (Advanced
+Methodology for European Laeken Indicators), Grant Agreement No.~217322). Visit
+\url{http://ameli.surveystatistics.net} for more information on the project.
+
+Furthermore, we would like to thank two anonymous referees for their 
+constructive remarks that helped to improve the package and the paper.
+
+
+%% ----------
+%% bibliography
+%% ----------
+
+\bibliography{simFrame}
+
+\end{document}

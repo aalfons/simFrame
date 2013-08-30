@@ -82,49 +82,56 @@ modelSimulation <- function(i, x, control) {
 
 ## design-based simulation
 
+# internal function that can take control object for sampling or set-up samples
+runDesignSimulation <- function(x, setup = NULL, nrep = 1, control, 
+                                contControl = NULL, NAControl = NULL, 
+                                design = character(), fun, ..., seed, 
+                                ncores = 1, cl = NULL) {
+  # initializations
+  seed <- getSeed(control)
+  # set up samples if necessary
+  if(is(setup, "VirtualSampleControl")) {
+    if(is.null(getSeed(setup))) {
+      set.seed(seed)
+      resetSeed <- FALSE
+    } else resetSeed <- TRUE
+    setup <- setup(x, setup)
+  } else resetSeed <- TRUE
+  # check the number of samples
+  nsamp <- length(setup)
+  if(nsamp == 0) {
+    # nothing to do
+    return(SimResults(sampleControl=getControl(setup), control=control))
+  }
+  s <- seq_len(nsamp)
+  # set up cluster for parallel computing if requested
+  cl <- startCluster(ncores, cl)
+  # run the simulations
+  if(is.null(cl)) {
+    if(resetSeed) set.seed(seed)
+    tmp <- lapply(s, designSimulation, x, setup, control)
+  } else {
+    if(attr(cl, "stopOnExit")) on.exit(stopCluster(cl))
+    clusterSetRNGStream(cl, iseed=seed)
+    tmp <- parLapply(cl, s, designSimulation, x, setup, control)
+  }
+  # construct results
+  getSimResults(tmp, sampleControl=getControl(setup), control=control)
+}
+
+# methods for generic function
+
 setMethod(
   "runSimulation", 
   signature(x = "data.frame", setup = "VirtualSampleControl", 
             nrep = "ANY", control = "SimControl"),
-  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
-           NAControl = NULL, design = character(), fun, ..., seed, 
-           ncores = 1, cl = NULL) {
-    # seed of the random number is first set by generic function 'setup'
-    setup <- setup(x, setup)
-    # seed is reset in the next method of 'runSimulation' (unless parallel 
-    # computing is used, then the seed is set for random number streams)
-    runSimulation(x, setup, control=control, ncores=ncores, cl=cl)
-  })
+  runDesignSimulation)
 
 setMethod(
   "runSimulation", 
   signature(x = "data.frame", setup = "SampleSetup", 
             nrep = "ANY", control = "SimControl"),
-  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
-           NAControl = NULL, design = character(), fun, ..., seed, 
-           ncores = 1, cl = NULL) {
-    # initializations
-    nsamp <- length(setup)
-    if(nsamp == 0) {
-      # nothing to do
-      return(SimResults(sampleControl=getControl(setup), control=control))
-    }
-    s <- seq_len(nsamp)
-    seed <- getSeed(control)
-    # set up cluster for parallel computing if requested
-    cl <- startCluster(ncores, cl)
-    # run the simulations
-    if(is.null(cl)) {
-      set.seed(seed)
-      tmp <- lapply(s, designSimulation, x, setup, control)
-    } else {
-      if(attr(cl, "stopOnExit")) on.exit(stopCluster(cl))
-      clusterSetRNGStream(cl, iseed=seed)
-      tmp <- parLapply(cl, s, designSimulation, x, setup, control)
-    }
-    # construct results
-    getSimResults(tmp, sampleControl=getControl(setup), control=control)
-  })
+  runDesignSimulation)
 
 # internal function also used for parallel computing with 'parLapply'
 designSimulation <- function(i, x, setup, control, tuning = list()) {
@@ -156,7 +163,7 @@ setMethod(
     nrep <- rep(as.integer(nrep), length.out=1)
     if(is.na(nrep) || nrep < 0) nrep <- 1
     nsamp <- length(setup)
-    setSeed(setup, integer())  # do not reset random seed when drawing samples
+    setSeed(setup, NULL)  # do not reset random seed when drawing samples
     if(nrep == 0 || nsamp == 0) {
       # nothing to do
       return(SimResults(dataControl=x, sampleControl=setup, nrep=nrep, 

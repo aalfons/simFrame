@@ -45,9 +45,8 @@ or \code{SampleControl(\dots, sub = "Basic")}.
       \code{fun}.}
     \item{\code{k}:}{A positive integer giving the number of samples to be set 
       up.}
-    \item{\code{seed}:}{An integer to be used as initial seed of the random 
-      number generator.  If not supplied explicitly, the seed will be based on 
-      the date and time of construction.}
+    \item{\code{seed}:}{An optional integer to be used as initial seed of the 
+      random number generator.}
   }
 }
 \section{Details}{

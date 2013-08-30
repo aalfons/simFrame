@@ -96,19 +96,19 @@ DataControl <- function(...) new("DataControl", ...)
 
 ## class definition
 setClass("VirtualSampleControl", 
-         representation(k = "numeric", seed = "numeric"),
+         representation(k = "numeric", seed = "OptNumeric"),
          contains = "VIRTUAL")
 
 ## class initialization
 setMethod(
   "initialize", "VirtualSampleControl", 
-  function(.Object, k = 1, seed = NA, ...) {
+  function(.Object, k = 1, seed = NULL, ...) {
     # check number of samples to be set up
     k <- rep(as.integer(k), length.out=1)
     if(is.na(k) || k < 1) k <- 1
     # use seed based on current date and time as default
     seed <- rep(as.integer(seed), length.out=1)
-    if(is.na(seed)) seed <- as.integer(Sys.time())
+    if(is.na(seed)) seed <- NULL
     # call method for superclass (or default)
     callNextMethod(.Object, k=k, seed=seed, ...)
   })

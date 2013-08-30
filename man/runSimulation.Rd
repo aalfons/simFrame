@@ -63,7 +63,9 @@ runSimulation(x, setup = NULL, nrep = 1, control,
   There are some requirements for slot \code{fun} of the control object 
   \code{control}.  Most importantly, the function must return a numeric 
   vector.  A data frame is passed to \code{fun} in every simulation run.  The 
-  corresponding argument must be called \code{x}.  If comparisons with the 
+  corresponding argument must be called \code{x}.  If comparisons with a tuning 
+  parameter from data generation need to made, the function should have an 
+  argument of the same name as the tuning parameter.  If comparisons with the 
   original data need to be made, e.g., for evaluating the quality of imputation 
   methods, the function should have an argument called \code{orig}.  If 
   different domains are used in the simulation, the indices of the current 

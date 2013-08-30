@@ -56,7 +56,7 @@ setGeneric(
     call <- match.call()
     if(!missing(control) && is(control, "VirtualSampleControl")) {
       seed <- getSeed(control)
-      if(length(seed) > 0) set.seed(seed)
+      if(!is.null(seed)) set.seed(seed)
     }
     # call method and store call
     res <- standardGeneric("setup")

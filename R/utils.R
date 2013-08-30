@@ -116,6 +116,12 @@ getEmptyResults <- function(control) {
   replicate(neps*nNA, numeric())
 }
 
+# drop unused levels in case of factor, convert otherwise
+getFactor <- function(x) {
+  if(is.factor(x)) x[, drop=TRUE]
+  else as.factor(x)
+}
+
 # get names of real columns of a data.frame 
 # (i.e., remove those used internally by simFrame)
 getNames <- function(x) setdiff(names(x), c(".weight",".contaminated"))

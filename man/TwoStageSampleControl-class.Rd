@@ -20,7 +20,7 @@ calls of the form \code{SampleControl(\dots, sub = "TwoStage")}.
       the first stage.}
     \item{\code{grouping}:}{An character, integer or logical vector specifying 
       grouping variables (columns) to be used for sampling primary sampling 
-      units (PSUs) and secondary sampling units (SSUs), respectively.}
+      units (PSUs) and, optionally, secondary sampling units (SSUs).}
     \item{\code{fun}:}{A list of length two containing the functions to be used 
       for sampling in the first and second stage, respectively (defaults to 
       \code{\link{srs}} for both stages).  The functions should return a vector 
@@ -40,9 +40,8 @@ calls of the form \code{SampleControl(\dots, sub = "TwoStage")}.
       function for sampling in \code{fun}.}
     \item{\code{k}:}{A positive integer giving the number of samples to be set 
       up.}
-    \item{\code{seed}:}{An integer to be used as initial seed of the random 
-      number generator.  If not supplied explicitly, the seed will be based on 
-      the date and time of construction.}
+    \item{\code{seed}:}{An optional integer to be used as initial seed of the 
+      random number generator.}
   }
 }
 \usage{

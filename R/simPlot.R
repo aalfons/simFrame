@@ -48,8 +48,6 @@ setMethod(
 # box plot
 boxPlot <- function(data, mapping, facets = NULL, main = NULL, 
                     xlab = NULL, ylab = NULL, ...) {
-  # define default title and axis labels
-  if(is.null(ylab)) ylab <- "Simulation results"
   # generate plot
   p <- ggplot(data, mapping) + geom_boxplot(...) + 
     labs(title=main, x=xlab, y=ylab)
@@ -64,9 +62,6 @@ boxPlot <- function(data, mapping, facets = NULL, main = NULL,
 # density plot
 densityPlot <- function(data, mapping, facets = NULL, main = NULL, 
                         xlab = NULL, ylab = NULL, ...) {
-  # define default title and axis labels
-  if(is.null(xlab)) xlab <- "Simulation results"
-  if(is.null(ylab)) ylab <- "Density"
   # generate plot
   p <- ggplot(data, mapping) + geom_density(...) + 
     labs(title=main, x=xlab, y=ylab)
@@ -81,8 +76,6 @@ densityPlot <- function(data, mapping, facets = NULL, main = NULL,
 # line plot
 linePlot <- function(data, mapping, facets = NULL, main = NULL, 
                      xlab = NULL, ylab = NULL, ...) {
-  # define default title and axis labels
-  if(is.null(ylab)) ylab <- "Simulation results"
   # define the function to draw the visual representation depending on whether 
   # a confidence band is specified in the aesthetic mapping
   geom <- 
