@@ -119,19 +119,24 @@ setMethod(
         # for contamination level 0, replicate results for all combinations of  
         # tuning parameters (those are of course only computed once)
         if(nrow(tuning) > 0 && 0 %in% epsilon) {
-          isZero <- (epsilon == 0)[indices[, 1]]
-          ntune <- nrow(tuning)
-          by <- rep.int(seq_along(contControl), ifelse(isZero, ntune, 1))
-          indices <- convertToIndices(epsilon, tuning, checkZero=FALSE)
-          contList <- split(seq_len(nrow(indices)), by)
-          valueList <- split(values, values[, remove])
-          valueList <- mapply(function(values, cont, isZero) {
-            n <- nrow(values)
-            if(isZero) values <- values[rep(seq_len(n), ntune),]
-            values$Cont <- rep.int(cont, n)
-            values
-          }, valueList, contList, isZero, SIMPLIFY=FALSE, USE.NAMES=FALSE)
-          values <- do.call(rbind, valueList)
+          cont <- values[, remove]
+          ntune <- length(setdiff(indices[cont, 2], 0))
+          if(ntune > 1) {
+            isZero <- (epsilon == 0)[indices[, 1]]
+            by <- rep.int(seq_len(nrow(indices)), ifelse(isZero, nrow(tuning), 1))
+            isZero <- isZero[cont]
+            indices <- convertToIndices(epsilon, tuning, checkZero=FALSE)
+            contList <- split(seq_len(nrow(indices)), by)[cont]
+            contList[isZero] <- lapply(contList[isZero], "[", seq_len(ntune))
+            valueList <- split(values, cont)
+            valueList <- mapply(function(values, cont, isZero) {
+              n <- nrow(values)
+              if(isZero) values <- values[rep(seq_len(n), ntune),]
+              values$Cont <- rep.int(cont, n)
+              values
+            }, valueList, contList, isZero, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+            values <- do.call(rbind, valueList)
+          }
         }
         epsilon <- epsilon[indices[, 1]]
       } else {
