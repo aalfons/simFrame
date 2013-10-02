@@ -120,23 +120,22 @@ setMethod(
         # tuning parameters (those are of course only computed once)
         if(nrow(tuning) > 0 && 0 %in% epsilon) {
           cont <- values[, remove]
-          ntune <- length(setdiff(indices[cont, 2], 0))
-          if(ntune > 1) {
-            isZero <- (epsilon == 0)[indices[, 1]]
-            by <- rep.int(seq_len(nrow(indices)), ifelse(isZero, nrow(tuning), 1))
-            isZero <- isZero[cont]
-            indices <- convertToIndices(epsilon, tuning, checkZero=FALSE)
-            contList <- split(seq_len(nrow(indices)), by)[cont]
-            contList[isZero] <- lapply(contList[isZero], "[", seq_len(ntune))
-            valueList <- split(values, cont)
-            valueList <- mapply(function(values, cont, isZero) {
-              n <- nrow(values)
-              if(isZero) values <- values[rep(seq_len(n), ntune),]
-              values$Cont <- rep.int(cont, n)
-              values
-            }, valueList, contList, isZero, SIMPLIFY=FALSE, USE.NAMES=FALSE)
-            values <- do.call(rbind, valueList)
-          }
+          tune <- setdiff(indices[cont, 2], 0)
+          ntune <- length(tune)
+          isZero <- (epsilon == 0)[indices[, 1]]
+          by <- rep.int(seq_len(nrow(indices)), ifelse(isZero, nrow(tuning), 1))
+          isZero <- isZero[cont]
+          indices <- convertToIndices(epsilon, tuning, checkZero=FALSE)
+          contList <- split(seq_len(nrow(indices)), by)[cont]
+          contList[isZero] <- lapply(contList[isZero], "[", tune)
+          valueList <- split(values, cont)
+          valueList <- mapply(function(values, cont, isZero) {
+            n <- nrow(values)
+            if(isZero) values <- values[rep(seq_len(n), ntune),]
+            values$Cont <- rep.int(cont, n)
+            values
+          }, valueList, contList, isZero, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+          values <- do.call(rbind, valueList)
         }
         epsilon <- epsilon[indices[, 1]]
       } else {
