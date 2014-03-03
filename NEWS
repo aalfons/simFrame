@@ -8,6 +8,30 @@ Changes in simFrame version 0.6.0
 
 
 
+Changes in simFrame version 0.5.3
+
+    + Number of worker processes in examples for parallel computing is now 
+      limited to 2.
+    
+
+Changes in simFrame version 0.5.2
+
+    + Bugfix in 'clusterRunSimulation' regarding export of internal object to 
+      worker processes.
+    
+    + Bugfix in demo for model-based simulation with parallel computing.
+
+
+Changes in simFrame version 0.5.1
+
+    + Slight optimizations in C++ code to compute inclusion probabilities.
+    
+    + Modified vignette according to changes in package 'robCompositions' 
+      (function 'invilr' renamed to 'isomLRinv').
+    
+    + Moved vignettes to 'vignettes' folder.
+
+
 Changes in simFrame version 0.5.0
 
     + Using package 'parallel' now for parallel computing instead of 'snow'.

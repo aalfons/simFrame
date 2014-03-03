@@ -1433,7 +1433,7 @@ of the results, the seed for the random number streams is set.
 
 <<>>=
 results <- runSimulation(dc, nrep = 50, NAControl = nc, 
-    fun = sim, seed = 12345, ncores = 4)
+    fun = sim, seed = 12345, ncores = 2)
 @
 
 After the parallel computations have finished, the simulation results can be 

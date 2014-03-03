@@ -28,7 +28,7 @@ sim <- function(x, orig) {
 
 ## run simulation
 results <- runSimulation(dc, nrep = 50, NAControl = nc, 
-    fun = sim, seed = 12345, ncores = 4)
+    fun = sim, seed = 12345, ncores = 2)
 
 ## inspect results
 head(results)

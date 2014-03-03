@@ -491,7 +491,7 @@ cc <- RandomContControl(target = "eqIncome",
     epsilon = c(0, 0.005, 0.01), dots = list(mean = 500000, sd = 10000))
 nc <- NAControl(target = "eqIncome", NARate = c(0, 0.05))
 results <- runSimulation(eusilcP, sc, contControl = cc, NAControl = nc, 
-    design = "gender", fun = sim, k = 125, seed = 12345, ncores = 4)
+    design = "gender", fun = sim, k = 125, seed = 12345, ncores = 2)
 @
 When the parallel computations are finished and the simulation results are 
 obtained, they can be inspected as usual.
