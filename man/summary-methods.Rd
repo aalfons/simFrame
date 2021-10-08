@@ -35,41 +35,40 @@
   \item{\dots}{additional arguments to be passed down to methods.}
 }
 \value{
-  The form of the resulting object depends on the class of the argument 
+  The form of the resulting object depends on the class of the argument
   \code{object}.  See the \dQuote{Methods} section below for details.
 }
 \section{Methods}{
   \describe{
-  \item{\code{signature(x = "SampleSetup")}}{returns an object of class 
-    \code{SummarySampleSetup}, which contains information on the size of each 
+  \item{\code{signature(x = "SampleSetup")}}{returns an object of class
+    \code{SummarySampleSetup}, which contains information on the size of each
     of the set up samples.}
-  \item{\code{signature(x = "SimControl")}}{currently returns the 
+  \item{\code{signature(x = "SimControl")}}{currently returns the
     object itself.}
-  \item{\code{signature(x = "SimResults")}}{produces a summary of the 
-    simulation results by calling the method of \code{\link[base]{summary}} 
+  \item{\code{signature(x = "SimResults")}}{produces a summary of the
+    simulation results by calling the method of \code{\link[base]{summary}}
     for the \code{data.frame} in slot \code{values}.}
-  \item{\code{signature(x = "Strata")}}{returns a \code{data.frame} containing 
+  \item{\code{signature(x = "Strata")}}{returns a \code{data.frame} containing
     the size of each stratum.}
-  \item{\code{signature(x = "VirtualContControl")}}{currently returns the 
+  \item{\code{signature(x = "VirtualContControl")}}{currently returns the
     object itself.}
-  \item{\code{signature(x = "VirtualDataControl")}}{currently returns the 
+  \item{\code{signature(x = "VirtualDataControl")}}{currently returns the
     object itself.}
-  \item{\code{signature(x = "VirtualNAControl")}}{currently returns the 
+  \item{\code{signature(x = "VirtualNAControl")}}{currently returns the
     object itself.}
-  \item{\code{signature(x = "VirtualSampleControl")}}{currently returns the 
+  \item{\code{signature(x = "VirtualSampleControl")}}{currently returns the
     object itself.}
   }
 }
 \author{Andreas Alfons}
 \references{
-Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for 
-Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of 
-Statistical Software}, \bold{37}(3), 1--36. URL 
-\url{http://www.jstatsoft.org/v37/i03/}.
+Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for
+Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of
+Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
 }
 \seealso{
-  \code{\link[base]{summary}}, \code{"\linkS4class{SampleSetup}"}, 
-  \code{"\linkS4class{SummarySampleSetup}"}, \code{"\linkS4class{SimResults}"}, 
+  \code{\link[base]{summary}}, \code{"\linkS4class{SampleSetup}"},
+  \code{"\linkS4class{SummarySampleSetup}"}, \code{"\linkS4class{SimResults}"},
   \code{"\linkS4class{Strata}"}
 }
 \examples{

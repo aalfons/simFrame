@@ -103,9 +103,9 @@ Further information is available in the following vignettes:
 }
 }
 \section{UML class diagram}{
-  A slightly simplified UML class diagram of the framework can be found in 
-  Figure 1 of the package vignette \emph{An Object-Oriented Framework for 
-  Statistical Simulation: The \R Package \code{simFrame}}.  Use 
+  A slightly simplified UML class diagram of the framework can be found in
+  Figure 1 of the package vignette \emph{An Object-Oriented Framework for
+  Statistical Simulation: The \R Package \code{simFrame}}.  Use
   \code{vignette("simFrame-intro")} to view this vignette.
 }
 \author{
@@ -114,9 +114,8 @@ Andreas Alfons [aut, cre]
 Maintainer: Andreas Alfons <alfons@ese.eur.nl>
 }
 \references{
-Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for 
-Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of 
-Statistical Software}, \bold{37}(3), 1--36. URL 
-\url{http://www.jstatsoft.org/v37/i03/}.
+Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for
+Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of
+Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
 }
 \keyword{package}

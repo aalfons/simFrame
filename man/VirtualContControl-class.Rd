@@ -25,11 +25,11 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{target}:}{Object of class \code{"OptCharacter"}; a character 
-      vector specifying specifying the variables (columns) to be contaminated, 
-      or \code{NULL} to contaminate all variables  (except the additional ones 
+    \item{\code{target}:}{Object of class \code{"OptCharacter"}; a character
+      vector specifying specifying the variables (columns) to be contaminated,
+      or \code{NULL} to contaminate all variables  (except the additional ones
       generated internally).}
-    \item{\code{epsilon}:}{Object of class \code{"numeric"} giving the 
+    \item{\code{epsilon}:}{Object of class \code{"numeric"} giving the
       contamination levels.}
   }
 }
@@ -38,45 +38,44 @@ Class \code{"\linkS4class{OptContControl}"}, directly.
 }
 \section{Accessor and mutator methods}{
   \describe{
-    \item{\code{getTarget}}{\code{signature(x = "VirtualContControl")}: get 
+    \item{\code{getTarget}}{\code{signature(x = "VirtualContControl")}: get
       slot \code{target}.}
-    \item{\code{setTarget}}{\code{signature(x = "VirtualContControl")}: set 
+    \item{\code{setTarget}}{\code{signature(x = "VirtualContControl")}: set
       slot \code{target}.}
-    \item{\code{getEpsilon}}{\code{signature(x = "VirtualContControl")}: get 
+    \item{\code{getEpsilon}}{\code{signature(x = "VirtualContControl")}: get
       slot \code{epsilon}.}
-    \item{\code{setEpsilon}}{\code{signature(x = "VirtualContControl")}: set 
+    \item{\code{setEpsilon}}{\code{signature(x = "VirtualContControl")}: set
       slot \code{epsilon}.}
   }
 }
 \section{Methods}{
   \describe{
-    \item{\code{head}}{\code{signature(x = "VirtualContControl")}: currently 
+    \item{\code{head}}{\code{signature(x = "VirtualContControl")}: currently
       returns the object itself.}
-    \item{\code{length}}{\code{signature(x = "VirtualContControl")}: get the 
+    \item{\code{length}}{\code{signature(x = "VirtualContControl")}: get the
       number of contamination levels to be used.}
-    \item{\code{show}}{\code{signature(object = "VirtualContControl")}: print 
+    \item{\code{show}}{\code{signature(object = "VirtualContControl")}: print
       the object on the \R console.}
-    \item{\code{summary}}{\code{signature(object = "VirtualContControl")}: 
+    \item{\code{summary}}{\code{signature(object = "VirtualContControl")}:
       currently returns the object itself.}
-    \item{\code{tail}}{\code{signature(x = "VirtualContControl")}: currently 
+    \item{\code{tail}}{\code{signature(x = "VirtualContControl")}: currently
       returns the object itself.}
   }
 }
 \section{UML class diagram}{
-  A slightly simplified UML class diagram of the framework can be found in 
-  Figure 1 of the package vignette \emph{An Object-Oriented Framework for 
-  Statistical Simulation: The \R Package \code{simFrame}}.  Use 
+  A slightly simplified UML class diagram of the framework can be found in
+  Figure 1 of the package vignette \emph{An Object-Oriented Framework for
+  Statistical Simulation: The \R Package \code{simFrame}}.  Use
   \code{vignette("simFrame-intro")} to view this vignette.
 }
 \author{Andreas Alfons}
 \references{
-Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for 
-Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of 
-Statistical Software}, \bold{37}(3), 1--36. URL 
-\url{http://www.jstatsoft.org/v37/i03/}.
+Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for
+Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of
+Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
 }
 \seealso{
-  \code{"\linkS4class{DCARContControl}"}, \code{"\linkS4class{DARContControl}"}, 
+  \code{"\linkS4class{DCARContControl}"}, \code{"\linkS4class{DARContControl}"},
   \code{"\linkS4class{ContControl}"}, \code{\link{contaminate}}
 }
 \examples{

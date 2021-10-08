@@ -17,71 +17,70 @@ contaminate(x, control, \dots)
 }
 \arguments{
   \item{x}{the data to be contaminated.}
-  \item{control}{a control object of a class inheriting from the virtual class 
-    \code{"VirtualContControl"} or a character string specifying such a control 
+  \item{control}{a control object of a class inheriting from the virtual class
+    \code{"VirtualContControl"} or a character string specifying such a control
     class (the default being \code{"DCARContControl"}).}
-  \item{i}{an integer giving the element of the slot \code{epsilon} of 
+  \item{i}{an integer giving the element of the slot \code{epsilon} of
     \code{control} to be used as contamination level.}
-  \item{\dots}{if \code{control} is a character string or missing, the slots of 
-    the control object may be supplied as additional arguments.  See 
-    \code{"\linkS4class{DCARContControl}"} and 
+  \item{\dots}{if \code{control} is a character string or missing, the slots of
+    the control object may be supplied as additional arguments.  See
+    \code{"\linkS4class{DCARContControl}"} and
     \code{"\linkS4class{DARContControl}"} for details on the slots.}
 }
 \details{
-  With the control classes implemented in \pkg{simFrame}, contamination is 
-  modeled as a two-step process.  The first step is to select observations to 
+  With the control classes implemented in \pkg{simFrame}, contamination is
+  modeled as a two-step process.  The first step is to select observations to
   be contaminated, the second is to model the distribution of the outliers.
-  
-  In order to extend the framework by a user-defined control class 
-  \code{"MyContControl"} (which must extend 
-  \code{"\linkS4class{VirtualContControl}"}), a method 
-  \code{contaminate(x, control, i)} with signature 
-  \code{'data.frame, MyContControl'} needs to be implemented.  In case the 
-  contaminated observations need to be identified at a later stage of the 
-  simulation, e.g., if conflicts with inserting missing values should be 
-  avoided, a logical indicator variable \code{".contaminated"} should be added 
+
+  In order to extend the framework by a user-defined control class
+  \code{"MyContControl"} (which must extend
+  \code{"\linkS4class{VirtualContControl}"}), a method
+  \code{contaminate(x, control, i)} with signature
+  \code{'data.frame, MyContControl'} needs to be implemented.  In case the
+  contaminated observations need to be identified at a later stage of the
+  simulation, e.g., if conflicts with inserting missing values should be
+  avoided, a logical indicator variable \code{".contaminated"} should be added
   to the returned data set.
 }
 \value{
-  A \code{data.frame} containing the contaminated data.  In addition, the 
-  column \code{".contaminated"}, which consists of logicals indicating the 
+  A \code{data.frame} containing the contaminated data.  In addition, the
+  column \code{".contaminated"}, which consists of logicals indicating the
   contaminated observations, is added to the \code{data.frame}.
 }
 \section{Methods}{
   \describe{
-  \item{\code{x = "data.frame", control = "character"}}{contaminate data using 
-    a control class specified by the character string \code{control}.  The 
+  \item{\code{x = "data.frame", control = "character"}}{contaminate data using
+    a control class specified by the character string \code{control}.  The
     slots of the control object may be supplied as additional arguments.}
-  \item{\code{x = "data.frame", control = "ContControl"}}{contaminate data as 
+  \item{\code{x = "data.frame", control = "ContControl"}}{contaminate data as
     defined by the control object \code{control}.}
-  \item{\code{x = "data.frame", control = "missing"}}{contaminate data using a 
-    control object of class \code{"ContControl"}.  Its slots may be supplied as 
+  \item{\code{x = "data.frame", control = "missing"}}{contaminate data using a
+    control object of class \code{"ContControl"}.  Its slots may be supplied as
     additional arguments.}
   }
 }
 \note{
-Since version 0.3, \code{contaminate} no longer checks if the auxiliary 
-variable with probability weights are numeric and contain only finite positive 
-values (\code{\link{sample}} still throws an error in these cases).  This has 
+Since version 0.3, \code{contaminate} no longer checks if the auxiliary
+variable with probability weights are numeric and contain only finite positive
+values (\code{\link{sample}} still throws an error in these cases).  This has
 been removed to improve computational performance in simulation studies.
 }
 \author{Andreas Alfons}
 \references{
-Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for 
-Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of 
-Statistical Software}, \bold{37}(3), 1--36. URL 
-\url{http://www.jstatsoft.org/v37/i03/}.
+Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for
+Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of
+Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
 
-Alfons, A., Templ, M. and Filzmoser, P. (2010) Contamination Models in the \R 
-Package \pkg{simFrame} for Statistical Simulation. In Aivazian, S., Filzmoser, 
-P. and Kharin, Y. (editors) \emph{Computer Data Analysis and Modeling: Complex 
+Alfons, A., Templ, M. and Filzmoser, P. (2010) Contamination Models in the \R
+Package \pkg{simFrame} for Statistical Simulation. In Aivazian, S., Filzmoser,
+P. and Kharin, Y. (editors) \emph{Computer Data Analysis and Modeling: Complex
 Stochastic Data and Systems}, volume 2, 178--181. Minsk. ISBN 978-985-476-848-9.
 
-\enc{Béguin}{Beguin}, C. and Hulliger, B. (2008) The BACON-EEM Algorithm for 
-Multivariate Outlier Detection in Incomplete Survey Data. \emph{Survey 
+\enc{Béguin}{Beguin}, C. and Hulliger, B. (2008) The BACON-EEM Algorithm for
+Multivariate Outlier Detection in Incomplete Survey Data. \emph{Survey
 Methodology}, \bold{34}(1), 91--103.
 
-Hulliger, B. and Schoch, T. (2009) Robust Multivariate Imputation with Survey 
+Hulliger, B. and Schoch, T. (2009) Robust Multivariate Imputation with Survey
 Data. \emph{57th Session of the International Statistical Institute}, Durban.
 }
 \seealso{
@@ -94,12 +93,12 @@ data(eusilcP)
 sam <- draw(eusilcP[, c("id", "eqIncome")], size = 20)
 
 # using a control object
-dcarc <- ContControl(target = "eqIncome", epsilon = 0.05, 
+dcarc <- ContControl(target = "eqIncome", epsilon = 0.05,
     dots = list(mean = 5e+05, sd = 10000), type = "DCAR")
 contaminate(sam, dcarc)
 
 # supply slots of control object as arguments
-contaminate(sam, target = "eqIncome", epsilon = 0.05, 
+contaminate(sam, target = "eqIncome", epsilon = 0.05,
     dots = list(mean = 5e+05, sd = 10000))
 
 
@@ -107,11 +106,11 @@ contaminate(sam, target = "eqIncome", epsilon = 0.05,
 require(mvtnorm)
 mean <- rep(0, 2)
 sigma <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
-foo <- generate(size = 10, distribution = rmvnorm, 
+foo <- generate(size = 10, distribution = rmvnorm,
     dots = list(mean = mean, sigma = sigma))
 
 # using a control object
-darc <- DARContControl(target = "V2", 
+darc <- DARContControl(target = "V2",
     epsilon = 0.2, fun = function(x) x * 100)
 contaminate(foo, darc)
 

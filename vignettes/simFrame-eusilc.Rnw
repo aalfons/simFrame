@@ -5,7 +5,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% almost as usual
-\author{Andreas Alfons\\Erasmus Universiteit\\Rotterdam \And Matthias Templ\\Vienna University of\\Technology,\\Statistics Austria \And Peter Filzmoser\\Vienna University of\\Technology}
+\author{Andreas Alfons\\Erasmus University\\Rotterdam \And Matthias Templ\\Zurich University of\\Applied Sciences \And Peter Filzmoser\\Vienna University of\\Technology}
 \title{Applications of Statistical Simulation in the Case of EU-SILC: Using the \proglang{R} Package \pkg{simFrame}}
 
 %% for pretty printing and a nice hypersummary also set:
@@ -15,15 +15,15 @@
 
 %% an abstract and keywords
 \Abstract{
-  This paper demonstrates the use of \pkg{simFrame} for various simulation 
-  designs in a practical application with EU-SILC data. It presents the full 
-  functionality of the framework regarding sampling designs, contamination 
-  models, missing data mechanisms and performing simulations separately on 
-  different domains. Due to the use of control objects, switching from one 
-  simulation design to another requires only minimal changes in the code. Using 
-  bespoke \proglang{R} code, on the other hand, changing the code to switch 
-  between simulation designs would require much greater effort. Furthermore, 
-  parallel computing with \pkg{simFrame} is demonstrated. 
+  This paper demonstrates the use of \pkg{simFrame} for various simulation
+  designs in a practical application with EU-SILC data. It presents the full
+  functionality of the framework regarding sampling designs, contamination
+  models, missing data mechanisms and performing simulations separately on
+  different domains. Due to the use of control objects, switching from one
+  simulation design to another requires only minimal changes in the code. Using
+  bespoke \proglang{R} code, on the other hand, changing the code to switch
+  between simulation designs would require much greater effort. Furthermore,
+  parallel computing with \pkg{simFrame} is demonstrated.
 }
 \Keywords{\proglang{R}, statistical simulation, EU-SILC}
 \Plainkeywords{R, statistical simulation, EU-SILC} %% without formatting
@@ -42,12 +42,12 @@
 %% in the following format:
 \Address{
   Andreas Alfons\\
-  Erasmus School of Economics\\ 
-  Erasmus Universiteit Rotterdam\\
-  PO Box 1738\\
-  3000DR Rotterdam, Netherlands\\
+  Erasmus School of Economics\\
+  Erasmus University Rotterdam\\
+  Burgemeester Oudlaan 50\\
+  3062PA Rotterdam, Netherlands\\
   E-mail: \email{alfons@ese.eur.nl}\\
-  URL: \url{http://people.few.eur.nl/alfons/}
+  URL: \url{https://personal.eur.nl/alfons/}
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:
@@ -77,44 +77,44 @@ options(width=72, prompt="R> ")
 %% ----------
 
 \section{Introduction}
-This is an updated version of a supplementary paper to ``An Object-Oriented 
-Framework for Statistical Simulation: The \proglang{R} Package \pkg{simFrame}'' 
-\citep{alfons10d} and demonstrates the use of \pkg{simFrame} \citep{alfons10c} 
-in \proglang{R} \citep{R10} for various simulation designs in a practical 
-application. It extends the example for design-based simulation in 
-\citet{alfons10d} (Example~6.1). Different simulation designs in terms of 
-sampling, contamination and missing data are thereby investigated to present 
-the strengths of the framework. 
+This is an updated version of a supplementary paper to ``An Object-Oriented
+Framework for Statistical Simulation: The \proglang{R} Package \pkg{simFrame}''
+\citep{alfons10d} and demonstrates the use of \pkg{simFrame} \citep{alfons10c}
+in \proglang{R} \citep{R10} for various simulation designs in a practical
+application. It extends the example for design-based simulation in
+\citet{alfons10d} (Example~6.1). Different simulation designs in terms of
+sampling, contamination and missing data are thereby investigated to present
+the strengths of the framework.
 
-Note that the paper is supplementary material and is supposed to be read after 
-studying vignette \code{"simFrame-intro"} \citep[an updated version 
-of][]{alfons10d}. It does not give a detailed discussion about the motivation 
-for the framework, nor does it describe the design or implementation of the 
-package. Instead it is focused on showing its full functionality for 
+Note that the paper is supplementary material and is supposed to be read after
+studying vignette \code{"simFrame-intro"} \citep[an updated version
+of][]{alfons10d}. It does not give a detailed discussion about the motivation
+for the framework, nor does it describe the design or implementation of the
+package. Instead it is focused on showing its full functionality for
 design-based simulation in additional code examples with brief explanations.
 However, model-based simulation is not considered here.
 
-The European Union Statistics on Income and Living Conditions (EU-SILC) 
-is panel survey conducted in EU member states and other European countries and 
-serves as basis for measuring risk-of-poverty and social cohesion in Europe. 
-An important indicator calculated from this survey is the \emph{Gini 
-coefficient}, which is a well-known measure of inequality. In the following 
-examples, the standard estimation method \citep{EU-SILC04} is compared to two 
-semiparametric methods under different simulation designs. The two 
-semiparametric approaches are based on fitting a Pareto distribution 
-\citep[e.g.,][]{kleiber03} to the upper tail of the data. In the first 
-approach, the classical Hill estimator \citep{hill75} is used to estimate the 
-shape parameter of the Pareto distribution, while the second uses the robust 
-partial density component (PDC) estimator \citep{vandewalle07}. All these 
-methods are implemented in the \proglang{R} package \pkg{laeken} 
-\citep{alfons10b}. For a more detailed discussion on Pareto tail modeling in 
-the case of the Gini coefficient and a related measure of inequality, the 
+The European Union Statistics on Income and Living Conditions (EU-SILC)
+is panel survey conducted in EU member states and other European countries and
+serves as basis for measuring risk-of-poverty and social cohesion in Europe.
+An important indicator calculated from this survey is the \emph{Gini
+coefficient}, which is a well-known measure of inequality. In the following
+examples, the standard estimation method \citep{EU-SILC04} is compared to two
+semiparametric methods under different simulation designs. The two
+semiparametric approaches are based on fitting a Pareto distribution
+\citep[e.g.,][]{kleiber03} to the upper tail of the data. In the first
+approach, the classical Hill estimator \citep{hill75} is used to estimate the
+shape parameter of the Pareto distribution, while the second uses the robust
+partial density component (PDC) estimator \citep{vandewalle07}. All these
+methods are implemented in the \proglang{R} package \pkg{laeken}
+\citep{alfons10b}. For a more detailed discussion on Pareto tail modeling in
+the case of the Gini coefficient and a related measure of inequality, the
 reader is referred to \citet{alfons10f}.
 
-The example data set of \pkg{simFrame} is used as population data throughout 
-the paper. It consists of $58\,654$ observations from $25\,000$ households and 
-was synthetically generated from Austrian EU-SILC survey data from 2006 using 
-the data simulation methodology by \citet{alfons10a}, which is implemented 
+The example data set of \pkg{simFrame} is used as population data throughout
+the paper. It consists of $58\,654$ observations from $25\,000$ households and
+was synthetically generated from Austrian EU-SILC survey data from 2006 using
+the data simulation methodology by \citet{alfons10a}, which is implemented
 \proglang{R} package \pkg{simPopulation} \citep{kraft10}.
 
 
@@ -133,48 +133,48 @@ library("simFrame")
 library("laeken")
 data("eusilcP")
 @
-Then, the function to be run in every iteration is defined. Its argument 
-\code{k} determines the number of households whose income is modeled by a 
-Pareto distribution. Since the Gini coefficient is calculated based on an 
-equivalized household income, all individuals of a household in the upper tail 
+Then, the function to be run in every iteration is defined. Its argument
+\code{k} determines the number of households whose income is modeled by a
+Pareto distribution. Since the Gini coefficient is calculated based on an
+equivalized household income, all individuals of a household in the upper tail
 receive the same value.
 <<>>=
 sim <- function(x, k) {
     x <- x[!is.na(x$eqIncome), ]
     g <- gini(x$eqIncome, x$.weight)$value
-    eqIncHill <- fitPareto(x$eqIncome, k = k, 
+    eqIncHill <- fitPareto(x$eqIncome, k = k,
         method = "thetaHill", groups = x$hid)
     gHill <- gini(eqIncHill, x$.weight)$value
-    eqIncPDC <- fitPareto(x$eqIncome, k = k, 
+    eqIncPDC <- fitPareto(x$eqIncome, k = k,
         method = "thetaPDC", groups = x$hid)
     gPDC <- gini(eqIncPDC, x$.weight)$value
     c(standard = g, Hill = gHill, PDC = gPDC)
 }
 @
-This function is used in the following examples, which are designed to exhibit 
-the strengths of the framework. In order to change from one simulation design 
-to another, all there is to do is to define or modify control objects and 
+This function is used in the following examples, which are designed to exhibit
+the strengths of the framework. In order to change from one simulation design
+to another, all there is to do is to define or modify control objects and
 supply them to the function \code{runSimulation()}.
 
 
 \subsection{Basic simulation design}
-In this basic simulation design, 100 samples of 1500 households are drawn using 
-simple random sampling. Note that the \code{setup()} function is not used to 
-permanently store the samples in an object. This is simply not necessary, since 
-the population is rather small and the sampling method is straightforward. 
-Furthermore, the Pareto distribution is fitted to the 175 households with the 
+In this basic simulation design, 100 samples of 1500 households are drawn using
+simple random sampling. Note that the \code{setup()} function is not used to
+permanently store the samples in an object. This is simply not necessary, since
+the population is rather small and the sampling method is straightforward.
+Furthermore, the Pareto distribution is fitted to the 175 households with the
 largest equivalized income.
 <<>>=
 set.seed(12345)
 sc <- SampleControl(grouping = "hid", size = 1500, k = 100)
 results <- runSimulation(eusilcP, sc, fun = sim, k = 175)
 @
-In order to inspect the simulation results, methods for several frequently 
-used generic functions are implemented. Besides \code{head()}, \code{tail()} 
-and \code{summary()} methods, a method for computing summary statistics with 
-\code{aggregate()} is available. By default, the mean is used as summary 
-statistic. Moreover, the \code{plot()} method selects a suitable graphical 
-representation of the simulation results automatically. A reference line for 
+In order to inspect the simulation results, methods for several frequently
+used generic functions are implemented. Besides \code{head()}, \code{tail()}
+and \code{summary()} methods, a method for computing summary statistics with
+\code{aggregate()} is available. By default, the mean is used as summary
+statistic. Moreover, the \code{plot()} method selects a suitable graphical
+representation of the simulation results automatically. A reference line for
 the true value can thereby be added as well.
 <<>>=
 head(results)
@@ -183,13 +183,13 @@ tv <- gini(eusilcP$eqIncome)$value
 plot(results, true = tv)
 @
 
-Figure~\ref{fig:basic} shows the resulting box plots of the simulation results 
-for the basic simulation design. While the PDC estimator comes with larger 
-variability, all three methods are on average quite close to the true 
-population value. 
-%This is also an indication that the choice for the threshold of the Pareto 
+Figure~\ref{fig:basic} shows the resulting box plots of the simulation results
+for the basic simulation design. While the PDC estimator comes with larger
+variability, all three methods are on average quite close to the true
+population value.
+%This is also an indication that the choice for the threshold of the Pareto
 %distribution is suitable.
-This is also an indication that the choice of the number of households for 
+This is also an indication that the choice of the number of households for
 fitting the Pareto distribution is suitable.
 
 \begin{figure}[t!]
@@ -205,19 +205,19 @@ print(plot(results, true = tv))
 
 
 \subsection{Using stratified sampling}
-The most frequently used sampling designs in official statistics are 
-implemented in \pkg{simFrame}. In order to switch to another sampling design, 
-only the corresponding control object needs to be changed. In this example, 
-stratified sampling by region is performed. The sample sizes for the different 
-strata are specified by using a vector for the slot \code{size} of the control 
+The most frequently used sampling designs in official statistics are
+implemented in \pkg{simFrame}. In order to switch to another sampling design,
+only the corresponding control object needs to be changed. In this example,
+stratified sampling by region is performed. The sample sizes for the different
+strata are specified by using a vector for the slot \code{size} of the control
 object.
 <<>>=
 set.seed(12345)
-sc <- SampleControl(design = "region", grouping = "hid", 
+sc <- SampleControl(design = "region", grouping = "hid",
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
 results <- runSimulation(eusilcP, sc, fun = sim, k = 175)
 @
-As before, the simulation results are inspected with \code{head()} and 
+As before, the simulation results are inspected with \code{head()} and
 \code{aggregate()}. A plot of the simulation results is produced as well.
 <<>>=
 head(results)
@@ -237,36 +237,36 @@ print(plot(results, true = tv))
 \end{center}
 \end{figure}
 
-Figure~\ref{fig:stratified} contains the plot of the simulation results for the 
-simulation design with stratified sampling. The results are very similar to 
-those from the basic simulation design with simple random sampling. On average, 
+Figure~\ref{fig:stratified} contains the plot of the simulation results for the
+simulation design with stratified sampling. The results are very similar to
+those from the basic simulation design with simple random sampling. On average,
 all three investigated methods are quite close to the true population value.
 
 
 \subsection{Adding contamination}
-When evaluating robust methods in simulation studies, contamination needs to be 
-added to the data to study the influence of these outliers on the robust 
-estimators and their classical counterparts. In \pkg{simFrame}, contamination 
-is specified by defining a control object. Various contamination models are 
-thereby implemented in the framework. Keep in mind that the term 
-\emph{contamination} is used in a technical sense here \citep[see][for an exact 
-definition]{alfons10d, alfons10e} and that contamination is modeled as a two 
-step process \citep[see also][]{beguin08, hulliger09b}. In this example, $0.5\%$ 
-of the households are selected to be contaminated using simple random sampling. 
-The equivalized income of the selected households is then drawn from a normal 
-distribution with mean \mbox{$\mu = 500\,000$} and standard deviation $\sigma = 
+When evaluating robust methods in simulation studies, contamination needs to be
+added to the data to study the influence of these outliers on the robust
+estimators and their classical counterparts. In \pkg{simFrame}, contamination
+is specified by defining a control object. Various contamination models are
+thereby implemented in the framework. Keep in mind that the term
+\emph{contamination} is used in a technical sense here \citep[see][for an exact
+definition]{alfons10d, alfons10e} and that contamination is modeled as a two
+step process \citep[see also][]{beguin08, hulliger09b}. In this example, $0.5\%$
+of the households are selected to be contaminated using simple random sampling.
+The equivalized income of the selected households is then drawn from a normal
+distribution with mean \mbox{$\mu = 500\,000$} and standard deviation $\sigma =
 10\,000$.
 <<>>=
 set.seed(12345)
-sc <- SampleControl(design = "region", grouping = "hid", 
+sc <- SampleControl(design = "region", grouping = "hid",
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
-cc <- DCARContControl(target = "eqIncome", epsilon = 0.005, 
+cc <- DCARContControl(target = "eqIncome", epsilon = 0.005,
     grouping = "hid", dots = list(mean = 500000, sd = 10000))
-results <- runSimulation(eusilcP, sc, 
+results <- runSimulation(eusilcP, sc,
     contControl = cc, fun = sim, k = 175)
 @
-The \code{head()}, \code{aggregate()} and \code{plot()} methods are again used 
-to take a look at the simulation results. Note that a column is added that 
+The \code{head()}, \code{aggregate()} and \code{plot()} methods are again used
+to take a look at the simulation results. Note that a column is added that
 indicates the contamination level used.
 <<>>=
 head(results)
@@ -281,55 +281,55 @@ plot(results, true = tv)
 <<fig=TRUE, echo=FALSE, width=4, height=4>>=
 print(plot(results, true = tv))
 @
-\caption{Simulation results for the simulation design with stratified sampling 
+\caption{Simulation results for the simulation design with stratified sampling
 and contamination.}
 \label{fig:cont}
 \end{center}
 \end{figure}
 
-In Figure~\ref{fig:cont}, the resulting box plots are presented. The figure 
-shows that such a small amount of contamination is enough to completely corrupt 
-the standard estimation of the Gini coefficient. Using the classical Hill 
-estimator to fit the Pareto distribution is still highly influenced by the 
+In Figure~\ref{fig:cont}, the resulting box plots are presented. The figure
+shows that such a small amount of contamination is enough to completely corrupt
+the standard estimation of the Gini coefficient. Using the classical Hill
+estimator to fit the Pareto distribution is still highly influenced by the
 outliers, whereas the PDC estimator leads to very accurate results.
 
 
 \subsection{Performing simulations separately on different domains}
-Data sets from official statistics typically contain strong heterogeneities, 
-therefore indicators are usually computed for subsets of the data as well. 
-Hence it is often of interest to investigate the behavior of indicators on 
-different subsets in simulation studies. In \pkg{simFrame}, this can be done by 
-simply specifying the \code{design} argument of the function 
-\code{runSimulation()}. In the case of extending the example from the previous 
-section, the framework then splits the samples, inserts contamination into each 
-subset and calls the supplied function for these subsets automatically. With 
-bespoke \proglang{R} code, the user would need to take care of this with a 
-loop-like structure such as a \code{for} loop or a function from the 
+Data sets from official statistics typically contain strong heterogeneities,
+therefore indicators are usually computed for subsets of the data as well.
+Hence it is often of interest to investigate the behavior of indicators on
+different subsets in simulation studies. In \pkg{simFrame}, this can be done by
+simply specifying the \code{design} argument of the function
+\code{runSimulation()}. In the case of extending the example from the previous
+section, the framework then splits the samples, inserts contamination into each
+subset and calls the supplied function for these subsets automatically. With
+bespoke \proglang{R} code, the user would need to take care of this with a
+loop-like structure such as a \code{for} loop or a function from the
 \code{apply} family.
 
-In the following example, the simulations are performed separately for each 
-gender. 
-%It should be noted that the threshold for the Pareto distribution is thus 
-%changed to~125. 
-It should be noted that the value of \code{k} for the Pareto distribution is 
-thus changed to~125. This is the same as Example~6.1 from \citet{alfons10d}, 
-except that a control object for sampling is supplied to \code{runSimulation()} 
+In the following example, the simulations are performed separately for each
+gender.
+%It should be noted that the threshold for the Pareto distribution is thus
+%changed to~125.
+It should be noted that the value of \code{k} for the Pareto distribution is
+thus changed to~125. This is the same as Example~6.1 from \citet{alfons10d},
+except that a control object for sampling is supplied to \code{runSimulation()}
 instead of setting up the samples beforehand and storing them in an object.
 
 <<>>=
 set.seed(12345)
-sc <- SampleControl(design = "region", grouping = "hid", 
+sc <- SampleControl(design = "region", grouping = "hid",
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
-cc <- DCARContControl(target = "eqIncome", epsilon = 0.005, 
+cc <- DCARContControl(target = "eqIncome", epsilon = 0.005,
     grouping = "hid", dots = list(mean = 500000, sd = 10000))
-results <- runSimulation(eusilcP, sc, contControl = cc, 
+results <- runSimulation(eusilcP, sc, contControl = cc,
     design = "gender", fun = sim, k = 125)
 @
-Below, the results are inspected using \code{head()} and \code{aggregate()}. 
-The \code{aggregate()} method thereby computes the summary statistic for each 
-subset automatically. Also the \code{plot()} method displays the results for 
-the different subsets in different panels by taking advantage of the 
-\pkg{lattice} system \citep{sarkar08, sarkar10}. In order to compute the true 
+Below, the results are inspected using \code{head()} and \code{aggregate()}.
+The \code{aggregate()} method thereby computes the summary statistic for each
+subset automatically. Also the \code{plot()} method displays the results for
+the different subsets in different panels by taking advantage of the
+\pkg{lattice} system \citep{sarkar08, sarkar10}. In order to compute the true
 values for each subset, the function \code{simSapply()} is used.
 
 <<>>=
@@ -345,39 +345,39 @@ plot(results, true = tv)
 <<fig=TRUE, echo=FALSE, width=7, height=4>>=
 print(plot(results, true = tv))
 @
-\caption{Simulation results for the simulation design with stratified sampling, 
+\caption{Simulation results for the simulation design with stratified sampling,
 contamination and performing the simulations separately for each gender.}
 \label{fig:split}
 \end{center}
 \end{figure}
 
-The resulting plots are shown in Figure~\ref{fig:split}, which is the same as 
-Figure~2 in \citet{alfons10d}. Clearly, the PDC estimator leads to excellent 
-results for both subsets, while the two classical approaches are in both cases 
+The resulting plots are shown in Figure~\ref{fig:split}, which is the same as
+Figure~2 in \citet{alfons10d}. Clearly, the PDC estimator leads to excellent
+results for both subsets, while the two classical approaches are in both cases
 highly influenced by the outliers.
 
 
 \subsection{Using multiple contamination levels}
-To get a more complete picture of the behavior of robust methods, more than one 
-level of contamination is typically investigated in simulation studies. The 
-only necessary modification of the code is to use a vector of contamination 
-levels as the slot \code{epsilon} of the contamination control object. In 
-this example, the contamination level is varied from~$0\%$ to~$1\%$ in steps 
-of~$0.25\%$. With bespoke \proglang{R} code, the user would have to add another 
-loop-like structure to the code and collect the results in a suitable data 
+To get a more complete picture of the behavior of robust methods, more than one
+level of contamination is typically investigated in simulation studies. The
+only necessary modification of the code is to use a vector of contamination
+levels as the slot \code{epsilon} of the contamination control object. In
+this example, the contamination level is varied from~$0\%$ to~$1\%$ in steps
+of~$0.25\%$. With bespoke \proglang{R} code, the user would have to add another
+loop-like structure to the code and collect the results in a suitable data
 structure. In \pkg{simFrame}, this is handled internally by the framework.
 <<>>=
 set.seed(12345)
-sc <- SampleControl(design = "region", grouping = "hid", 
+sc <- SampleControl(design = "region", grouping = "hid",
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
-cc <- DCARContControl(target = "eqIncome", 
+cc <- DCARContControl(target = "eqIncome",
     epsilon = c(0, 0.0025, 0.005, 0.0075, 0.01),
     dots = list(mean = 500000, sd = 10000))
-results <- runSimulation(eusilcP, sc, contControl = cc, 
+results <- runSimulation(eusilcP, sc, contControl = cc,
     design = "gender", fun = sim, k = 125)
 @
-The simulation results are inspected as usual. Note that the \code{aggregate()} 
-method in this case returns values for each combination of contamination level 
+The simulation results are inspected as usual. Note that the \code{aggregate()}
+method in this case returns values for each combination of contamination level
 and gender.
 <<>>=
 head(results)
@@ -392,66 +392,66 @@ plot(results, true = tv)
 <<fig=TRUE, echo=FALSE, width=7, height=4>>=
 print(plot(results, true = tv))
 @
-\caption{Simulation results for the simulation design with stratified sampling, 
-multiple contamination levels and performing the simulations separately for 
+\caption{Simulation results for the simulation design with stratified sampling,
+multiple contamination levels and performing the simulations separately for
 each gender.}
 \label{fig:multcont}
 \end{center}
 \end{figure}
 
-If multiple contamination levels are used in a simulation study, the 
-\code{plot()} method for the simulation results no longer produces box plots. 
-Instead, the average results are plotted against the corresponding 
-contamination levels, as shown in Figure~\ref{fig:multcont}. The plots show 
-how the classical estimators move away from the references line as the 
-contamination level increases, while the values obtained with the PDC estimator 
+If multiple contamination levels are used in a simulation study, the
+\code{plot()} method for the simulation results no longer produces box plots.
+Instead, the average results are plotted against the corresponding
+contamination levels, as shown in Figure~\ref{fig:multcont}. The plots show
+how the classical estimators move away from the references line as the
+contamination level increases, while the values obtained with the PDC estimator
 remain quite accurate.
 
 
 \subsection{Inserting missing values}
-Survey data almost always contain a considerable amount of missing values. In 
-close-to-reality simulation studies, the variability due to missing data 
-therefore needs to be considered. 
-% In particular, the influence of different imputation methods on point and 
+Survey data almost always contain a considerable amount of missing values. In
+close-to-reality simulation studies, the variability due to missing data
+therefore needs to be considered.
+% In particular, the influence of different imputation methods on point and
 % variance estimates of indicators may be of interenst.
-% Similar to contamination, the insertion of missing values is handled by 
-% control objects. 
-Three types of missing data mechanisms are commonly distinguished in 
-the literature \citep[e.g.,][]{little02}: missing completely at random (MCAR), 
-missing at random (MAR) and missing not at random (MNAR). All three missing 
-data mechanisms are implemented in the framework. 
+% Similar to contamination, the insertion of missing values is handled by
+% control objects.
+Three types of missing data mechanisms are commonly distinguished in
+the literature \citep[e.g.,][]{little02}: missing completely at random (MCAR),
+missing at random (MAR) and missing not at random (MNAR). All three missing
+data mechanisms are implemented in the framework.
 
-In the following example, missing values are inserted into the equivalized 
-household income of non-contaminated households with MCAR, i.e., the households 
-whose values are going to be set to \code{NA} are selected using simple random 
-sampling. In order to compare the scenario without missing values to a scenario 
-with missing values, the missing value rates~$0\%$ and~$5\%$ are used. In the 
-latter case, the missing values are simply disregarded for fitting the Pareto 
-distribution and estimating the Gini coefficient. Furthermore, the number of 
-samples is reduced to 50 and only the contamination levels~$0\%$, $0.5\%$ 
-and~$1\%$ are investigated to keep the computation time of this motivational 
-example low. 
+In the following example, missing values are inserted into the equivalized
+household income of non-contaminated households with MCAR, i.e., the households
+whose values are going to be set to \code{NA} are selected using simple random
+sampling. In order to compare the scenario without missing values to a scenario
+with missing values, the missing value rates~$0\%$ and~$5\%$ are used. In the
+latter case, the missing values are simply disregarded for fitting the Pareto
+distribution and estimating the Gini coefficient. Furthermore, the number of
+samples is reduced to 50 and only the contamination levels~$0\%$, $0.5\%$
+and~$1\%$ are investigated to keep the computation time of this motivational
+example low.
 
-With \pkg{simFrame}, only a control object for missing data needs 
-to be defined and supplied to \code{runSimulation()}, the rest is done 
-automatically by the framework. To apply these changes to a simulation study 
-implemented with bespoke \proglang{R} code, yet another loop-like structure for 
-the different missing value rates as well as changes in the data structure for 
+With \pkg{simFrame}, only a control object for missing data needs
+to be defined and supplied to \code{runSimulation()}, the rest is done
+automatically by the framework. To apply these changes to a simulation study
+implemented with bespoke \proglang{R} code, yet another loop-like structure for
+the different missing value rates as well as changes in the data structure for
 the simulation results would be necessary.
 <<>>=
 set.seed(12345)
-sc <- SampleControl(design = "region", grouping = "hid", 
+sc <- SampleControl(design = "region", grouping = "hid",
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 50)
-cc <- DCARContControl(target = "eqIncome", 
+cc <- DCARContControl(target = "eqIncome",
     epsilon = c(0, 0.005, 0.01), dots = list(mean = 500000, sd = 10000))
 nc <- NAControl(target = "eqIncome", NArate = c(0, 0.05))
-results <- runSimulation(eusilcP, sc, contControl = cc, 
+results <- runSimulation(eusilcP, sc, contControl = cc,
     NAControl = nc, design = "gender", fun = sim, k = 125)
 @
-As always, the \code{head()}, \code{aggregate()} and \code{plot()} methods are 
-used to take a look at the simulation results. It should be noted that a column 
-is added to the results that indicates the missing value rate used and that 
-\code{aggregate()} in this example returns a value for each combination of 
+As always, the \code{head()}, \code{aggregate()} and \code{plot()} methods are
+used to take a look at the simulation results. It should be noted that a column
+is added to the results that indicates the missing value rate used and that
+\code{aggregate()} in this example returns a value for each combination of
 contamination level, missing value rate and gender.
 <<>>=
 head(results)
@@ -467,37 +467,37 @@ plot(results, true = tv)
 <<fig=TRUE, echo=FALSE, width=7, height=5.5>>=
 print(plot(results, true = tv))
 @
-\caption{Simulation results for the simulation design with stratified sampling, 
-multiple contamination levels, multiple missing value rates and performing the 
+\caption{Simulation results for the simulation design with stratified sampling,
+multiple contamination levels, multiple missing value rates and performing the
 simulations separately for each gender.}
 \label{fig:NA}
 \end{center}
 \end{figure}
 
-If multiple contamination levels and multiple missing value rates are used in 
-the simulation study, conditional plots are produced by the \code{plot()} 
-method for the simulation results. Figure~\ref{fig:NA} shows the resulting 
-plots for this example. The bottom panels illustrate the scenario without 
-missing values, while the scenario with $5\%$ missing values is displayed in 
-the top panels. In this case, there is not much of a difference in the results 
+If multiple contamination levels and multiple missing value rates are used in
+the simulation study, conditional plots are produced by the \code{plot()}
+method for the simulation results. Figure~\ref{fig:NA} shows the resulting
+plots for this example. The bottom panels illustrate the scenario without
+missing values, while the scenario with $5\%$ missing values is displayed in
+the top panels. In this case, there is not much of a difference in the results
 for the two scenarios.
 
 
 \subsection{Parallel computing}
-Statistical simulation is an \emph{embarrassingly parallel} procedure, hence 
-parallel computing can drastically reduce the computational costs. 
-%In \pkg{simFrame}, parallel computing is implemented using \pkg{snow} 
-%\citep{rossini07, tierney08}. 
-Since version 0.5.0, parallel computing in \mbox{\pkg{simFrame}} is implemented 
-using \pkg{parallel}, which is part of the \proglang{R} base distribution since 
-version 2.14.0. Only minimal additional programming effort is required to adapt 
-the code from the previous example: to initialize the computer cluster, to 
-ensure that all packages and objects are available on each worker process, to 
-use the function \code{clusterRunSimulation()} instead of 
-\code{runSimulation()} and to stop the computer cluster after the simulations. 
-In addition, random number streams 
+Statistical simulation is an \emph{embarrassingly parallel} procedure, hence
+parallel computing can drastically reduce the computational costs.
+%In \pkg{simFrame}, parallel computing is implemented using \pkg{snow}
+%\citep{rossini07, tierney08}.
+Since version 0.5.0, parallel computing in \mbox{\pkg{simFrame}} is implemented
+using \pkg{parallel}, which is part of the \proglang{R} base distribution since
+version 2.14.0. Only minimal additional programming effort is required to adapt
+the code from the previous example: to initialize the computer cluster, to
+ensure that all packages and objects are available on each worker process, to
+use the function \code{clusterRunSimulation()} instead of
+\code{runSimulation()} and to stop the computer cluster after the simulations.
+In addition, random number streams
 %\citep[e.g.,][]{lecuyer02, sevcikova09}
-\citep[e.g.,][]{lecuyer02} should be used instead of the built-in random number 
+\citep[e.g.,][]{lecuyer02} should be used instead of the built-in random number
 generator.
 
 <<results=hide>>=
@@ -508,18 +508,18 @@ clusterEvalQ(cl, {
         data("eusilcP")
     })
 clusterSetRNGStream(cl, iseed=12345)
-sc <- SampleControl(design = "region", grouping = "hid", 
+sc <- SampleControl(design = "region", grouping = "hid",
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 50)
-cc <- DCARContControl(target = "eqIncome", 
+cc <- DCARContControl(target = "eqIncome",
     epsilon = c(0, 0.005, 0.01), dots = list(mean = 500000, sd = 10000))
 nc <- NAControl(target = "eqIncome", NArate = c(0, 0.05))
 clusterExport(cl, c("sc", "cc", "nc", "sim"))
-results <- clusterRunSimulation(cl, eusilcP, sc, 
-    contControl = cc, NAControl = nc, design = "gender", 
+results <- clusterRunSimulation(cl, eusilcP, sc,
+    contControl = cc, NAControl = nc, design = "gender",
     fun = sim, k = 125)
 stopCluster(cl)
 @
-When the parallel computations are finished and the simulation results are 
+When the parallel computations are finished and the simulation results are
 obtained, they can be inspected as usual.
 <<>>=
 head(results)
@@ -535,17 +535,17 @@ plot(results, true = tv)
 <<fig=TRUE, echo=FALSE, width=7, height=5.5>>=
 print(plot(results, true = tv))
 @
-\caption{Simulation results obtained by parallel computing for the simulation 
-design with stratified sampling, multiple contamination levels, multiple 
+\caption{Simulation results obtained by parallel computing for the simulation
+design with stratified sampling, multiple contamination levels, multiple
 missing value rates and performing the simulations separately for each gender.}
 \label{fig:parallel}
 \end{center}
 \end{figure}
 
-Figure~\ref{fig:parallel} shows the simulation results obtained with parallel 
-computing. The plots are, of course, very similar to the plots for the previous 
-example in Figure~\ref{fig:NA}, since the design of the simulation studies is 
-the same. 
+Figure~\ref{fig:parallel} shows the simulation results obtained with parallel
+computing. The plots are, of course, very similar to the plots for the previous
+example in Figure~\ref{fig:NA}, since the design of the simulation studies is
+the same.
 
 
 %% ----------
@@ -553,25 +553,25 @@ the same.
 %% ----------
 
 \section{Conclusions}
-In this paper, the use of the \proglang{R} package \pkg{simFrame} for different 
-simulation designs has been demonstrated in a practical application. The full 
-functionality of the framework for design-based simulation has been presented 
-in various code examples. These examples showed that the framework allows 
-researchers to make use of a wide range of simulation designs with only a few 
-lines of code. In order to switch from one simulation design to another, only 
-control objects need to be defined or modified. Even moving from basic to 
-highly complex designs therefore requires only minimal changes to the code. 
-With bespoke \proglang{R} code, such modifications would often need a 
-considerable amount of programming. Furthermore, parallel computing with 
+In this paper, the use of the \proglang{R} package \pkg{simFrame} for different
+simulation designs has been demonstrated in a practical application. The full
+functionality of the framework for design-based simulation has been presented
+in various code examples. These examples showed that the framework allows
+researchers to make use of a wide range of simulation designs with only a few
+lines of code. In order to switch from one simulation design to another, only
+control objects need to be defined or modified. Even moving from basic to
+highly complex designs therefore requires only minimal changes to the code.
+With bespoke \proglang{R} code, such modifications would often need a
+considerable amount of programming. Furthermore, parallel computing with
 \pkg{simFrame} can easily be done based on package \pkg{parallel}.
 
-Besides the functionality for carrying out simulation studies, methods for 
-several frequently used generic functions are available for inspecting or 
-summarizing the simulation results. Most notably, a suitable plot method of 
+Besides the functionality for carrying out simulation studies, methods for
+several frequently used generic functions are available for inspecting or
+summarizing the simulation results. Most notably, a suitable plot method of
 the simulation results is selected automatically depending on their structure.
 
-Due to this flexibility, \pkg{simFrame} is widely applicable for gaining 
-insight into the quality of statistical methods and is a valuable addition to 
+Due to this flexibility, \pkg{simFrame} is widely applicable for gaining
+insight into the quality of statistical methods and is a valuable addition to
 a researcher's toolbox.
 
 
@@ -580,14 +580,14 @@ a researcher's toolbox.
 %% ----------
 
 %\section*{Computational details}
-%All computations in this paper were performed using \pkg{Sweave} 
-%\citep{leisch02a, leisch02b} with \proglang{R} version~\Sexpr{getRversion()} 
-%and \pkg{simFrame} version~\Sexpr{sessionInfo()$otherPkgs$simFrame$Version}. 
-%%Nevertheless, the package is continuously being developed, it is recommended 
+%All computations in this paper were performed using \pkg{Sweave}
+%\citep{leisch02a, leisch02b} with \proglang{R} version~\Sexpr{getRversion()}
+%and \pkg{simFrame} version~\Sexpr{sessionInfo()$otherPkgs$simFrame$Version}.
+%%Nevertheless, the package is continuously being developed, it is recommended
 %%to use the most recent version.
-%The most recent version of the package is always available from CRAN (the 
-%Comprehensive \proglang{R} Archive Network, \url{http://cran.R-project.org}), 
-%and (an up-to-date version of) this paper is also included as a package 
+%The most recent version of the package is always available from CRAN (the
+%Comprehensive \proglang{R} Archive Network, \url{https://cran.R-project.org}),
+%and (an up-to-date version of) this paper is also included as a package
 %vignette \citep{leisch03}.
 
 

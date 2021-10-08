@@ -23,20 +23,20 @@ setNA(x, control, \dots)
 }
 \arguments{
   \item{x}{the data in which missing values should be inserted.}
-  \item{control}{a control object inheriting from the virtual class 
-    \code{"VirtualNAControl"} or a character string specifying such a control 
+  \item{control}{a control object inheriting from the virtual class
+    \code{"VirtualNAControl"} or a character string specifying such a control
     class (the default being \code{"NAControl"}).}
-  \item{i}{an integer giving the element or row of the slot \code{NArate} of 
+  \item{i}{an integer giving the element or row of the slot \code{NArate} of
     \code{control} to be used as missing value rate(s).}
-  \item{\dots}{if \code{control} is a character string or missing, the slots of 
-    the control object may be supplied as additional arguments.  See 
+  \item{\dots}{if \code{control} is a character string or missing, the slots of
+    the control object may be supplied as additional arguments.  See
     \code{"\linkS4class{NAControl}"} for details on the slots.}
 }
 \details{
-  In order to extend the framework by a user-defined control class 
-  \code{"MyNAControl"} (which must extend 
-  \code{"\linkS4class{VirtualNAControl}"}), a method 
-  \code{setNA(x, control, i)} with signature \code{'data.frame, MyNAControl'} 
+  In order to extend the framework by a user-defined control class
+  \code{"MyNAControl"} (which must extend
+  \code{"\linkS4class{VirtualNAControl}"}), a method
+  \code{setNA(x, control, i)} with signature \code{'data.frame, MyNAControl'}
   needs to be implemented.
 }
 \value{
@@ -44,28 +44,27 @@ setNA(x, control, \dots)
 }
 \section{Methods}{
   \describe{
-  \item{\code{x = "data.frame", control = "character"}}{set missing values 
-    using a control class specified by the character string \code{control}.  
+  \item{\code{x = "data.frame", control = "character"}}{set missing values
+    using a control class specified by the character string \code{control}.
     The slots of the control object may be supplied as additional arguments.}
-  \item{\code{x = "data.frame", control = "missing"}}{set missing values using 
-    a control object of class \code{"NAControl"}.  Its slots may be supplied as 
+  \item{\code{x = "data.frame", control = "missing"}}{set missing values using
+    a control object of class \code{"NAControl"}.  Its slots may be supplied as
     additional arguments.}
-  \item{\code{x = "data.frame", control = "NAControl"}}{set missing values as 
+  \item{\code{x = "data.frame", control = "NAControl"}}{set missing values as
     defined by the control object \code{control}.}
   }
 }
 \note{
-Since version 0.3, \code{setNA} no longer checks if auxiliary variable(s) 
-with probability weights are numeric and contain only finite positive values 
-(\code{\link{sample}} still throws an error in these cases).  This has been 
+Since version 0.3, \code{setNA} no longer checks if auxiliary variable(s)
+with probability weights are numeric and contain only finite positive values
+(\code{\link{sample}} still throws an error in these cases).  This has been
 removed to improve computational performance in simulation studies.
 }
 \author{Andreas Alfons}
 \references{
-Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for 
-Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of 
-Statistical Software}, \bold{37}(3), 1--36. URL 
-\url{http://www.jstatsoft.org/v37/i03/}.
+Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for
+Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of
+Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
 }
 \seealso{
   \code{"\linkS4class{NAControl}"}, \code{"\linkS4class{VirtualNAControl}"}
@@ -86,7 +85,7 @@ marc <- NAControl(target = "eqIncome", NArate = 0.2, aux = "age")
 setNA(sam, marc)
 
 # missing not at random
-mnarc <- NAControl(target = "eqIncome", 
+mnarc <- NAControl(target = "eqIncome",
     NArate = 0.2, aux = "eqIncome")
 setNA(sam, mnarc)
 

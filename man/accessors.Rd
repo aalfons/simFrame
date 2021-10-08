@@ -108,8 +108,8 @@
 
 \title{Accessor and mutator functions for objects}
 \description{
-  Get values of slots of objects via accessor functions and set values via 
-  mutator functions.  If no mutator methods are available, the slots of the 
+  Get values of slots of objects via accessor functions and set values via
+  mutator functions.  If no mutator methods are available, the slots of the
   corresponding objects are not supposed to be changed by the user.
 }
 \usage{
@@ -205,70 +205,70 @@ getValues(x)
 }
 \arguments{
   \item{x}{an object.}
-  \item{aux}{a character string specifying an auxiliary variable (see 
+  \item{aux}{a character string specifying an auxiliary variable (see
     \code{"\linkS4class{ContControl}"} and \code{"\linkS4class{NAControl}"}).}
-  \item{collect}{a logical indicating whether groups should be collected after 
-    sampling individuals or sampled directly (see 
+  \item{collect}{a logical indicating whether groups should be collected after
+    sampling individuals or sampled directly (see
     \code{"\linkS4class{SampleControl}"}).}
-  \item{colnames}{a character vector specifying column names (see 
+  \item{colnames}{a character vector specifying column names (see
     \code{"\linkS4class{DataControl}"}).}
-  \item{contControl}{an object of class \code{"\linkS4class{ContControl}"} (see 
+  \item{contControl}{an object of class \code{"\linkS4class{ContControl}"} (see
     \code{"\linkS4class{SimControl}"}).}
-  \item{design}{a character vector specifying columns to be used for 
-    stratification (see \code{"\linkS4class{SampleControl}"}, 
-    \code{"\linkS4class{TwoStageControl}"} and 
+  \item{design}{a character vector specifying columns to be used for
+    stratification (see \code{"\linkS4class{SampleControl}"},
+    \code{"\linkS4class{TwoStageControl}"} and
     \code{"\linkS4class{SimControl}"}).}
-  \item{distribution}{a function generating data (see 
-    \code{"\linkS4class{DataControl}"} and 
+  \item{distribution}{a function generating data (see
+    \code{"\linkS4class{DataControl}"} and
     \code{"\linkS4class{DCARContControl}"}).}
-  \item{dots}{additional arguments to be passed to a function (see 
-    \code{"\linkS4class{DataControl}"}, \code{"\linkS4class{DARContControl}"}, 
-    \code{"\linkS4class{DCARContControl}"}, 
-    \code{"\linkS4class{SampleControl}"}, 
-    \code{"\linkS4class{TwoStageControl}"} and 
+  \item{dots}{additional arguments to be passed to a function (see
+    \code{"\linkS4class{DataControl}"}, \code{"\linkS4class{DARContControl}"},
+    \code{"\linkS4class{DCARContControl}"},
+    \code{"\linkS4class{SampleControl}"},
+    \code{"\linkS4class{TwoStageControl}"} and
     \code{"\linkS4class{SimControl}"}).}
-  \item{epsilon}{a numeric vector giving contamination levels (see 
+  \item{epsilon}{a numeric vector giving contamination levels (see
     \code{"\linkS4class{VirtualContControl}"}).}
-  \item{fun}{a function (see 
-    \code{"\linkS4class{DARContControl}"}, 
-    \code{"\linkS4class{SampleControl}"}, 
-    \code{"\linkS4class{TwoStageControl}"} and 
+  \item{fun}{a function (see
+    \code{"\linkS4class{DARContControl}"},
+    \code{"\linkS4class{SampleControl}"},
+    \code{"\linkS4class{TwoStageControl}"} and
     \code{"\linkS4class{SimControl}"}).}
-  \item{grouping}{a character string specifying a grouping variable (see 
-    \code{"\linkS4class{ContControl}"}, \code{"\linkS4class{NAControl}"}, 
-     \code{"\linkS4class{SampleControl}"} and 
+  \item{grouping}{a character string specifying a grouping variable (see
+    \code{"\linkS4class{ContControl}"}, \code{"\linkS4class{NAControl}"},
+     \code{"\linkS4class{SampleControl}"} and
      \code{"\linkS4class{TwoStageControl}"}).}
-  \item{intoContamination}{a logical indicating whether missing values should 
-    also be inserted into contaminated observations (see 
+  \item{intoContamination}{a logical indicating whether missing values should
+    also be inserted into contaminated observations (see
     \code{"\linkS4class{NAControl}"}).}
-  \item{k}{a single positive integer giving the number of samples to be set up 
+  \item{k}{a single positive integer giving the number of samples to be set up
     (see \code{"\linkS4class{VirtualSampleControl}"}).}
-  \item{NAControl}{an object of class \code{"\linkS4class{NAControl}"} (see 
+  \item{NAControl}{an object of class \code{"\linkS4class{NAControl}"} (see
     \code{"\linkS4class{SimControl}"}).}
-  \item{NArate}{a numeric vector or matrix giving missing value rates (see 
+  \item{NArate}{a numeric vector or matrix giving missing value rates (see
     \code{"\linkS4class{VirtualNAControl}"}).}
-  \item{prob}{a numeric vector giving probability weights (see 
-    \code{"\linkS4class{SampleControl}"} and 
+  \item{prob}{a numeric vector giving probability weights (see
+    \code{"\linkS4class{SampleControl}"} and
     \code{"\linkS4class{TwoStageControl}"}).}
-  \item{SAE}{a logical indicating whether small area estimation will be used in 
+  \item{SAE}{a logical indicating whether small area estimation will be used in
     the simulation experiment (see \code{"\linkS4class{SimControl}"}).}
-  \item{size}{a non-negative integer or a vector of non-negative integers (see 
-    \code{"\linkS4class{DataControl}"}, \code{"\linkS4class{SampleControl}"} 
+  \item{size}{a non-negative integer or a vector of non-negative integers (see
+    \code{"\linkS4class{DataControl}"}, \code{"\linkS4class{SampleControl}"}
     and \code{"\linkS4class{TwoStageControl}"}).}
-  \item{stage}{optional integer; for certain slots of 
-    \code{"\linkS4class{TwoStageControl}"}, this allows to access or modify 
-    only the list component for the specified stage.  Use \code{1} for the 
+  \item{stage}{optional integer; for certain slots of
+    \code{"\linkS4class{TwoStageControl}"}, this allows to access or modify
+    only the list component for the specified stage.  Use \code{1} for the
     first stage and \code{2} for the second stage.}
-  \item{target}{a character vector specifying target columns (see 
-    \code{"\linkS4class{VirtualContControl}"} and 
+  \item{target}{a character vector specifying target columns (see
+    \code{"\linkS4class{VirtualContControl}"} and
     \code{"\linkS4class{VirtualNAControl}"}).}
-  \item{\dots}{only used to allow for the \code{stage} argument in accessor and 
-    mutator methods for \code{"\linkS4class{TwoStageControl}"}. Otherwise no 
+  \item{\dots}{only used to allow for the \code{stage} argument in accessor and
+    mutator methods for \code{"\linkS4class{TwoStageControl}"}. Otherwise no
     additional arguments are available.}
 }
 \value{
   For accessor functions, the corresponding slot of \code{x} is returned.
-  
+
   For mutator functions, the corresponding slot of \code{x} is replaced.
 }
 \section{Methods for function getAdd}{
@@ -531,10 +531,9 @@ getValues(x)
 }
 \author{Andreas Alfons}
 \references{
-Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for 
-Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of 
-Statistical Software}, \bold{37}(3), 1--36. URL 
-\url{http://www.jstatsoft.org/v37/i03/}.
+Alfons, A., Templ, M. and Filzmoser, P. (2010) An Object-Oriented Framework for
+Statistical Simulation: The \R Package \pkg{simFrame}. \emph{Journal of
+Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
 }
 \examples{
 nc <- NAControl(NArate = 0.05)
