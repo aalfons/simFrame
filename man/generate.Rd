@@ -64,18 +64,14 @@ Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
   \code{"\linkS4class{DataControl}"}, \code{"\linkS4class{VirtualDataControl}"}
 }
 \examples{
-require(mvtnorm)
-mean <- rep(0, 2)
-sigma <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
-
 # using a control object
-dc <- DataControl(size = 10, distribution = rmvnorm,
-    dots = list(mean = mean, sigma = sigma))
+dc <- DataControl(size = 10, distribution = rnorm,
+    dots = list(mean = 0, sd = 2))
 generate(dc)
 
 # supply slots of control object as arguments
-generate(size = 10, distribution = rmvnorm,
-    dots = list(mean = mean, sigma = sigma))
+generate(size = 10, distribution = rnorm,
+    dots = list(mean = 0, sd = 2))
 }
 \keyword{distribution}
 \keyword{methods}

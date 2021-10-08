@@ -121,12 +121,9 @@ Data. \emph{57th Session of the International Statistical Institute}, Durban.
   \code{"\linkS4class{VirtualContControl}"}, \code{\link{contaminate}}
 }
 \examples{
-require(mvtnorm)
-mean <- rep(0, 2)
-sigma <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
-foo <- generate(size = 10, distribution = rmvnorm,
-    dots = list(mean = mean, sigma = sigma))
-cc <- DARContControl(target = "V2",
+foo <- generate(size = 10, distribution = rnorm,
+    dots = list(mean = 0, sd = 2))
+cc <- DARContControl(target = "V1",
     epsilon = 0.2, fun = function(x) x * 100)
 contaminate(foo, cc)
 }

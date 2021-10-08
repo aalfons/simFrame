@@ -103,19 +103,16 @@ contaminate(sam, target = "eqIncome", epsilon = 0.05,
 
 
 ## distributed at random
-require(mvtnorm)
-mean <- rep(0, 2)
-sigma <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
-foo <- generate(size = 10, distribution = rmvnorm,
-    dots = list(mean = mean, sigma = sigma))
+foo <- generate(size = 10, distribution = rnorm,
+    dots = list(mean = 0, sd = 2))
 
 # using a control object
-darc <- DARContControl(target = "V2",
+darc <- DARContControl(target = "V1",
     epsilon = 0.2, fun = function(x) x * 100)
 contaminate(foo, darc)
 
 # supply slots of control object as arguments
-contaminate(foo, "DARContControl", target = "V2",
+contaminate(foo, "DARContControl", target = "V1",
     epsilon = 0.2, fun = function(x) x * 100)
 }
 \keyword{manip}

@@ -51,11 +51,11 @@ compatibility with early draft versions of \code{simFrame}).
       for selecting the items (observations or groups) to be contaminated.}
     \item{\code{distribution}:}{Object of class \code{"function"} generating
       the values of the contamination data, e.g.,
-      \code{\link[stats:Normal]{rnorm}} (the default) or
-      \code{\link[mvtnorm:Mvnorm]{rmvnorm}}.  It should take a non-negative
-      integer as its first argument, giving the number of items to be created,
-      and return an object that can be coerced to a \code{data.frame},
-      containing the contamination data.}
+      \code{\link[stats:Normal]{rnorm}} (the default) or \code{rmvnorm} from
+      package \pkg{mvtnorm}.  It should take a non-negative integer as its
+      first argument, giving the number of items to be created, and return an
+      object that can be coerced to a \code{data.frame}, containing the
+      contamination data.}
     \item{\code{dots}:}{Object of class \code{"list"} containing additional
       arguments to be passed to \code{distribution}.}
   }

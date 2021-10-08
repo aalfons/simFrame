@@ -32,9 +32,10 @@ Objects can be created by calls of the form \code{new("DataControl", \dots)} or
       observations to be generated.}
     \item{\code{distribution}:}{Object of class \code{"function"} generating
       the data, e.g., \code{\link[stats:Normal]{rnorm}} (the default) or
-      \code{\link[mvtnorm:Mvnorm]{rmvnorm}}.  It should take a positive integer
-      as its first argument, giving the number of observations to be generated,
-      and return an object that can be coerced to a \code{data.frame}.}
+      \code{rmvnorm} from package \pkg{mvtnorm}.  It should take a positive
+      integer as its first argument, giving the number of observations to be
+      generated, and return an object that can be coerced to a
+      \code{data.frame}.}
     \item{\code{dots}:}{Object of class \code{"list"} containing additional
       arguments to be passed to \code{distribution}.}
     \item{\code{colnames}:}{Object of class \code{"OptCharacter"} ; a character
@@ -92,11 +93,8 @@ Statistical Software}, \bold{37}(3), 1--36. \doi{10.18637/jss.v037.i03}.
 \seealso{
   \code{"\linkS4class{VirtualDataControl}"}, \code{\link{generate}}}
 \examples{
-require(mvtnorm)
-mean <- rep(0, 2)
-sigma <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
-dc <- DataControl(size = 10, distribution = rmvnorm,
-    dots = list(mean = mean, sigma = sigma))
+dc <- DataControl(size = 10, distribution = rnorm,
+    dots = list(mean = 0, sd = 2))
 generate(dc)
 }
 \keyword{classes}
