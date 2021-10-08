@@ -2,8 +2,16 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{OptContControl-class}
+%% aliases to avoid confusion due to capitalization
+\alias{optContControl-class}
+\alias{optcontControl-class}
+\alias{optContcontrol-class}
+\alias{optcontcontrol-class}
+\alias{OptcontControl-class}
+\alias{Optcontcontrol-class}
+\alias{OptContcontrol-class}
 
-\title{Class \code{"OptContControl"}}
+\title{Class "OptContControl"}
 \description{Virtual class used internally for convenience.}
 \section{Objects from the Class}{
   A virtual Class: No objects may be created from it.
@@ -18,4 +26,10 @@ No methods defined with class \code{"OptContControl"} in the signature.
   \code{vignette("simFrame-intro")} to view this vignette.
 }
 \author{Andreas Alfons}
+\seealso{
+  \code{"\linkS4class{SimControl}"}
+}
+\examples{
+showClass("OptContControl")
+}
 \keyword{classes}

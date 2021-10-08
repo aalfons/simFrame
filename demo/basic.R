@@ -1,7 +1,7 @@
-# ------------------------------------
+# ---------------------------------------
 # Author: Andreas Alfons
-#         Erasmus University Rotterdam
-# ------------------------------------
+#         Vienna University of Technology
+# ---------------------------------------
 
 ## initializations
 library("simFrame")
@@ -9,16 +9,17 @@ data("eusilcP")
 
 ## control objects for sampling and contamination
 sc <- SampleControl(size = 500, k = 50)
-cc <- RandomContControl(target = "eqIncome", epsilon = 0.02, 
-    fun = function(x) x * 25, type = "CAR")
+cc <- DARContControl(target = "eqIncome", epsilon = 0.02, 
+    fun = function(x) x * 25)
 
 ## define function for simulation runs
 sim <- function(x) {
     c(mean = mean(x$eqIncome), trimmed = mean(x$eqIncome, trim = 0.02))
 }
 
-## run simulation
-results <- runSimulation(eusilcP, sc, contControl = cc, fun = sim, seed = 12345)
+## set seed and run simulation
+set.seed(12345)
+results <- runSimulation(eusilcP, sc, contControl = cc, fun = sim)
 
 ## inspect results
 head(results)
@@ -29,5 +30,5 @@ tv <- mean(eusilcP$eqIncome)
 tv
 
 ## plot results
-plot(results) + geom_hline(yintercept=tv)
-plot(results, method = "density") + geom_vline(xintercept=tv)
+plot(results, true = tv)
+simDensityplot(results, true = tv)

@@ -4,6 +4,6 @@ setClass("MyDataControl",
 
 setMethod("generate",
     signature(control = "MyDataControl"),
-    function(control, i) {
+    function(control) {
         # method definition
     })

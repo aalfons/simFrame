@@ -1,7 +1,9 @@
 \name{eusilcP}
-\docType{data}
 \alias{eusilcP}
+%% aliases to avoid confusion due to capitalization
+\alias{eusilcp}
 
+\docType{data}
 \title{
 Synthetic EU-SILC data
 }
@@ -9,11 +11,9 @@ Synthetic EU-SILC data
 This data set is synthetically generated from real Austrian EU-SILC (European 
 Union Statistics on Income and Living Conditions) data.
 }
-\usage{
-data("eusilcP")
-}
+\usage{data(eusilcP)}
 \format{
-  A data frame with 58 654 observations on the following 28 variables:
+  A \code{data.frame} with 58 654 observations on the following 28 variables:
   \describe{
     \item{\code{hid}}{integer; the household ID.}
     \item{\code{region}}{factor; the federal state in which the household is 
@@ -80,8 +80,8 @@ cryptic codes.  Furthermore, the variables \code{hsize}, \code{eqsize},
 \code{eqIncome} and \code{age} are not included in the standardized format of 
 EU-SILC data, but have been derived from other variables for convenience.  
 Moreover, some very sparse income components were not included in the the 
-generation of this synthetic data set.  Thus the equivalized household income 
-is computed from the available income components.
+generation of this synthetic data set. Thus the equivalized household income is 
+computed from the available income components.
 }
 \source{
 This is a synthetic data set based on Austrian EU-SILC data from 2006.  The 
@@ -92,7 +92,10 @@ Eurostat (2004) Description of target variables: Cross-sectional and
 longitudinal. \emph{EU-SILC 065/04}, Eurostat.
 }
 \examples{
-data("eusilcP")
+data(eusilcP)
 summary(eusilcP)
+
+strata <- stratify(eusilcP, c("region", "gender"))
+summary(strata)
 }
 \keyword{datasets}

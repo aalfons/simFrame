@@ -2,8 +2,12 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{OptCharacter-class}
+%% aliases to avoid confusion due to capitalization
+\alias{optCharacter-class}
+\alias{optcharacter-class}
+\alias{Optcharacter-class}
 
-\title{Class \code{"OptCharacter"}}
+\title{Class "OptCharacter"}
 \description{Virtual class used internally for convenience.}
 \section{Objects from the Class}{
   A virtual Class: No objects may be created from it.
@@ -18,4 +22,7 @@ No methods defined with class \code{"OptCharacter"} in the signature.
   \code{vignette("simFrame-intro")} to view this vignette.
 }
 \author{Andreas Alfons}
+\examples{
+showClass("OptCharacter")
+}
 \keyword{classes}

@@ -5,7 +5,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% almost as usual
-\author{Andreas Alfons\\Erasmus University Rotterdam \And Matthias Templ\\Vienna University of\\Technology,\\Statistics Austria \And Peter Filzmoser\\Vienna University of\\Technology}
+\author{Andreas Alfons\\Erasmus Universiteit\\Rotterdam \And Matthias Templ\\Vienna University of\\Technology,\\Statistics Austria \And Peter Filzmoser\\Vienna University of\\Technology}
 \title{Applications of Statistical Simulation in the Case of EU-SILC: Using the \proglang{R} Package \pkg{simFrame}}
 
 %% for pretty printing and a nice hypersummary also set:
@@ -43,9 +43,9 @@
 \Address{
   Andreas Alfons\\
   Erasmus School of Economics\\ 
-  Erasmus University Rotterdam\\
-  Burgemeester Oudlaan 50\\
-  3062PA Rotterdam, The Netherlands\\
+  Erasmus Universiteit Rotterdam\\
+  PO Box 1738\\
+  3000DR Rotterdam, Netherlands\\
   E-mail: \email{alfons@ese.eur.nl}\\
   URL: \url{http://people.few.eur.nl/alfons/}
 }
@@ -68,7 +68,7 @@
 \begin{document}
 
 <<echo=FALSE, results=hide>>=
-options(prompt = "R> ", continue = "+  ", width = 75, useFancyQuotes = FALSE)
+options(width=72, prompt="R> ")
 @
 
 
@@ -165,8 +165,9 @@ the population is rather small and the sampling method is straightforward.
 Furthermore, the Pareto distribution is fitted to the 175 households with the 
 largest equivalized income.
 <<>>=
+set.seed(12345)
 sc <- SampleControl(grouping = "hid", size = 1500, k = 100)
-results <- runSimulation(eusilcP, sc, fun = sim, k = 175, seed = 12345)
+results <- runSimulation(eusilcP, sc, fun = sim, k = 175)
 @
 In order to inspect the simulation results, methods for several frequently 
 used generic functions are implemented. Besides \code{head()}, \code{tail()} 
@@ -179,13 +180,15 @@ the true value can thereby be added as well.
 head(results)
 aggregate(results)
 tv <- gini(eusilcP$eqIncome)$value
-plot(results) + geom_hline(yintercept=tv)
+plot(results, true = tv)
 @
 
 Figure~\ref{fig:basic} shows the resulting box plots of the simulation results 
 for the basic simulation design. While the PDC estimator comes with larger 
 variability, all three methods are on average quite close to the true 
 population value. 
+%This is also an indication that the choice for the threshold of the Pareto 
+%distribution is suitable.
 This is also an indication that the choice of the number of households for 
 fitting the Pareto distribution is suitable.
 
@@ -193,7 +196,7 @@ fitting the Pareto distribution is suitable.
 \begin{center}
 \setkeys{Gin}{width=0.5\textwidth}
 <<fig=TRUE, echo=FALSE, width=4, height=4>>=
-plot(results) + geom_hline(yintercept=tv)
+print(plot(results, true = tv))
 @
 \caption{Simulation results for the basic simulation design.}
 \label{fig:basic}
@@ -209,9 +212,10 @@ stratified sampling by region is performed. The sample sizes for the different
 strata are specified by using a vector for the slot \code{size} of the control 
 object.
 <<>>=
+set.seed(12345)
 sc <- SampleControl(design = "region", grouping = "hid", 
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
-results <- runSimulation(eusilcP, sc, fun = sim, k = 175, seed = 12345)
+results <- runSimulation(eusilcP, sc, fun = sim, k = 175)
 @
 As before, the simulation results are inspected with \code{head()} and 
 \code{aggregate()}. A plot of the simulation results is produced as well.
@@ -219,14 +223,14 @@ As before, the simulation results are inspected with \code{head()} and
 head(results)
 aggregate(results)
 tv <- gini(eusilcP$eqIncome)$value
-plot(results) + geom_hline(yintercept=tv)
+plot(results, true = tv)
 @
 
 \begin{figure}[t!]
 \begin{center}
 \setkeys{Gin}{width=0.5\textwidth}
 <<fig=TRUE, echo=FALSE, width=4, height=4>>=
-plot(results) + geom_hline(yintercept=tv)
+print(plot(results, true = tv))
 @
 \caption{Simulation results for the simulation design with stratified sampling.}
 \label{fig:stratified}
@@ -253,12 +257,13 @@ The equivalized income of the selected households is then drawn from a normal
 distribution with mean \mbox{$\mu = 500\,000$} and standard deviation $\sigma = 
 10\,000$.
 <<>>=
+set.seed(12345)
 sc <- SampleControl(design = "region", grouping = "hid", 
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
-cc <- RandomContControl(target = "eqIncome", epsilon = 0.005, 
+cc <- DCARContControl(target = "eqIncome", epsilon = 0.005, 
     grouping = "hid", dots = list(mean = 500000, sd = 10000))
-results <- runSimulation(eusilcP, sc, contControl = cc, 
-    fun = sim, k = 175, seed = 12345)
+results <- runSimulation(eusilcP, sc, 
+    contControl = cc, fun = sim, k = 175)
 @
 The \code{head()}, \code{aggregate()} and \code{plot()} methods are again used 
 to take a look at the simulation results. Note that a column is added that 
@@ -267,14 +272,14 @@ indicates the contamination level used.
 head(results)
 aggregate(results)
 tv <- gini(eusilcP$eqIncome)$value
-plot(results) + geom_hline(yintercept=tv)
+plot(results, true = tv)
 @
 
 \begin{figure}[t!]
 \begin{center}
 \setkeys{Gin}{width=0.5\textwidth}
 <<fig=TRUE, echo=FALSE, width=4, height=4>>=
-plot(results) + geom_hline(yintercept=tv)
+print(plot(results, true = tv))
 @
 \caption{Simulation results for the simulation design with stratified sampling 
 and contamination.}
@@ -304,39 +309,41 @@ loop-like structure such as a \code{for} loop or a function from the
 
 In the following example, the simulations are performed separately for each 
 gender. 
+%It should be noted that the threshold for the Pareto distribution is thus 
+%changed to~125. 
 It should be noted that the value of \code{k} for the Pareto distribution is 
-thus changed to~125. This is the same as Example~6.1 from \citet{alfons10d}.
+thus changed to~125. This is the same as Example~6.1 from \citet{alfons10d}, 
+except that a control object for sampling is supplied to \code{runSimulation()} 
+instead of setting up the samples beforehand and storing them in an object.
 
 <<>>=
+set.seed(12345)
 sc <- SampleControl(design = "region", grouping = "hid", 
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
-cc <- RandomContControl(target = "eqIncome", epsilon = 0.005, 
+cc <- DCARContControl(target = "eqIncome", epsilon = 0.005, 
     grouping = "hid", dots = list(mean = 500000, sd = 10000))
 results <- runSimulation(eusilcP, sc, contControl = cc, 
-    design = "gender", fun = sim, k = 125, seed = 12345)
+    design = "gender", fun = sim, k = 125)
 @
 Below, the results are inspected using \code{head()} and \code{aggregate()}. 
 The \code{aggregate()} method thereby computes the summary statistic for each 
 subset automatically. Also the \code{plot()} method displays the results for 
 the different subsets in different panels by taking advantage of the 
-\pkg{ggplot2} system \citep{wickham09, wickham13}. In order to compute the true 
-values for each subset, the function \code{aggregate()} is used.
+\pkg{lattice} system \citep{sarkar08, sarkar10}. In order to compute the true 
+values for each subset, the function \code{simSapply()} is used.
 
 <<>>=
 head(results)
 aggregate(results)
-tv <- aggregate(eusilcP[, "eqIncome"], eusilcP[, "gender", drop=FALSE], 
-    function(x) gini(x)$value)
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+tv <- simSapply(eusilcP, "gender", function(x) gini(x$eqIncome)$value)
+plot(results, true = tv)
 @
 
 \begin{figure}[t!]
 \begin{center}
 \setkeys{Gin}{width=0.9\textwidth}
 <<fig=TRUE, echo=FALSE, width=7, height=4>>=
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+print(plot(results, true = tv))
 @
 \caption{Simulation results for the simulation design with stratified sampling, 
 contamination and performing the simulations separately for each gender.}
@@ -360,13 +367,14 @@ of~$0.25\%$. With bespoke \proglang{R} code, the user would have to add another
 loop-like structure to the code and collect the results in a suitable data 
 structure. In \pkg{simFrame}, this is handled internally by the framework.
 <<>>=
+set.seed(12345)
 sc <- SampleControl(design = "region", grouping = "hid", 
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
-cc <- RandomContControl(target = "eqIncome", 
+cc <- DCARContControl(target = "eqIncome", 
     epsilon = c(0, 0.0025, 0.005, 0.0075, 0.01),
     dots = list(mean = 500000, sd = 10000))
 results <- runSimulation(eusilcP, sc, contControl = cc, 
-    design = "gender", fun = sim, k = 125, seed = 12345)
+    design = "gender", fun = sim, k = 125)
 @
 The simulation results are inspected as usual. Note that the \code{aggregate()} 
 method in this case returns values for each combination of contamination level 
@@ -374,18 +382,15 @@ and gender.
 <<>>=
 head(results)
 aggregate(results)
-tv <- aggregate(eusilcP[, "eqIncome"], eusilcP[, "gender", drop=FALSE], 
-    function(x) gini(x)$value)
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+tv <- simSapply(eusilcP, "gender", function(x) gini(x$eqIncome)$value)
+plot(results, true = tv)
 @
 
 \begin{figure}[t!]
 \begin{center}
 \setkeys{Gin}{width=0.9\textwidth}
 <<fig=TRUE, echo=FALSE, width=7, height=4>>=
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+print(plot(results, true = tv))
 @
 \caption{Simulation results for the simulation design with stratified sampling, 
 multiple contamination levels and performing the simulations separately for 
@@ -397,16 +402,20 @@ each gender.}
 If multiple contamination levels are used in a simulation study, the 
 \code{plot()} method for the simulation results no longer produces box plots. 
 Instead, the average results are plotted against the corresponding 
-contamination levels together with confidence bands, as shown in 
-Figure~\ref{fig:multcont}. The plots show how the classical estimators move 
-away from the references line as the contamination level increases, while the 
-values obtained with the PDC estimator remain quite accurate.
+contamination levels, as shown in Figure~\ref{fig:multcont}. The plots show 
+how the classical estimators move away from the references line as the 
+contamination level increases, while the values obtained with the PDC estimator 
+remain quite accurate.
 
 
 \subsection{Inserting missing values}
 Survey data almost always contain a considerable amount of missing values. In 
 close-to-reality simulation studies, the variability due to missing data 
 therefore needs to be considered. 
+% In particular, the influence of different imputation methods on point and 
+% variance estimates of indicators may be of interenst.
+% Similar to contamination, the insertion of missing values is handled by 
+% control objects. 
 Three types of missing data mechanisms are commonly distinguished in 
 the literature \citep[e.g.,][]{little02}: missing completely at random (MCAR), 
 missing at random (MAR) and missing not at random (MNAR). All three missing 
@@ -430,13 +439,14 @@ implemented with bespoke \proglang{R} code, yet another loop-like structure for
 the different missing value rates as well as changes in the data structure for 
 the simulation results would be necessary.
 <<>>=
+set.seed(12345)
 sc <- SampleControl(design = "region", grouping = "hid", 
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 50)
-cc <- RandomContControl(target = "eqIncome", 
+cc <- DCARContControl(target = "eqIncome", 
     epsilon = c(0, 0.005, 0.01), dots = list(mean = 500000, sd = 10000))
-nc <- NAControl(target = "eqIncome", NARate = c(0, 0.05))
-results <- runSimulation(eusilcP, sc, contControl = cc, NAControl = nc, 
-    design = "gender", fun = sim, k = 125, seed = 12345)
+nc <- NAControl(target = "eqIncome", NArate = c(0, 0.05))
+results <- runSimulation(eusilcP, sc, contControl = cc, 
+    NAControl = nc, design = "gender", fun = sim, k = 125)
 @
 As always, the \code{head()}, \code{aggregate()} and \code{plot()} methods are 
 used to take a look at the simulation results. It should be noted that a column 
@@ -446,18 +456,16 @@ contamination level, missing value rate and gender.
 <<>>=
 head(results)
 aggregate(results)
-tv <- aggregate(eusilcP[, "eqIncome"], eusilcP[, "gender", drop=FALSE], 
-    function(x) gini(x)$value)
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+tv <- simSapply(eusilcP, "gender", function(x) gini(x$eqIncome)$value)
+plot(results, true = tv)
 @
 
 \begin{figure}[!t]
 \begin{center}
 \setkeys{Gin}{width=0.9\textwidth}
+% <<fig=TRUE, echo=FALSE, width=7, height=6.25>>=
 <<fig=TRUE, echo=FALSE, width=7, height=5.5>>=
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+print(plot(results, true = tv))
 @
 \caption{Simulation results for the simulation design with stratified sampling, 
 multiple contamination levels, multiple missing value rates and performing the 
@@ -469,47 +477,63 @@ simulations separately for each gender.}
 If multiple contamination levels and multiple missing value rates are used in 
 the simulation study, conditional plots are produced by the \code{plot()} 
 method for the simulation results. Figure~\ref{fig:NA} shows the resulting 
-plots for this example. The top panels illustrate the scenario without 
+plots for this example. The bottom panels illustrate the scenario without 
 missing values, while the scenario with $5\%$ missing values is displayed in 
-the bottom panels. In this case, there is not much of a difference in the results 
+the top panels. In this case, there is not much of a difference in the results 
 for the two scenarios.
 
 
 \subsection{Parallel computing}
 Statistical simulation is an \emph{embarrassingly parallel} procedure, hence 
 parallel computing can drastically reduce the computational costs. 
-Parallel computing in \pkg{simFrame} is implemented using \pkg{parallel}, which 
-is part of the \proglang{R} base distribution since version 2.14.0. Only 
-minimal additional programming effort is required to adapt the code from the previous example: the number of processor cores is specified in the call to 
-function \code{runSimulation()}. Internally, random number streams 
-\citep[e.g.,][]{lecuyer02} are used on the worker processes.
+%In \pkg{simFrame}, parallel computing is implemented using \pkg{snow} 
+%\citep{rossini07, tierney08}. 
+Since version 0.5.0, parallel computing in \mbox{\pkg{simFrame}} is implemented 
+using \pkg{parallel}, which is part of the \proglang{R} base distribution since 
+version 2.14.0. Only minimal additional programming effort is required to adapt 
+the code from the previous example: to initialize the computer cluster, to 
+ensure that all packages and objects are available on each worker process, to 
+use the function \code{clusterRunSimulation()} instead of 
+\code{runSimulation()} and to stop the computer cluster after the simulations. 
+In addition, random number streams 
+%\citep[e.g.,][]{lecuyer02, sevcikova09}
+\citep[e.g.,][]{lecuyer02} should be used instead of the built-in random number 
+generator.
 
-<<>>=
+<<results=hide>>=
+cl <- makeCluster(2, type="PSOCK")
+clusterEvalQ(cl, {
+        library("simFrame")
+        library("laeken")
+        data("eusilcP")
+    })
+clusterSetRNGStream(cl, iseed=12345)
 sc <- SampleControl(design = "region", grouping = "hid", 
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 50)
-cc <- RandomContControl(target = "eqIncome", 
+cc <- DCARContControl(target = "eqIncome", 
     epsilon = c(0, 0.005, 0.01), dots = list(mean = 500000, sd = 10000))
-nc <- NAControl(target = "eqIncome", NARate = c(0, 0.05))
-results <- runSimulation(eusilcP, sc, contControl = cc, NAControl = nc, 
-    design = "gender", fun = sim, k = 125, seed = 12345, ncores = 2)
+nc <- NAControl(target = "eqIncome", NArate = c(0, 0.05))
+clusterExport(cl, c("sc", "cc", "nc", "sim"))
+results <- clusterRunSimulation(cl, eusilcP, sc, 
+    contControl = cc, NAControl = nc, design = "gender", 
+    fun = sim, k = 125)
+stopCluster(cl)
 @
 When the parallel computations are finished and the simulation results are 
 obtained, they can be inspected as usual.
 <<>>=
 head(results)
 aggregate(results)
-tv <- aggregate(eusilcP[, "eqIncome"], eusilcP[, "gender", drop=FALSE], 
-    function(x) gini(x)$value)
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+tv <- simSapply(eusilcP, "gender", function(x) gini(x$eqIncome)$value)
+plot(results, true = tv)
 @
 
 \begin{figure}[!t]
 \begin{center}
 \setkeys{Gin}{width=0.9\textwidth}
+% <<fig=TRUE, echo=FALSE, width=7, height=6.25>>=
 <<fig=TRUE, echo=FALSE, width=7, height=5.5>>=
-plot(results, ylab = "Gini coefficient") + 
-    geom_hline(aes(yintercept=x), data=tv)
+print(plot(results, true = tv))
 @
 \caption{Simulation results obtained by parallel computing for the simulation 
 design with stratified sampling, multiple contamination levels, multiple 

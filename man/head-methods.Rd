@@ -4,11 +4,11 @@
 \alias{head,SampleSetup-method}
 \alias{head,SimControl-method}
 \alias{head,SimResults-method}
+\alias{head,Strata-method}
 \alias{head,VirtualContControl-method}
 \alias{head,VirtualDataControl-method}
 \alias{head,VirtualNAControl-method}
 \alias{head,VirtualSampleControl-method}
-
 \title{Methods for returning the first parts of an object}
 \description{
   Return the first parts of an object.
@@ -20,6 +20,8 @@
 
 \S4method{head}{SimResults}(x, \dots)
 
+\S4method{head}{Strata}(x, \dots)
+
 \S4method{head}{VirtualContControl}(x)
 
 \S4method{head}{VirtualDataControl}(x)
@@ -30,9 +32,10 @@
 }
 \arguments{
   \item{x}{an object.}
-  \item{k}{the number of set up samples to be kept in the resulting object.}
-  \item{n}{the number of indices to be kept in each of the set up samples in 
-    the resulting object.}
+  \item{k}{for objects of class \code{"SampleSetup"}, the number of set up 
+    samples to be kept in the resulting object.}
+  \item{n}{for objects of class \code{"SampleSetup"}, the number of indices 
+    to be kept in each of the set up samples in the resulting object.}
   \item{\dots}{additional arguments to be passed down to methods.}
 }
 \value{
@@ -48,7 +51,11 @@
     object itself.}
   \item{\code{signature(x = "SimResults")}}{returns the first parts of 
     simulation results.  The method of \code{\link[utils]{head}} for the 
-    data frame in slot \code{values} is thereby called.}
+    \code{data.frame} in slot \code{values} is thereby called.}
+  \item{\code{signature(x = "Strata")}}{returns the first parts of strata 
+    information.  The method of \code{\link[utils]{head}} for the vector in 
+    slot \code{values} is thereby called and the slots \code{split} and 
+    \code{size} are adapted accordingly.}
   \item{\code{signature(x = "VirtualContControl")}}{currently returns the 
     object itself.}
   \item{\code{signature(x = "VirtualDataControl")}}{currently returns the 
@@ -68,19 +75,25 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 }
 \seealso{
   \code{\link[utils]{head}}, \code{"\linkS4class{SampleSetup}"}, 
-  \code{"\linkS4class{SimResults}"}
+  \code{"\linkS4class{SimResults}"}, \code{"\linkS4class{Strata}"}
 }
 \examples{
 ## load data
-data("eusilcP")
+data(eusilcP)
 
 ## class "SampleSetup"
 # set up samples using group sampling
-set <- setup(eusilcP, grouping = "hid", size = 1000, 
-    k = 50, seed = 12345)
+set <- setup(eusilcP, grouping = "hid", size = 1000, k = 50)
 summary(set)
 # get the first 10 indices of each of the first 5 samples
 head(set, k = 5, n = 10)
+
+## class "Strata"
+# set up samples using group sampling
+strata <- stratify(eusilcP, "region")
+summary(strata)
+# get strata information for the first 10 observations
+head(strata, 10)
 }
 \keyword{methods}
 \keyword{manip}

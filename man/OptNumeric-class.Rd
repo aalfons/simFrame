@@ -2,8 +2,12 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{OptNumeric-class}
+%% aliases to avoid confusion due to capitalization
+\alias{optNumeric-class}
+\alias{optnumeric-class}
+\alias{Optnumeric-class}
 
-\title{Class \code{"OptNumeric"}}
+\title{Class "OptNumeric"}
 \description{Virtual class used internally for convenience.}
 \section{Objects from the Class}{
   A virtual Class: No objects may be created from it.
@@ -18,4 +22,7 @@ No methods defined with class \code{"OptNumeric"} in the signature.
   \code{vignette("simFrame-intro")} to view this vignette.
 }
 \author{Andreas Alfons}
+\examples{
+showClass("OptNumeric")
+}
 \keyword{classes}

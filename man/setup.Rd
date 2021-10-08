@@ -1,11 +1,12 @@
 \name{setup}
+\Rdversion{1.1}
 \docType{methods}
 \alias{setup}
 \alias{setup-methods}
-\alias{setup,data.frame,BasicSampleControl-method}
 \alias{setup,data.frame,character-method}
 \alias{setup,data.frame,missing-method}
-\alias{setup,data.frame,TwoStageSampleControl-method}
+\alias{setup,data.frame,SampleControl-method}
+\alias{setup,data.frame,TwoStageControl-method}
 
 \title{Set up multiple samples}
 \description{
@@ -13,17 +14,17 @@ Generic function for setting up multiple samples.
 }
 \usage{
 setup(x, control, \dots)
+
+\S4method{setup}{data.frame,SampleControl}(x, control)
 }
 \arguments{
   \item{x}{the data to sample from.}
   \item{control}{a control object inheriting from the virtual class 
-    \code{"\linkS4class{VirtualSampleControl}"} or a character string 
-    specifying such a control class.  If missing, the constructor 
-    \code{\link{SampleControl}} is called to generate the control object.}
+    \code{"VirtualSampleControl"} or a character string specifying such a 
+    control class (the default being \code{"SampleControl"}).}
   \item{\dots}{if \code{control} is a character string or missing, the slots of 
     the control object may be supplied as additional arguments.  See 
-    \code{"\linkS4class{BasicSampleControl}"} and 
-    \code{"\linkS4class{TwoStageSampleControl}"} for details on the slots.}
+    \code{"\linkS4class{SampleControl}"} for details on the slots.}
 }
 \details{
   A fundamental design principle of the framework in the case of design-based 
@@ -55,15 +56,13 @@ setup(x, control, \dots)
   If the two groups use not only the same population data, but also the same 
   previously set up samples, their results are highly comparable.
   
-  The control classes \code{"BasicSampleControl"} and 
-  \code{"TwoStageSampleControl"} are highly flexible and cover many frequently 
-  used sampling designs such as stratified (two-stage) sampling with a 
-  specified sampling method.  Hence it is often sufficient to implement the 
-  desired sampling method for the simple non-stratified case to extend the 
-  existing framework.  See \code{"\linkS4class{BasicSampleControl}"} and 
-  \code{"\linkS4class{TwoStageSampleControl}"} for some restrictions on the 
-  argument names of such a function, which should return a vector containing 
-  the indices of the sampled observations.
+  The control class \code{"SampleControl"} is highly flexible and allows 
+  stratified sampling as well as sampling of whole groups rather than 
+  individuals with a specified sampling method.  Hence it is often sufficient 
+  to implement the desired sampling method for the simple non-stratified case 
+  to extend the existing framework.  See \code{"\linkS4class{SampleControl}"} 
+  for some restrictions on the argument names of such a function, which should 
+  return a vector containing the indices of the sampled observations.
   
   Nevertheless, for very complex sampling procedures, it is possible to define 
   a control class \code{"MySampleControl"} extending 
@@ -71,12 +70,12 @@ setup(x, control, \dots)
   \code{setup(x, control)} with signature \code{'data.frame, MySampleControl'}.  
   In order to optimize computational performance, it is necessary to 
   efficiently set up multiple samples.  Thereby the slot \code{k} of 
-  \code{"\linkS4class{VirtualSampleControl}"} needs to be used to control the 
-  number of samples, and the resulting object must be of class 
+  \code{"VirtualSampleControl"} needs to be used to control the number of 
+  samples, and the resulting object must be of class 
   \code{"\linkS4class{SampleSetup}"}.
 }
 \value{
-  An object of class \code{"\linkS4class{SampleSetup}"}.
+  An object of class \code{"SampleSetup"}.
 }
 \section{Methods}{
   \describe{
@@ -84,12 +83,10 @@ setup(x, control, \dots)
     using a control class specified by the character string \code{control}.  
     The slots of the control object may be supplied as additional arguments.}
   \item{\code{x = "data.frame", control = "missing"}}{set up multiple samples 
-    using a control object constructed by \code{\link{SampleControl}}.  Its 
-    slots may be supplied as additional arguments.}
-  \item{\code{x = "data.frame", control = "BasicSampleControl"}}{set up 
-    multiple samples for basic sampling designs.}
-  \item{\code{x = "data.frame", control = "TwoStageSampleControl"}}{set up 
-    multiple samples for two-stage sampling designs.}
+    using a control object of class \code{"SampleControl"}.  Its slots may be 
+    supplied as additional arguments.}
+  \item{\code{x = "data.frame", control = "SampleControl"}}{set up multiple 
+    samples as defined by the control object \code{control}.}
   }
 }
 \author{Andreas Alfons}
@@ -100,36 +97,34 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 \url{http://www.jstatsoft.org/v37/i03/}.
 }
 \seealso{
-  \code{\link{draw}}, 
-  \code{"\linkS4class{BasicSampleControl}"}, 
-  \code{"\linkS4class{TwoStageSampleControl}"}, 
+  \code{\link{simSample}}, \code{\link{draw}}, 
+  \code{"\linkS4class{SampleControl}"}, \code{"\linkS4class{TwoStageControl}"}, 
+  \code{"\linkS4class{VirtualSampleControl}"}, 
   \code{"\linkS4class{SampleSetup}"}
 }
 \examples{
-data("eusilcP")    # load data
+set.seed(12345)  # for reproducibility
+data(eusilcP)    # load data
 
 ## simple random sampling
-srss <- setup(eusilcP, size = 20, k = 4, seed = 12345)
+srss <- setup(eusilcP, size = 20, k = 4)
 summary(srss)
 draw(eusilcP[, c("id", "eqIncome")], srss, i = 1)
 
 ## group sampling
-gss <- setup(eusilcP, grouping = "hid", size = 10, 
-    k = 4, seed = 12345)
+gss <- setup(eusilcP, grouping = "hid", size = 10, k = 4)
 summary(gss)
 draw(eusilcP[, c("hid", "id", "eqIncome")], gss, i = 2)
 
 ## stratified simple random sampling
 ssrss <- setup(eusilcP, design = "region", 
-    size = c(2, 5, 5, 3, 4, 5, 3, 5, 2), 
-    k = 4, seed = 12345)
+    size = c(2, 5, 5, 3, 4, 5, 3, 5, 2), k = 4)
 summary(ssrss)
 draw(eusilcP[, c("id", "region", "eqIncome")], ssrss, i = 3)
 
 ## stratified group sampling
 sgss <- setup(eusilcP, design = "region", 
-    grouping = "hid", size = c(2, 5, 5, 3, 4, 5, 3, 5, 2), 
-    k = 4, seed = 12345)
+    grouping = "hid", size = c(2, 5, 5, 3, 4, 5, 3, 5, 2), k = 4)
 summary(sgss)
 draw(eusilcP[, c("hid", "id", "region", "eqIncome")], sgss, i = 4)
 }

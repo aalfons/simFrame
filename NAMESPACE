@@ -1,85 +1,150 @@
-export(BasicContControl)
-export(BasicSampleControl)
-export(ContControl)
-export(DataControl)
-export(NAControl)
-export(RandomContControl)
-export(SampleControl)
-export(SampleSetup)
-export(SimControl)
-export(SimResults)
-export(SummarySampleSetup)
-export(TwoStageSampleControl)
-export(brewer)
-export(inclusionProb)
-export(midzuno)
-export(srs)
-export(tille)
-export(ups)
-exportClasses(BasicContControl)
-exportClasses(BasicSampleControl)
-exportClasses(BasicVector)
-exportClasses(ContControl)
-exportClasses(DataControl)
-exportClasses(NAControl)
-exportClasses(OptCall)
-exportClasses(OptCharacter)
-exportClasses(OptContControl)
-exportClasses(OptDataControl)
-exportClasses(OptNAControl)
-exportClasses(OptNumeric)
-exportClasses(OptSampleControl)
-exportClasses(RandomContControl)
-exportClasses(SampleControl)
-exportClasses(SampleSetup)
-exportClasses(SimControl)
-exportClasses(SimResults)
-exportClasses(SummarySampleSetup)
-exportClasses(TwoStageSampleControl)
-exportClasses(VirtualContControl)
-exportClasses(VirtualDataControl)
-exportClasses(VirtualNAControl)
-exportMethods(aggregate)
-exportMethods(autoplot)
-exportMethods(contaminate)
-exportMethods(draw)
-exportMethods(fortify)
-exportMethods(generate)
-exportMethods(getAux)
-exportMethods(getCall)
-exportMethods(getCollect)
-exportMethods(getColnames)
-exportMethods(getControl)
-exportMethods(getDesign)
-exportMethods(getDots)
-exportMethods(getEpsilon)
-exportMethods(getFun)
-exportMethods(getGrouping)
-exportMethods(getIndices)
-exportMethods(getInfo)
-exportMethods(getIntoContamination)
-exportMethods(getK)
-exportMethods(getNARate)
-exportMethods(getNrep)
-exportMethods(getProb)
-exportMethods(getSeed)
-exportMethods(getSize)
-exportMethods(getTarget)
-exportMethods(getTuning)
-exportMethods(getType)
-exportMethods(getValues)
-exportMethods(head)
-exportMethods(length)
-exportMethods(plot)
-exportMethods(runSimulation)
-exportMethods(setNA)
-exportMethods(setup)
-exportMethods(show)
-exportMethods(simPlot)
-exportMethods(subset)
-exportMethods(summary)
-exportMethods(tail)
-import(ggplot2)
-import(methods)
-import(stats4)
 useDynLib(simFrame)
+
+# import packages
+import(Rcpp)
+import(lattice)
+import(parallel)
+import(methods)
+
+# import specific functions from packages
+importFrom(stats, aggregate)
+importFrom(stats4, plot, summary)
+importFrom(utils, head, tail)
+
+# S3 functions
+export(
+    brewer,
+#    clusterAssign,
+    ContControl,
+    DARContControl,
+    DCARContControl,
+    DataControl,
+    inclusionProb,
+    midzuno,
+    NAControl,
+    runSim,
+    SampleControl, 
+    SampleSetup,
+    SimControl,
+#    SimResult, 
+    SimResults,
+    SummarySampleSetup, 
+    TwoStageControl,
+    simSample,
+    Strata,
+    srs,
+    tille,
+    ups
+)
+
+# S4 classes
+exportClasses(
+    BasicVector,
+    ContControl,
+    DARContControl,
+    DCARContControl,
+    DataControl,
+    NAControl,
+    NumericMatrix,
+    OptBasicVector,
+    OptCall,
+    OptCharacter,
+    OptContControl,
+    OptDataControl,
+    OptNAControl,
+    OptNumeric,
+    OptSampleControl,
+    SampleControl,
+    SampleSetup,
+    SimControl,
+#    SimResult,
+    SimResults,
+    Strata,
+    SummarySampleSetup,
+    TwoStageControl,
+    VirtualContControl,
+    VirtualDataControl,
+    VirtualNAControl,
+    VirtualSampleControl
+)
+
+# accessor methods for slots
+exportMethods(
+    getAdd,
+    getAux,
+    setAux,
+    getCall,
+    getCollect,
+    setCollect,
+    getColnames,
+    setColnames,
+    getContControl,
+    setContControl,
+    getControl,
+    getDataControl,
+    getDesign,
+    setDesign,
+    getDistribution,
+    setDistribution,
+    getDots,
+    setDots,
+    getEpsilon,
+    setEpsilon,
+    getGrouping,
+    setGrouping,
+    getFun,
+    setFun,
+    getIndices,
+    getIntoContamination,
+    setIntoContamination,
+    getK,
+    setK,
+    getLegend,
+    getNAControl,
+    setNAControl,
+    getNArate,
+    setNArate,
+    getNr,
+    getNrep,
+    getProb,
+    setProb,
+    getSAE,
+    setSAE,
+    getSampleControl,
+    getSeed,
+    getSize,
+    setSize,
+    getSplit,
+    getTarget,
+    setTarget,
+    getValues
+)
+
+# S4 generics
+exportMethods(
+    aggregate,
+    clusterSetup,
+    clusterRunSimulation,
+    contaminate,
+    draw,
+    generate,
+    getStrataLegend,
+    getStrataSplit,
+    getStrataTable,
+    getStratumSizes,
+    getStratumValues,
+    head,
+    plot,
+    runSimulation,
+    setNA,
+    setup,
+    show,
+    simApply,
+    simBwplot,
+    simDensityplot,
+    simSapply,
+    simXyplot,
+    stratify,
+    summary,
+    tail
+)

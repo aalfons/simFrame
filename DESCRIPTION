@@ -1,8 +1,8 @@
 Package: simFrame
-Version: 0.6.0
+Version: 0.5.3
 Title: Simulation framework
-Date: 2013-08-30
-Depends: R (>= 2.14.0), Rcpp (>= 0.8.6), parallel, ggplot2 (>= 0.9.3)
+Date: 2014-03-03
+Depends: R (>= 2.14.0), Rcpp (>= 0.8.6), lattice, parallel
 Imports: methods, stats4
 Suggests: laeken, mvtnorm, robCompositions, sampling
 LinkingTo: Rcpp
@@ -11,3 +11,5 @@ License: GPL (>= 2)
 LazyLoad: yes
 Authors@R: person("Andreas", "Alfons", email = "alfons@ese.eur.nl",
                   role = c("aut", "cre"))
+Author: Andreas Alfons [aut, cre]
+Maintainer: Andreas Alfons <alfons@ese.eur.nl>

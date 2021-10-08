@@ -1,19 +1,20 @@
-# ------------------------------------
+# ---------------------------------------
 # Author: Andreas Alfons
-#         Erasmus University Rotterdam
-# ------------------------------------
+#         Vienna University of Technology
+# ---------------------------------------
 
 ## initializations
 library("simFrame")
 library("laeken")
 data("eusilcP")
+set.seed(12345)
 
-## define samples
-sc <- SampleControl(eusilcP, design = "region", grouping = "hid", 
+## set up samples
+set <- setup(eusilcP, design = "region", grouping = "hid", 
     size = c(75, 250, 250, 125, 200, 225, 125, 150, 100), k = 100)
 
 ## define contamination
-cc <- RandomContControl(target = "eqIncome", epsilon = 0.005, 
+cc <- DCARContControl(target = "eqIncome", epsilon = 0.005, 
     grouping = "hid", dots = list(mean = 500000, sd = 10000))
 
 ## define function for simulation runs
@@ -29,18 +30,15 @@ sim <- function(x, k) {
 }
 
 ## run simulation
-results <- runSimulation(eusilcP, sc, contControl = cc, 
-    design = "gender", fun = sim, k = 125, seed = 12345)
+results <- runSimulation(eusilcP, set, contControl = cc, 
+    design = "gender", fun = sim, k = 125)
 
 ## inspect results
 head(results)
 aggregate(results)
 
 ## compute true values
-tv <- aggregate(eusilcP[, "eqIncome"], eusilcP[, "gender", drop=FALSE], 
-    function(x) gini(x)$value)
-tv
+tv <- simSapply(eusilcP, "gender", function(x) gini(x$eqIncome)$value)
 
 ## plot results
-plot(results, true = tv, ylab = "Gini coefficient") + 
-  geom_hline(aes(yintercept=x), data=tv)
+plot(results, true = tv, xlab = "Gini coefficient")

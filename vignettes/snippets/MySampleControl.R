@@ -7,3 +7,9 @@ setMethod("setup",
     function(x, control) {
         # method definition
     })
+
+setMethod("clusterSetup",
+    signature(x = "data.frame", control = "MySampleControl"),
+    function(cl, x, control) {
+        # method definition
+    })

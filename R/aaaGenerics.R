@@ -1,188 +1,235 @@
-# ------------------------------------
+# ----------------------
 # Author: Andreas Alfons
-#         Erasmus University Rotterdam
-# ------------------------------------
+#         KU Leuven
+# ----------------------
 
-#' @import methods
+setGeneric("clusterRunSimulation",
+    function(cl, x, setup, nrep, control, contControl = NULL, 
+            NAControl = NULL, design = character(), fun, ..., 
+            SAE = FALSE) {
+        res <- standardGeneric("clusterRunSimulation")
+        call <- match.call()
+        setCall(res, call)
+        res
+    },
+    valueClass = "SimResults")
 
-NULL
+setGeneric("clusterSetup",
+    function(cl, x, control, ...) {
+        res <- standardGeneric("clusterSetup")
+        call <- match.call()
+        setCall(res, call)
+        res
+    },
+    valueClass = "SampleSetup")
+
+setGeneric("contaminate",
+    function(x, control, ...) standardGeneric("contaminate"),
+    valueClass = "data.frame")
+
+setGeneric("draw",
+    function(x, setup, ...) standardGeneric("draw"), 
+    valueClass = "data.frame")
+
+setGeneric("generate",
+    function(control, ...) standardGeneric("generate"), 
+    valueClass = "data.frame")
+
+setGeneric("getSampleIndices",
+    function(x, control) standardGeneric("getSampleIndices"),
+    valueClass = "list")
+
+setGeneric("getSampleProb",
+    function(x, control) standardGeneric("getSampleProb"),
+    valueClass = "numeric")
+
+setGeneric("getStrataLegend",
+    function(x, design) standardGeneric("getStrataLegend"),
+    valueClass = "data.frame")
+
+setGeneric("getStrataSplit",
+    function(x, design, USE.NAMES = TRUE) standardGeneric("getStrataSplit"),
+    valueClass = "list")
+
+setGeneric("getStrataTable",
+    function(x, design) standardGeneric("getStrataTable"),
+    valueClass = "data.frame")
+
+setGeneric("getStratumSizes",
+    function(x, design, USE.NAMES = TRUE) standardGeneric("getStratumSizes"),
+    valueClass = "numeric")
+
+setGeneric("getStratumValues",
+    function(x, design, split) standardGeneric("getStratumValues"),
+    valueClass = "numeric")
+
+setGeneric("runSimulation",
+    function(x, setup, nrep, control, contControl = NULL, 
+            NAControl = NULL, design = character(), fun, ..., 
+            SAE = FALSE) {
+        # make sure that .Random.seed exists
+        if(!exists(".Random.seed", envir=.GlobalEnv, inherits = FALSE)) runif(1)
+        # call method and store seed before and after
+        firstSeed <- .Random.seed
+        res <- standardGeneric("runSimulation")
+        lastSeed <- .Random.seed
+        setSeed(res, list(firstSeed, lastSeed))
+        call <- match.call()
+        setCall(res, call)
+        res
+    },
+    valueClass = "SimResults")
+
+setGeneric("setNA",
+    function(x, control, ...) standardGeneric("setNA"),
+    valueClass = "data.frame")
+
+setGeneric("setup",
+    function(x, control, ...) {
+        # make sure that .Random.seed exists
+        if(!exists(".Random.seed", envir=.GlobalEnv, inherits = FALSE)) runif(1)
+        # call method and store seed before and after
+        firstSeed <- .Random.seed
+        res <- standardGeneric("setup")
+        lastSeed <- .Random.seed
+        setSeed(res, list(firstSeed, lastSeed))
+        call <- match.call()
+        setCall(res, call)
+        res
+    },
+    valueClass = "SampleSetup")
+
+setGeneric("simApply",
+    function(x, design, fun, ...) standardGeneric("simApply"))
+
+setGeneric("simBwplot",
+    function(x, ...) standardGeneric("simBwplot"))
+
+setGeneric("simDensityplot",
+    function(x, ...) standardGeneric("simDensityplot"))
+
+setGeneric("simSapply",
+    function(x, design, fun, ..., simplify = TRUE) standardGeneric("simSapply"))
+
+setGeneric("simXyplot",
+    function(x, ...) standardGeneric("simXyplot"))
+
+setGeneric("stratify", 
+    function(x, design) {
+        res <- standardGeneric("stratify")
+        call <- match.call()
+        setCall(res, call)
+        res
+    }, 
+    valueClass = "Strata")
 
 
-#' @export
-setGeneric(
-  "contaminate",
-  function(x, control, ...) standardGeneric("contaminate"),
-  valueClass = "data.frame")
+## public accessor and mutator functions (to be exported)
+setGeneric("getAdd", function(x) standardGeneric("getAdd"))
 
-#' @export
-setGeneric(
-  "draw",
-  function(x, setup, ...) standardGeneric("draw"), 
-  valueClass = "data.frame")
-
-#' @export
-setGeneric(
-  "generate",
-  function(control, ...) standardGeneric("generate"), 
-  valueClass = "data.frame")
-
-#' @export
-setGeneric(
-  "runSimulation",
-  function(x, setup = NULL, nrep = 1, control, contControl = NULL, 
-           NAControl = NULL, design = character(), fun, ..., seed, 
-           ncores = 1, cl = NULL) {
-    # initializations
-    call <- match.call()
-    # call method and store call
-    res <- standardGeneric("runSimulation")
-    setCall(res, call)
-    res
-  },
-  valueClass = "SimResults"
-)
-
-#' @export
-setGeneric(
-  "setNA",
-  function(x, control, ...) standardGeneric("setNA"),
-  valueClass = "data.frame")
-
-#' @export
-setGeneric(
-  "setup",
-  function(x, control, ...) {
-    # initializations
-    call <- match.call()
-    if(!missing(control) && is(control, "VirtualSampleControl")) {
-      seed <- getSeed(control)
-      if(!is.null(seed)) set.seed(seed)
-    }
-    # call method and store call
-    res <- standardGeneric("setup")
-    setCall(res, call)
-    res
-  },
-  valueClass = "SampleSetup")
-
-#' @import ggplot2
-#' @export
-setGeneric("simPlot", function(object, ...) standardGeneric("simPlot"))
-
-
-## public accessor functions (to be exported)
-
-#' @export
 setGeneric("getAux", function(x) standardGeneric("getAux"))
+setGeneric("setAux", function(x, aux) standardGeneric("setAux"))
 
-#' @export
+setGeneric("getCall", function(x, ...) standardGeneric("getCall"))
+
 setGeneric("getCollect", function(x) standardGeneric("getCollect"))
+setGeneric("setCollect", function(x, collect) standardGeneric("setCollect"))
 
-#' @export
 setGeneric("getColnames", function(x) standardGeneric("getColnames"))
+setGeneric("setColnames", 
+    function(x, colnames) standardGeneric("setColnames"))
 
-#' @export
-setGeneric("getControl", function(x, ...) standardGeneric("getControl"))
+setGeneric("getContControl", function(x) standardGeneric("getContControl"))
+setGeneric("setContControl", 
+    function(x, contControl) standardGeneric("setContControl"))
 
-#' @export
+setGeneric("getControl", function(x) standardGeneric("getControl"))
+
+setGeneric("getDataControl", function(x) standardGeneric("getDataControl"))
+
 setGeneric("getDesign", function(x) standardGeneric("getDesign"))
+setGeneric("setDesign", function(x, design) standardGeneric("setDesign"))
 
-#' @export
+setGeneric("getDistribution", function(x) standardGeneric("getDistribution"))
+setGeneric("setDistribution", 
+    function(x, distribution) standardGeneric("setDistribution"))
+
+#setGeneric("getDots", function(x) standardGeneric("getDots"))
+#setGeneric("setDots", function(x, dots) standardGeneric("setDots"))
 setGeneric("getDots", function(x, ...) standardGeneric("getDots"))
+setGeneric("setDots", function(x, dots, ...) standardGeneric("setDots"))
 
-#' @export
 setGeneric("getEpsilon", function(x) standardGeneric("getEpsilon"))
+setGeneric("setEpsilon", function(x, epsilon) standardGeneric("setEpsilon"))
 
-#' @export
-setGeneric("getFun", function(x, ...) standardGeneric("getFun"))
-
-#' @export
 setGeneric("getGrouping", function(x) standardGeneric("getGrouping"))
+setGeneric("setGrouping", function(x, grouping) standardGeneric("setGrouping"))
 
-#' @export
+#setGeneric("getFun", function(x) standardGeneric("getFun"))
+#setGeneric("setFun", function(x, fun) standardGeneric("setFun"))
+setGeneric("getFun", function(x, ...) standardGeneric("getFun"))
+setGeneric("setFun", function(x, fun, ...) standardGeneric("setFun"))
+
 setGeneric("getIndices", function(x) standardGeneric("getIndices"))
 
-#' @export
-setGeneric("getInfo", function(x) standardGeneric("getInfo"))
-
-#' @export
 setGeneric("getIntoContamination", 
-           function(x) standardGeneric("getIntoContamination"))
+    function(x) standardGeneric("getIntoContamination"))
+setGeneric("setIntoContamination", 
+    function(x, intoContamination) standardGeneric("setIntoContamination"))
 
-#' @export
 setGeneric("getK", function(x) standardGeneric("getK"))
+setGeneric("setK", function(x, k) standardGeneric("setK"))
 
-#' @export
-setGeneric("getNARate", function(x) standardGeneric("getNARate"))
+setGeneric("getLegend", function(x) standardGeneric("getLegend"))
 
-#' @export
+setGeneric("getNAControl", function(x) standardGeneric("getNAControl"))
+setGeneric("setNAControl", 
+    function(x, NAControl) standardGeneric("setNAControl"))
+
+setGeneric("getNArate", function(x) standardGeneric("getNArate"))
+setGeneric("setNArate", function(x, NArate) standardGeneric("setNArate"))
+
+setGeneric("getNr", function(x) standardGeneric("getNr"))
+
 setGeneric("getNrep", function(x) standardGeneric("getNrep"))
 
-#' @export
+#setGeneric("getProb", function(x) standardGeneric("getProb"))
+#setGeneric("setProb", function(x, prob) standardGeneric("setProb"))
 setGeneric("getProb", function(x, ...) standardGeneric("getProb"))
+setGeneric("setProb", function(x, prob, ...) standardGeneric("setProb"))
 
-#' @export
+setGeneric("getSAE", function(x) standardGeneric("getSAE"))
+setGeneric("setSAE", function(x, SAE) standardGeneric("setSAE"))
+
+setGeneric("getSampleControl", function(x) standardGeneric("getSampleControl"))
+
 setGeneric("getSeed", function(x) standardGeneric("getSeed"))
 
-#' @export
+#setGeneric("getSize", function(x) standardGeneric("getSize"))
+#setGeneric("setSize", function(x, size) standardGeneric("setSize"))
 setGeneric("getSize", function(x, ...) standardGeneric("getSize"))
+setGeneric("setSize", function(x, size, ...) standardGeneric("setSize"))
 
-#' @export
+setGeneric("getSplit", function(x) standardGeneric("getSplit"))
+
 setGeneric("getTarget", function(x) standardGeneric("getTarget"))
+setGeneric("setTarget", function(x, target) standardGeneric("setTarget"))
 
-#' @export
-setGeneric("getTuning", function(x) standardGeneric("getTuning"))
-
-#' @export
-setGeneric("getType", function(x) standardGeneric("getType"))
-
-#' @export
 setGeneric("getValues", function(x) standardGeneric("getValues"))
 
 
-## private mutator functions
-
+## private accessor and mutator functions (not exported)
 setGeneric("setCall", function(x, call) standardGeneric("setCall"))
-# setGeneric("setColnames", function(x, colnames) standardGeneric("setColnames"))
 setGeneric("setIndices", function(x, indices) standardGeneric("setIndices"))
-setGeneric("setK", function(x, k) standardGeneric("setK"))
 setGeneric("setSeed", function(x, seed) standardGeneric("setSeed"))
 setGeneric("setValues", function(x, values) standardGeneric("setValues"))
 
 
 ## existing S3 or S4 generics (just to be safe)
-
-#' @export
 setGeneric("aggregate")
-
-#' @import ggplot2
-#' @export
-setGeneric("autoplot")
-
-#' @import ggplot2
-#' @export
-setGeneric("fortify")
-
-#' @export
-setGeneric("getCall")
-
-#' @export
 setGeneric("head")
-
-#' @export
 setGeneric("length")
-
-#' @export
 setGeneric("plot")
-
-#' @export
 setGeneric("show")
-
-#' @export
-setGeneric("subset")
-
-#' @export
 setGeneric("summary")
-
-#' @export
 setGeneric("tail")

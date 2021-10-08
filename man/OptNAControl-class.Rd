@@ -2,8 +2,16 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{OptNAControl-class}
+%% aliases to avoid confusion due to capitalization
+\alias{optNAControl-class}
+\alias{optnaControl-class}
+\alias{optNAcontrol-class}
+\alias{optnacontrol-class}
+\alias{OptnaControl-class}
+\alias{Optnacontrol-class}
+\alias{OptNAcontrol-class}
 
-\title{Class \code{"OptNAControl"}}
+\title{Class "OptNAControl"}
 \description{Virtual class used internally for convenience.}
 \section{Objects from the Class}{
   A virtual Class: No objects may be created from it.
@@ -18,4 +26,10 @@ No methods defined with class \code{"OptNAControl"} in the signature.
   \code{vignette("simFrame-intro")} to view this vignette.
 }
 \author{Andreas Alfons}
+\seealso{
+  \code{"\linkS4class{SimControl}"}
+}
+\examples{
+showClass("OptNAControl")
+}
 \keyword{classes}

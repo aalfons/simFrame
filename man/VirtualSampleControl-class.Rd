@@ -3,10 +3,18 @@
 \docType{class}
 \alias{VirtualSampleControl-class}
 \alias{getK,VirtualSampleControl-method}
-\alias{getSeed,VirtualSampleControl-method}
+\alias{setK,VirtualSampleControl-method}
 \alias{show,VirtualSampleControl-method}
+%% aliases to avoid confusion due to capitalization
+\alias{virtualSampleControl-class}
+\alias{virtualsampleControl-class}
+\alias{virtualsamplecontrol-class}
+\alias{virtualSamplecontrol-class}
+\alias{VirtualsampleControl-class}
+\alias{VirtualSamplecontrol-class}
+\alias{Virtualsamplecontrol-class}
 
-\title{Class \code{"VirtualSampleControl"}}
+\title{Class "VirtualSampleControl"}
 \description{
   Virtual superclass for controlling the setup of samples.
 }
@@ -15,25 +23,30 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{k}:}{A positive integer giving the number of samples to be set 
-      up.}
-    \item{\code{seed}:}{An optional integer to be used as initial seed of the 
-      random number generator.}
+    \item{\code{k}:}{Object of class \code{"numeric"}, a single positive 
+      integer giving the number of samples to be set up.}
   }
 }
 \section{Extends}{
 Class \code{"\linkS4class{OptSampleControl}"}, directly.
 }
-\section{Accessor methods}{
+\section{Accessor and mutator methods}{
   \describe{
     \item{\code{getK}}{\code{signature(x = "VirtualSampleControl")}: get slot 
       \code{k}.}
-    \item{\code{getSeed}}{\code{signature(x = "VirtualSampleControl")}: get 
-      slot \code{seed}.}
+    \item{\code{setK}}{\code{signature(x = "VirtualSampleControl")}: set slot 
+      \code{k}.}
   }
 }
 \section{Methods}{
   \describe{
+    \item{\code{clusterRunSimulation}}{\code{signature(cl = "ANY", 
+      x = "data.frame", setup = "VirtualSampleControl", nrep = "missing", 
+      control = "SimControl")}: run a simulation experiment on a cluster.}
+    \item{\code{clusterRunSimulation}}{\code{signature(cl = "ANY", 
+      x = "VirtualDataControl", setup = "VirtualSampleControl", 
+      nrep = "numeric", control = "SimControl")}: run a simulation experiment 
+      on a cluster.}
     \item{\code{draw}}{\code{signature(x = "data.frame", 
       setup = "VirtualSampleControl")}: draw a sample.}
     \item{\code{head}}{\code{signature(x = "VirtualSampleControl")}: currently 
@@ -41,11 +54,14 @@ Class \code{"\linkS4class{OptSampleControl}"}, directly.
     \item{\code{length}}{\code{signature(x = "VirtualSampleControl")}: get the 
       number of samples to be set up.}
     \item{\code{runSimulation}}{\code{signature(x = "data.frame", 
-      setup = "VirtualSampleControl", nrep = "ANY", control = "SimControl")}: 
-      run a simulation experiment.}
+      setup = "VirtualSampleControl", nrep = "missing", 
+      control = "SimControl")}: run a simulation experiment.}
     \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
-      setup = "VirtualSampleControl", nrep = "ANY", control = "SimControl")}: 
-      run a simulation experiment.}
+      setup = "VirtualSampleControl", nrep = "numeric", 
+      control = "SimControl")}: run a simulation experiment.}
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
+      setup = "VirtualSampleControl", nrep = "missing", 
+      control = "SimControl")}: run a simulation experiment.}
     \item{\code{show}}{\code{signature(object = "VirtualSampleControl")}: print 
       the object on the \R console.}
     \item{\code{summary}}{\code{signature(object = "VirtualSampleControl")}: 
@@ -68,9 +84,10 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 \url{http://www.jstatsoft.org/v37/i03/}.
 }
 \seealso{
-  \code{"\linkS4class{BasicSampleControl}"}, 
-  \code{"\linkS4class{TwoStageSampleControl}"}, 
-  \code{"\linkS4class{SampleSetup}"}, 
-  \code{\link{setup}}, \code{\link{draw}}
+  \code{"\linkS4class{SampleControl}"}, \code{"\linkS4class{TwoStageControl}"}, 
+  \code{"\linkS4class{SampleSetup}"}, \code{\link{setup}}, \code{\link{draw}}
+}
+\examples{
+showClass("VirtualSampleControl")
 }
 \keyword{classes}

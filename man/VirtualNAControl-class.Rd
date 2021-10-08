@@ -2,11 +2,21 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{VirtualNAControl-class}
-\alias{getNARate,VirtualNAControl-method}
 \alias{getTarget,VirtualNAControl-method}
+\alias{setTarget,VirtualNAControl-method}
+\alias{getNArate,VirtualNAControl-method}
+\alias{setNArate,VirtualNAControl-method}
 \alias{show,VirtualNAControl-method}
+%% aliases to avoid confusion due to capitalization
+\alias{virtualNAControl-class}
+\alias{virtualnaControl-class}
+\alias{virtualnacontrol-class}
+\alias{virtualNAcontrol-class}
+\alias{VirtualnaControl-class}
+\alias{VirtualNAcontrol-class}
+\alias{Virtualnacontrol-class}
 
-\title{Class \code{"VirtualNAControl"}}
+\title{Class "VirtualNAControl"}
 \description{
   Virtual superclass for controlling the insertion of missing values in a 
   simulation experiment.
@@ -16,26 +26,31 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{target}:}{A character vector specifying the variables (columns) 
-      into which missing values should be inserted, or \code{NULL} to insert 
-      missing values into all variables (except additional ones generated 
-      internally).}
-    \item{\code{NARate}:}{A numeric matrix giving the missing value rates.  In 
-      case of only one column, the same missing value rates are used for all 
-      target variables.  Otherwise the missing value rates to be used for each 
-      target variable are given by the respective column.  A vector is 
-      converted to a matrix during initialization.}
+    \item{\code{target}:}{Object of class \code{"OptCharacter"}; a character 
+      vector specifying the variables (columns) in which missing values should 
+      be inserted, or \code{NULL} to insert missing values in all variables 
+      (except the additional ones generated internally).}
+    \item{\code{NArate}:}{Object of class \code{"NumericMatrix"} giving the 
+      missing value rates, which may be selected individually for the target 
+      variables. In case of a vector, the same missing value rates are used for 
+      all target variables. In case of a matrix, on the other hand, the missing 
+      value rates to be used for each target variable are given by the 
+      respective column.}
   }
 }
 \section{Extends}{
 Class \code{"\linkS4class{OptNAControl}"}, directly.
 }
-\section{Accessor methods}{
+\section{Accessor and mutator methods}{
   \describe{
     \item{\code{getTarget}}{\code{signature(x = "VirtualNAControl")}: get slot 
       \code{target}.}
-    \item{\code{getNARate}}{\code{signature(x = "VirtualNAControl")}: get slot 
-      \code{NARate}.}
+    \item{\code{setTarget}}{\code{signature(x = "VirtualNAControl")}: set slot 
+      \code{target}.}
+    \item{\code{getNArate}}{\code{signature(x = "VirtualNAControl")}: get slot 
+      \code{NArate}.}
+    \item{\code{setNArate}}{\code{signature(x = "VirtualNAControl")}: set slot 
+      \code{NArate}.}
   }
 }
 \section{Methods}{
@@ -43,7 +58,8 @@ Class \code{"\linkS4class{OptNAControl}"}, directly.
     \item{\code{head}}{\code{signature(x = "VirtualNAControl")}: currently 
       returns the object itself.}
     \item{\code{length}}{\code{signature(x = "VirtualNAControl")}: get the 
-      number of missing value rates to be used (i.e., the number of rows).}
+      number of missing value rates to be used (the length in case of a vector 
+      or the number of rows in case of a matrix).}
     \item{\code{show}}{\code{signature(object = "VirtualNAControl")}: print the 
       object on the \R console.}
     \item{\code{summary}}{\code{signature(object = "VirtualNAControl")}: 
@@ -67,5 +83,8 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 }
 \seealso{
   \code{"\linkS4class{NAControl}"}, \code{\link{setNA}}
+}
+\examples{
+showClass("VirtualNAControl")
 }
 \keyword{classes}

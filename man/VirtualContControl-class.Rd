@@ -2,11 +2,21 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{VirtualContControl-class}
-\alias{getEpsilon,VirtualContControl-method}
 \alias{getTarget,VirtualContControl-method}
+\alias{setTarget,VirtualContControl-method}
+\alias{getEpsilon,VirtualContControl-method}
+\alias{setEpsilon,VirtualContControl-method}
 \alias{show,VirtualContControl-method}
+%% aliases to avoid confusion due to capitalization
+\alias{virtualContControl-class}
+\alias{virtualcontControl-class}
+\alias{virtualcontcontrol-class}
+\alias{virtualContcontrol-class}
+\alias{VirtualcontControl-class}
+\alias{VirtualContcontrol-class}
+\alias{Virtualcontcontrol-class}
 
-\title{Class \code{"VirtualContControl"}}
+\title{Class "VirtualContControl"}
 \description{
   Virtual superclass for controlling contamination in a simulation experiment.
 }
@@ -15,20 +25,26 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{target}:}{A character vector specifying specifying the 
-      variables (columns) to be contaminated, or \code{NULL} to contaminate 
-      all variables (except additional ones generated internally).}
-    \item{\code{epsilon}:}{A numeric vector giving the contamination levels.}
+    \item{\code{target}:}{Object of class \code{"OptCharacter"}; a character 
+      vector specifying specifying the variables (columns) to be contaminated, 
+      or \code{NULL} to contaminate all variables  (except the additional ones 
+      generated internally).}
+    \item{\code{epsilon}:}{Object of class \code{"numeric"} giving the 
+      contamination levels.}
   }
 }
 \section{Extends}{
 Class \code{"\linkS4class{OptContControl}"}, directly.
 }
-\section{Accessor methods}{
+\section{Accessor and mutator methods}{
   \describe{
     \item{\code{getTarget}}{\code{signature(x = "VirtualContControl")}: get 
       slot \code{target}.}
+    \item{\code{setTarget}}{\code{signature(x = "VirtualContControl")}: set 
+      slot \code{target}.}
     \item{\code{getEpsilon}}{\code{signature(x = "VirtualContControl")}: get 
+      slot \code{epsilon}.}
+    \item{\code{setEpsilon}}{\code{signature(x = "VirtualContControl")}: set 
       slot \code{epsilon}.}
   }
 }
@@ -60,8 +76,10 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 \url{http://www.jstatsoft.org/v37/i03/}.
 }
 \seealso{
-  \code{"\linkS4class{BasicContControl}"}, 
-  \code{"\linkS4class{RandomContControl}"}, 
-  \code{\link{contaminate}}
+  \code{"\linkS4class{DCARContControl}"}, \code{"\linkS4class{DARContControl}"}, 
+  \code{"\linkS4class{ContControl}"}, \code{\link{contaminate}}
+}
+\examples{
+showClass("VirtualContControl")
 }
 \keyword{classes}

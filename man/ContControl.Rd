@@ -1,46 +1,52 @@
 \name{ContControl}
+\Rdversion{1.1}
 \alias{ContControl}
+%% aliases to avoid confusion due to capitalization
+\alias{contControl}
+\alias{contcontrol}
+\alias{Contcontrol}
+
 \title{Create contamination control objects}
+\description{Create objects of a class inheriting from \code{"ContControl"}.}
 \usage{
-  ContControl(..., sub = c("Basic", "Random"))
+ContControl(\dots, type = c("DCAR", "DAR"))
 }
 \arguments{
-  \item{\dots}{arguments passed to the constructor of the
-  class determined by \code{sub}.}
-
-  \item{sub}{a character string specifying whether to
-  create a control object of the subclass
-  \code{"\linkS4class{BasicContControl}"} or
-  \code{"\linkS4class{RandomContControl}"}.}
+  \item{\dots}{arguments passed to \code{new("DCARContControl", \dots)} or 
+    \code{new("DARContControl", \dots)}, as determined by \code{type}.}
+  \item{type}{a character string specifying whether a control object of class 
+    \code{"DCARContControl"} or \code{"DARContControl"} should be created.}
 }
 \value{
-  An object of class determined by \code{sub}.
+  If \code{type = "DCAR"}, an object of class \code{"DCARContControl"}.
+
+  If \code{type = "DAR"}, an object of class \code{"DARContControl"}.
 }
-\description{
-  Create objects of a class inheriting from
-  \code{"\linkS4class{ContControl}"}.
+\note{
+  This constructor exists mainly for back compatibility with early draft 
+  versions of \code{simFrame}.
+}
+\author{Andreas Alfons}
+\seealso{
+  \code{"\linkS4class{DCARContControl}"}, \code{"\linkS4class{DARContControl}"}, 
+  \code{"\linkS4class{ContControl}"}
 }
 \examples{
-# contaminate the first observations
-x <- generate(size = 10)
-bcc <- ContControl(epsilon = 0.2, fun = function(x) x * 10,
-    type = "CAR", sub = "Basic")
-contaminate(x, bcc)
-
-# randomly select observations to be contaminated
-data("eusilcP")
+## distributed completely at random
+data(eusilcP)
 sam <- draw(eusilcP[, c("id", "eqIncome")], size = 20)
-rcc <- ContControl(target = "eqIncome", epsilon = 0.1,
-    dots = list(mean = 5e+05, sd = 10000),
-    type = "CCAR", sub = "Random")
-contaminate(sam, rcc)
-}
-\author{
-  Andreas Alfons
-}
-\seealso{
-  \code{"\linkS4class{BasicContControl}"},
-  \code{"\linkS4class{RandomContControl}"}
+dcarc <- ContControl(target = "eqIncome", epsilon = 0.05, 
+    dots = list(mean = 5e+05, sd = 10000), type = "DCAR")
+contaminate(sam, dcarc)
+
+## distributed at random
+require(mvtnorm)
+mean <- rep(0, 2)
+sigma <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+foo <- generate(size = 10, distribution = rmvnorm, 
+    dots = list(mean = mean, sigma = sigma))
+darc <- ContControl(target = "V2", epsilon = 0.2, 
+    fun = function(x) x * 100, type = "DAR")
+contaminate(foo, darc)
 }
 \keyword{classes}
-

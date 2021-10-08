@@ -4,11 +4,11 @@
 \alias{summary,SampleSetup-method}
 \alias{summary,SimControl-method}
 \alias{summary,SimResults-method}
+\alias{summary,Strata-method}
 \alias{summary,VirtualContControl-method}
 \alias{summary,VirtualDataControl-method}
 \alias{summary,VirtualNAControl-method}
 \alias{summary,VirtualSampleControl-method}
-
 \title{Methods for producing a summary of an object}
 \description{
   Produce a summary an object.
@@ -19,6 +19,8 @@
 \S4method{summary}{SimControl}(object)
 
 \S4method{summary}{SimResults}(object, \dots)
+
+\S4method{summary}{Strata}(object)
 
 \S4method{summary}{VirtualContControl}(object)
 
@@ -39,13 +41,15 @@
 \section{Methods}{
   \describe{
   \item{\code{signature(x = "SampleSetup")}}{returns an object of class 
-    \code{"\linkS4class{SummarySampleSetup}"}", which contains information on 
-    the size of each of the set up samples.}
+    \code{SummarySampleSetup}, which contains information on the size of each 
+    of the set up samples.}
   \item{\code{signature(x = "SimControl")}}{currently returns the 
     object itself.}
   \item{\code{signature(x = "SimResults")}}{produces a summary of the 
     simulation results by calling the method of \code{\link[base]{summary}} 
-    for the data frame in slot \code{values}.}
+    for the \code{data.frame} in slot \code{values}.}
+  \item{\code{signature(x = "Strata")}}{returns a \code{data.frame} containing 
+    the size of each stratum.}
   \item{\code{signature(x = "VirtualContControl")}}{currently returns the 
     object itself.}
   \item{\code{signature(x = "VirtualDataControl")}}{currently returns the 
@@ -65,16 +69,21 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 }
 \seealso{
   \code{\link[base]{summary}}, \code{"\linkS4class{SampleSetup}"}, 
-  \code{"\linkS4class{SummarySampleSetup}"}, \code{"\linkS4class{SimResults}"}
+  \code{"\linkS4class{SummarySampleSetup}"}, \code{"\linkS4class{SimResults}"}, 
+  \code{"\linkS4class{Strata}"}
 }
 \examples{
 ## load data
-data("eusilcP")
+data(eusilcP)
 
 ## class "SampleSetup"
 # set up samples using group sampling
-set <- setup(eusilcP, grouping = "hid", size = 1000, 
-    k = 50, seed = 12345)
+set <- setup(eusilcP, grouping = "hid", size = 1000, k = 50)
 summary(set)
+
+## class "Strata"
+# set up samples using group sampling
+strata <- stratify(eusilcP, "region")
+summary(strata)
 }
 \keyword{methods}

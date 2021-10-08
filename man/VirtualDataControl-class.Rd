@@ -2,45 +2,48 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{VirtualDataControl-class}
-\alias{getSize,VirtualDataControl-method}
-\alias{show,VirtualDataControl-method}
+%% aliases to avoid confusion due to capitalization
+\alias{virtualDataControl-class}
+\alias{virtualdataControl-class}
+\alias{virtualdatacontrol-class}
+\alias{virtualDatacontrol-class}
+\alias{VirtualdataControl-class}
+\alias{VirtualDatacontrol-class}
+\alias{Virtualdatacontrol-class}
 
-\title{Class \code{"VirtualDataControl"}}
+\title{Class "VirtualDataControl"}
 \description{
   Virtual superclass for controlling model-based generation of data.
 }
 \section{Objects from the Class}{
   A virtual Class: No objects may be created from it.
 }
-\section{Slots}{
-  \describe{
-    \item{\code{size}:}{A numeric vector giving the data sizes, i.e., the 
-      numbers of observations to be generated.}
-  }
-}
 \section{Extends}{
 Class \code{"\linkS4class{OptDataControl}"}, directly.
 }
-\section{Accessor methods}{
-  \describe{
-    \item{\code{getSize}}{\code{signature(x = "VirtualDataControl")}: get slot 
-      \code{size}.}
-  }
-}
 \section{Methods}{
   \describe{
+    \item{\code{clusterRunSimulation}}{\code{signature(cl = "ANY", 
+      x = "VirtualDataControl", setup = "missing", nrep = "numeric", 
+      control = "SimControl")}: run a simulation experiment on a cluster.}
+    \item{\code{clusterRunSimulation}}{\code{signature(cl = "ANY", 
+      x = "VirtualDataControl", setup = "VirtualSampleControl", 
+      nrep = "numeric", control = "SimControl")}: run a simulation experiment 
+      on a cluster.}
     \item{\code{head}}{\code{signature(x = "VirtualContControl")}: currently 
       returns the object itself.}
-    \item{\code{length}}{\code{signature(x = "VirtualDataControl")}: get the 
-      number of data sizes to be used.}
     \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
-      setup = "ANY", nrep = "ANY", control = "SimControl")}: run a 
+      setup = "missing", nrep = "numeric", control = "SimControl")}: run a 
       simulation experiment.}
     \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
-      setup = "VirtualSampleControl", nrep = "ANY", 
+      setup = "missing", nrep = "missing", control = "SimControl")}: run a 
+      simulation experiment.}
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
+      setup = "VirtualSampleControl", nrep = "numeric", 
       control = "SimControl")}: run a simulation experiment.}
-    \item{show}{\code{signature(object = "VirtualDataControl")}: print the 
-      object on the \R console.}
+    \item{\code{runSimulation}}{\code{signature(x = "VirtualDataControl", 
+      setup = "VirtualSampleControl", nrep = "missing", 
+      control = "SimControl")}: run a simulation experiment.}
     \item{\code{summary}}{\code{signature(object = "VirtualContControl")}: 
       currently returns the object itself.}
     \item{\code{tail}}{\code{signature(x = "VirtualContControl")}: currently 
@@ -62,5 +65,8 @@ Statistical Software}, \bold{37}(3), 1--36. URL
 }
 \seealso{
   \code{"\linkS4class{DataControl}"}, \code{\link{generate}}
+}
+\examples{
+showClass("VirtualDataControl")
 }
 \keyword{classes}
