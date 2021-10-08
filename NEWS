@@ -1,32 +1,53 @@
+Changes in simFrame version 0.5.4
+
+    + Fixed DOI's and URL's in documentation.
+
+    + Properly registered C++ functions.
+
+    + Properly imported all required functions from package 'stats'.
+
+    + Bugfix in clusterSetup() involving typo in object name.
+
+    + Removed demo()'s.
+
+    + Removed links to package 'sampling' from documentation.
+
+    + Removed package 'mvtnorm' from examples.
+
+    + Removed package vignettes due to the CRAN requirement that packages in
+      'Suggests' should only be used conditionally in vignettes.  Vignettes
+      can still be found on https://github.com/aalfons/simFrame
+
+
 Changes in simFrame version 0.5.3
 
-    + Number of worker processes in examples for parallel computing is now 
+    + Number of worker processes in examples for parallel computing is now
       limited to 2.
-    
+
 
 Changes in simFrame version 0.5.2
 
-    + Bugfix in 'clusterRunSimulation' regarding export of internal object to 
+    + Bugfix in 'clusterRunSimulation' regarding export of internal object to
       worker processes.
-    
+
     + Bugfix in demo for model-based simulation with parallel computing.
 
 
 Changes in simFrame version 0.5.1
 
     + Slight optimizations in C++ code to compute inclusion probabilities.
-    
-    + Modified vignette according to changes in package 'robCompositions' 
+
+    + Modified vignette according to changes in package 'robCompositions'
       (function 'invilr' renamed to 'isomLRinv').
-    
+
     + Moved vignettes to 'vignettes' folder.
 
 
 Changes in simFrame version 0.5.0
 
     + Using package 'parallel' now for parallel computing instead of 'snow'.
-    
-    + 'runSimulation' and 'clusterRunSimulation' no longer produce a warning 
+
+    + 'runSimulation' and 'clusterRunSimulation' no longer produce a warning
       when simulations are performed separately on different domains.
 
 
@@ -38,40 +59,40 @@ Changes in simFrame version 0.4.4
 
 Changes in simFrame version 0.4.3
 
-    + S4 generic 'getCall' now has '...' argument to be consistent with 
+    + S4 generic 'getCall' now has '...' argument to be consistent with
       R 2.14.0 S3 generic.
-    
+
     + Updated author affiliation.
 
 
 Changes in simFrame version 0.4.2
 
-    + Midzuno and Tille sampling now give a warning instead of throwing an error 
+    + Midzuno and Tille sampling now give a warning instead of throwing an error
       when all inclusion probabilities are outside the interval (eps, 1-eps).
 
 
 Changes in simFrame version 0.4.1
 
-    + Added column to example data 'eusilcP' that indicates the main income 
+    + Added column to example data 'eusilcP' that indicates the main income
       holder of each household.
 
 
 Changes in simFrame version 0.4
 
-    + Implemented 'runSimulation' and 'clusterRunSimulation' methods for mixed 
+    + Implemented 'runSimulation' and 'clusterRunSimulation' methods for mixed
       simulation designs.
-    
-    + Added control class "TwoStageControl" and corresponding 'setup' and 
+
+    + Added control class "TwoStageControl" and corresponding 'setup' and
       'clusterSetup' methods for two-stage sampling.
-        
-    + Probability weights or inclusion probabilities for unequal probability 
-      sampling can now be supplied by specifying a variable of the population 
+
+    + Probability weights or inclusion probabilities for unequal probability
+      sampling can now be supplied by specifying a variable of the population
       data.
-    
+
     + Using Rcpp now to incorporate C++ instead of C code.
-    
-    + Added functions 'brewer', 'midzuno' and 'tille' for Brewer, Midzuno and 
-      Tille sampling, respectively (corresponding to 'UPbrewer', 'UPmidzuno' 
+
+    + Added functions 'brewer', 'midzuno' and 'tille' for Brewer, Midzuno and
+      Tille sampling, respectively (corresponding to 'UPbrewer', 'UPmidzuno'
       and 'UPtille' from package 'sampling', but faster C++ implementation).
 
 
@@ -89,14 +110,14 @@ Changes in simFrame version 0.3.6
 Changes in simFrame version 0.3.5
 
     + Improved code in 'CITATION' file.
-    
+
     + Updated references in package vignettes.
 
 
 Changes in simFrame version 0.3.4
 
-    + If 'nrep' is not supplied in 'runSimulation' or 'clusterRunSimulation', 
-      the corresponding slot of the resulting "SimResults" objects now contains 
+    + If 'nrep' is not supplied in 'runSimulation' or 'clusterRunSimulation',
+      the corresponding slot of the resulting "SimResults" objects now contains
       a zero-length numeric vector instead of 0.
 
 
@@ -112,97 +133,97 @@ Changes in simFrame version 0.3.2
 
 Changes in simFrame version 0.3.1
 
-    + Bugfix in 'clusterSetup' solved problem with inclusion probabilities for 
+    + Bugfix in 'clusterSetup' solved problem with inclusion probabilities for
       group sampling if the data are not sorted according to the groups.
 
 
 Changes in simFrame version 0.3
 
-    + Control class "NAControl" now allows to specify an auxiliary variable 
+    + Control class "NAControl" now allows to specify an auxiliary variable
       with probability weights for each target variable.
-    
-    + To improve computational performance in simulation studies, 'contaminate' 
-      and 'setNA' no longer check if auxiliary variable(s) with probability 
-      weights are numeric and contain only finite positive values ('sample' 
+
+    + To improve computational performance in simulation studies, 'contaminate'
+      and 'setNA' no longer check if auxiliary variable(s) with probability
+      weights are numeric and contain only finite positive values ('sample'
       still throws an error in these cases).
-    
-    + Bugfix in 'setup' solved problem with inclusion probabilities for group 
+
+    + Bugfix in 'setup' solved problem with inclusion probabilities for group
       sampling if the data are not sorted according to the groups.
-    
-    + Classes "SampleSetup" and "SimResults" now contain slots for the control 
-      object(s) used.  Accordingly, some redundant slots were removed from 
+
+    + Classes "SampleSetup" and "SimResults" now contain slots for the control
+      object(s) used.  Accordingly, some redundant slots were removed from
       class "SampleSetup".
-    
-    + Added package 'sampling' to 'Suggests' section of 'DESCRIPTION' file, 
-      minimal changes in 'simDensityplot', 'simXyplot' and in help file 
-      'tail-methods' so that 'R CMD check' and 'R CMD INSTALL' no longer 
+
+    + Added package 'sampling' to 'Suggests' section of 'DESCRIPTION' file,
+      minimal changes in 'simDensityplot', 'simXyplot' and in help file
+      'tail-methods' so that 'R CMD check' and 'R CMD INSTALL' no longer
       produce warnings or notes.
 
 
 
 Changes in simFrame version 0.2
 
-    + Argument 'average' added to plot function 'simXyplot' that specifies 
+    + Argument 'average' added to plot function 'simXyplot' that specifies
       whether the mean or median is used to compute averages.
-    
-    + Replaced example data, which is now called 'eusilcP' and has household 
+
+    + Replaced example data, which is now called 'eusilcP' and has household
       income components.
-    
-    + Added accessor and mutator functions 'getFoo' and 'setFoo' for slots 
-      (here "foo" stands for the name of the slot).  If no method 'setFoo' is 
-      available, this means that the slot is not supposed to be changed by the 
+
+    + Added accessor and mutator functions 'getFoo' and 'setFoo' for slots
+      (here "foo" stands for the name of the slot).  If no method 'setFoo' is
+      available, this means that the slot is not supposed to be changed by the
       user.
-    
-    + Renamed slots "group" to "grouping" and "method" to "fun" (where 
-      available) since functions named 'getGroup', 'getMethod' and 'setMethod' 
-      already exist and cannot be used for accessor and mutator functions, 
+
+    + Renamed slots "group" to "grouping" and "method" to "fun" (where
+      available) since functions named 'getGroup', 'getMethod' and 'setMethod'
+      already exist and cannot be used for accessor and mutator functions,
       respectively.
-    
-    + Renamed function 'getProb' to 'inclusionProb' to allow accessor method 
+
+    + Renamed function 'getProb' to 'inclusionProb' to allow accessor method
       for slot "prob".
-    
+
     + Removed class "SimResult" to avoid confusion.
-    
+
     + Added 'show' methods and improved existing ones.
-    
+
     + Added 'summary', 'head' and 'tail' methods.
-    
+
     + Restructured help.
-    
-    + Added demos for design-based simulation, model-based simulation and 
+
+    + Added demos for design-based simulation, model-based simulation and
       parallel computing.
-    
-    + Classes "SampleControl" and "SampleSetup" now contain a slot that 
-      indicates whether groups are collected after sampling individuals or 
+
+    + Classes "SampleControl" and "SampleSetup" now contain a slot that
+      indicates whether groups are collected after sampling individuals or
       sampled directly.
-    
-    + Class "SampleSetup" now contains a slot that stores the seed of the 
+
+    + Class "SampleSetup" now contains a slot that stores the seed of the
       random number generator before and after setting up the samples.
-    
-    + Made various improvements for plot functions if simulation results with 
+
+    + Made various improvements for plot functions if simulation results with
       multiple contamination levels or missing value rates are supplied.
-    
+
     + Included package vignettes.
 
 
 
 Changes in simFrame version 0.1.2
 
-    + Class "NAControl" now contains a slot that specifies whether missing 
+    + Class "NAControl" now contains a slot that specifies whether missing
       values should also be inserted into contaminated observations.
-    
+
     + Added 'aggregate' method for objects of class "SimResults".
-    
-    + In function 'contaminate', the column ".contaminated" is always appended, 
-      even if 'epsilon' is 0 or 'x' does not have any rows. 
+
+    + In function 'contaminate', the column ".contaminated" is always appended,
+      even if 'epsilon' is 0 or 'x' does not have any rows.
 
 
 Changes in simFrame version 0.1.1
 
-    + Argument 'select' added to plot functions for specifying columns to be 
+    + Argument 'select' added to plot functions for specifying columns to be
       plotted.
-    
-    + Row names of example data 'eusilc' are now sorted from 1 to the number of 
+
+    + Row names of example data 'eusilc' are now sorted from 1 to the number of
       rows.
-    
+
     + Fixed cross-references in some help files.
