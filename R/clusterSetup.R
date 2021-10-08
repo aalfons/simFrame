@@ -10,15 +10,15 @@ setMethod("clusterSetup",
     signature(cl = "ANY", x = "data.frame", control = "character"),
     function(cl, x, control, ...) {
         if(length(control) != 1) {
-            stop("'control' must specify exactly one class ", 
+            stop("'control' must specify exactly one class ",
                 "inheriting from \"VirtualSampleControl\"")
         }
         if(!extends(control, "VirtualSampleControl")) {
-            stop(gettextf("\"%s\" does not extend class \"VirtualSampleControl\"", 
+            stop(gettextf("\"%s\" does not extend class \"VirtualSampleControl\"",
                     control))
         }
 #        control <- new(control, ...)
-        # temporary solution: constructor for class "TwoStageControl" has 
+        # temporary solution: constructor for class "TwoStageControl" has
         # arguments that aren't slots
         if(isTRUE(control == "TwoStageControl")) control <- TwoStageControl(...)
         else control <- new(control, ...)
@@ -40,8 +40,8 @@ setMethod("clusterSetup",
     signature(cl = "ANY", x = "data.frame", control = "SampleControl"),
     function(cl, x, control) {
         # initializations
-        nam <- names(x)
-        grouping <- getCharacter(getGrouping(control), nam)
+        cnam <- names(x)
+        grouping <- getCharacter(getGrouping(control), cnam)
         if(length(grouping) > 1) {
             stop("'grouping' must not specify more than one variable")
         }
@@ -51,11 +51,11 @@ setMethod("clusterSetup",
             if(length(prob) > 1) {
                 stop("'prob' must not specify more than one variable")
             }
-        } 
+        }
         # parallel computing
         seqList <- clusterSplit(cl, 1:getK(control))
         kList <- lapply(seqList, length)
-        indices <- clusterApply(cl, kList, 
+        indices <- clusterApply(cl, kList,
             function(k, x, control) {
                 setK(control, k)
                 getSampleIndices(x, control)
@@ -68,14 +68,14 @@ setMethod("clusterSetup",
 
 
 ## utilities
-# this is currently an ugly solution, it would 
+# this is currently an ugly solution, it would
 # be nice to share code with 'setup' instead
 
 # get indices of the sampled observations
 setMethod("getSampleIndices",
     signature(x = "data.frame", control = "SampleControl"),
     function(x, control) {
-        
+
         # initializations
         cnam <- names(x)
         design <- getCharacter(getDesign(control), cnam)
@@ -101,31 +101,31 @@ setMethod("getSampleIndices",
 #                stop("'prob' must not specify more than one variable")
 #            }
             useProb <- length(prob) > 0
-        } else useProb <- !is.null(prob) 
+        } else useProb <- !is.null(prob)
         dots <- getDots(control)
         k <- getK(control)
-        
+
         # it might be possible to increase the performance (C code?)
-        
+
         if(length(design) > 0) {
             # -------------------
             # stratified sampling
             # -------------------
             split <- getStrataSplit(x, design)
-            call <- call("mapply", FUN=fun, MoreArgs=dots, 
+            call <- call("mapply", FUN=fun, MoreArgs=dots,
                 SIMPLIFY=FALSE, USE.NAMES=FALSE)  # initialize call
-            
+
             if(groupSampling) {
                 # --------------
                 # group sampling
                 # --------------
                 groupSplit <- lapply(split, function(s) x[s, grouping])
                 iGroupSplit <- lapply(groupSplit, function(x) !duplicated(x))
-                uniqueGroupSplit <- mapply(function(x, i) x[i], groupSplit, iGroupSplit, 
+                uniqueGroupSplit <- mapply(function(x, i) x[i], groupSplit, iGroupSplit,
                     SIMPLIFY=FALSE, USE.NAMES=FALSE)  # unique groups in strata
                 N <- sapply(uniqueGroupSplit, length)  # number of groups in strata
                 if(useX) {
-                    tmp <- mapply(function(x, i) x[i], split, iGroupSplit, 
+                    tmp <- mapply(function(x, i) x[i], split, iGroupSplit,
                         SIMPLIFY=FALSE, USE.NAMES=FALSE)  # list of indices
                     xSplit <- lapply(tmp, function(s) x[s, , drop=FALSE])
                     call$x <- xSplit
@@ -138,7 +138,7 @@ setMethod("getSampleIndices",
                     if(haveNewProb) {
                         probSplit <- lapply(split, function(s) x[s, prob])
                         # probability weights for unique group member by strata
-                        probSplit <- mapply(function(x, i) x[i], probSplit, 
+                        probSplit <- mapply(function(x, i) x[i], probSplit,
                             iGroupSplit, SIMPLIFY=FALSE, USE.NAMES=FALSE)
                     } else {
                         Ngroups <- sum(N)  # number of groups
@@ -147,8 +147,8 @@ setMethod("getSampleIndices",
                         }
                         if(length(design) == 1) strata <- x[, design]
                         else strata <- unsplit(1:length(split), x[, design])
-                        # if we determine unique groups in the following way, 
-                        # it also works if different group members are in 
+                        # if we determine unique groups in the following way,
+                        # it also works if different group members are in
                         # different strata
                         iGroups <- unsplit(iGroupSplit, strata)
                         probSplit <- split(prob, strata[iGroups])
@@ -156,8 +156,8 @@ setMethod("getSampleIndices",
                     }
                     call$prob <- probSplit
                 }
-                indices <- replicate(k, 
-                    try(simEval(call, split, groupSplit, uniqueGroupSplit)), 
+                indices <- replicate(k,
+                    try(simEval(call, split, groupSplit, uniqueGroupSplit)),
                     simplify=FALSE)  # repeated call
             } else {
                 # -----------------------
@@ -187,8 +187,8 @@ setMethod("getSampleIndices",
                 # repeated call
                 if(collectGroups) {
                     groupSplit <- lapply(split, function(s) x[s, grouping])
-                    indices <- replicate(k, 
-                        try(simEval(call, split, groupSplit, groupSplit)), 
+                    indices <- replicate(k,
+                        try(simEval(call, split, groupSplit, groupSplit)),
                         simplify=FALSE)
                 } else indices <- replicate(k, try(simEval(call, split)), simplify=FALSE)
             }
@@ -197,7 +197,7 @@ setMethod("getSampleIndices",
             # no stratification
             # -----------------
             call <- as.call(c(fun, dots))  # initialize call to 'fun'
-            
+
             if(groupSampling) {
                 # --------------
                 # group sampling
@@ -221,8 +221,8 @@ setMethod("getSampleIndices",
                     }
                     call$prob <- prob
                 }
-                indices <- replicate(k, 
-                    try(simEval(call, groups=groups, unique=uniqueGroups)), 
+                indices <- replicate(k,
+                    try(simEval(call, groups=groups, unique=uniqueGroups)),
                     simplify=FALSE)  # repeated call
             } else {
                 # -----------------------
@@ -246,15 +246,15 @@ setMethod("getSampleIndices",
                 # repeated call to fun
                 if(collectGroups) {
                     groups <- x[, grouping]  # group of each observation
-                    indices <- replicate(k, 
-                        try(simEval(call, groups=groups, unique=groups)), 
+                    indices <- replicate(k,
+                        try(simEval(call, groups=groups, unique=groups)),
                         simplify=FALSE)
                 } else indices <- replicate(k, try(eval(call)), simplify=FALSE)
             }
         }
-        
+
         # check for try errors and return indices
-        # replace errors with empty index vectors: let 'runSimulation' handle 
+        # replace errors with empty index vectors: let 'runSimulation' handle
         # the problems, this is important to debug model-based sampling
         notOK <- checkError(indices)
         if(all(notOK)) indices <- replicate(k, integer(), simplify=FALSE)
@@ -266,7 +266,7 @@ setMethod("getSampleIndices",
 setMethod("getSampleProb",
     signature(x = "data.frame", control = "SampleControl"),
     function(x, control) {
-        
+
         # initializations
         cnam <- names(x)
         design <- getCharacter(getDesign(control), cnam)
@@ -288,11 +288,11 @@ setMethod("getSampleProb",
 #                stop("'prob' must not specify more than one variable")
 #            }
             useProb <- length(prob) > 0
-        } else useProb <- !is.null(prob) 
-        
-        
+        } else useProb <- !is.null(prob)
+
+
         # it might be possible to increase the performance (C code?)
-        
+
         if(length(design) > 0) {
             if(groupSampling) {
                 # -------------------------
@@ -301,7 +301,7 @@ setMethod("getSampleProb",
                 split <- getStrataSplit(x, design)
                 groupSplit <- lapply(split, function(s) x[s, grouping])
                 iGroupSplit <- lapply(groupSplit, function(x) !duplicated(x))
-                uniqueGroupSplit <- mapply(function(x, i) x[i], groupSplit, iGroupSplit, 
+                uniqueGroupSplit <- mapply(function(x, i) x[i], groupSplit, iGroupSplit,
                     SIMPLIFY=FALSE, USE.NAMES=FALSE)  # unique groups in strata
                 N <- sapply(uniqueGroupSplit, length)  # number of groups in strata
                 if(length(size) > 1) size <- rep(size, length.out=length(N))
@@ -310,7 +310,7 @@ setMethod("getSampleProb",
                         probSplit <- lapply(split, function(s) x[s, prob])
                         strata <- x[, design]
                         # probability weights for unique group member by strata
-                        probSplit <- mapply(function(x, i) x[i], probSplit, 
+                        probSplit <- mapply(function(x, i) x[i], probSplit,
                             iGroupSplit, SIMPLIFY=FALSE, USE.NAMES=FALSE)
                     } else {
                         Ngroups <- sum(N)  # number of groups
@@ -320,19 +320,19 @@ setMethod("getSampleProb",
                         # this saves time in case of multiple design variables
                         if(length(design) == 1) strata <- x[, design]
                         else strata <- unsplit(1:length(split), x[, design])
-                        # if we determine unique groups in the following way, 
-                        # it also works if different group members are in 
+                        # if we determine unique groups in the following way,
+                        # it also works if different group members are in
                         # different strata
                         iGroups <- unsplit(iGroupSplit, strata)
                         probSplit <- split(prob, strata[iGroups])
                         names(probSplit) <- NULL
                     }
                     if(useSize) {
-                        probSplit <- mapply(inclusionProb, probSplit, size, 
+                        probSplit <- mapply(inclusionProb, probSplit, size,
                             SIMPLIFY=FALSE, USE.NAMES=FALSE)
-                    } 
+                    }
                     # reconstruct inclustion probabilities for individuals
-                    prob <- mapply(expand, probSplit, groupSplit,           # from groups in 
+                    prob <- mapply(expand, probSplit, groupSplit,           # from groups in
                         uniqueGroupSplit, SIMPLIFY=FALSE, USE.NAMES=FALSE)  # each stratum
                     prob <- unsplit(prob, strata)  # from strata
                 } else prob <- unsplit(size/N, x[, design])
@@ -356,7 +356,7 @@ setMethod("getSampleProb",
                     }
                     if(useSize) {
                         probSplit <- lapply(split, function(s) prob[s])
-                        probSplit <- mapply(inclusionProb, probSplit, size, 
+                        probSplit <- mapply(inclusionProb, probSplit, size,
                             SIMPLIFY=FALSE, USE.NAMES=FALSE)
                         prob <- unsplit(probSplit, x[, design])
                     }
@@ -402,17 +402,17 @@ setMethod("getSampleProb",
                 if(collectGroups) groups <- x[, grouping]  # group of each observation
             }
         }
-        
+
         if(collectGroups) {
             # aggregate inclusion probabilities
             prob <- tapply(prob, groups, sum, simplify=FALSE)  # aggregate
             prob <- unsplit(prob, groups)  # blow up again
         }
-        
+
         # return final inclustion probabilities
         prob
     })
-    
+
 # ---------------------------------------
 
 ## get two-stage sample setup using control class "TwoStageControl"
@@ -420,8 +420,8 @@ setMethod("clusterSetup",
     signature(cl = "ANY", x = "data.frame", control = "TwoStageControl"),
     function(cl, x, control) {
         # initializations
-        nam <- names(x)
-        grouping <- getCharacter(getGrouping(control), nam)
+        cnam <- names(x)
+        grouping <- getCharacter(getGrouping(control), cnam)
         if(!(length(grouping) %in% 1:2)) {
             stop("'grouping' must specify either one or two variables")
         }
@@ -431,18 +431,18 @@ setMethod("clusterSetup",
             if(length(prob1) > 1) {
                 stop("'prob1' must not specify more than one variable")
             }
-        } 
+        }
         prob2 <- getProb(control, stage=2)
         if(is(prob2, "character") || is(prob2, "logical")) {
             prob2 <- getCharacter(prob2, cnam)
             if(length(prob2) > 1) {
                 stop("'prob2' must not specify more than one variable")
             }
-        } 
+        }
         # parallel computing
         seqList <- clusterSplit(cl, 1:getK(control))
         kList <- lapply(seqList, length)
-        indices <- clusterApply(cl, kList, 
+        indices <- clusterApply(cl, kList,
             function(k, x, control) {
                 setK(control, k)
                 getSampleIndices(x, control)
@@ -454,18 +454,18 @@ setMethod("clusterSetup",
     })
 
 ## utilities
-# this is currently an ugly solution, it would 
+# this is currently an ugly solution, it would
 # be nice to share code with 'setup' instead
 
 # get indices of the sampled observations
 setMethod("getSampleIndices",
     signature(x = "data.frame", control = "TwoStageControl"),
     function(x, control) {
-        
+
         ## -----------
         ## first stage
         ## -----------
-        
+
         # initializations
         cnam <- names(x)
         design <- getCharacter(getDesign(control), cnam)
@@ -489,35 +489,35 @@ setMethod("getSampleIndices",
 #                stop("'prob1' must not specify more than one variable")
 #            }
             useProb <- length(prob1) > 0
-        } else useProb <- !is.null(prob1) 
+        } else useProb <- !is.null(prob1)
         dots <- getDots(control, stage=1)
         k <- getK(control)
-        
+
         ## computations
         PSU <- x[, grouping[1]]  # primary sampling units
         if((length(design) > 0) || useX || (useProb && haveNewProb)) {
             iPSU <- !duplicated(PSU)  # indices of unique primary sampling units
             uniquePSU <- PSU[iPSU]  # unique primary sampling units
         } else uniquePSU <- unique(PSU)
-        
+
         if(length(design) > 0) {
             # -------------------
             # stratified sampling
             # -------------------
-            
+
             xPSU <- x[iPSU, , drop=FALSE]
             iSplit <- getStrataSplit(xPSU, design)
             uniquePSUSplit <- lapply(iSplit, function(i) uniquePSU[i])
             N <- sapply(uniquePSUSplit, length)  # number of PSUs in strata
             # construct function call to 'fun'
-            call <- call("mapply", FUN=fun, MoreArgs=dots, 
+            call <- call("mapply", FUN=fun, MoreArgs=dots,
                 SIMPLIFY=FALSE, USE.NAMES=FALSE)  # initialize call
             if(useX) {
                 xSplit <- lapply(iSplit, function(i) xPSU[i, , drop=FALSE])
                 call$x <- xSplit
             } else if(useN) call$N <- N
             if(useSize) {
-                # stratification, hence 'size' should be a single integer or 
+                # stratification, hence 'size' should be a single integer or
                 # an integer vector with number of strata as length
                 if(length(size) > 1) size <- rep(size, length.out=length(N))
                 call$size <- size
@@ -536,17 +536,17 @@ setMethod("getSampleIndices",
                 call$prob <- probSplit  # add probability weights to function call
             }
             # repeated call to sample PSUs
-            # convert sampled PSUs to character strings so that the SSUs 
-            # can be extracted from the list correctly with subscripts 
-            indices <- replicate(k, 
-                try(as.character(simEval(call, uniquePSUSplit))), 
+            # convert sampled PSUs to character strings so that the SSUs
+            # can be extracted from the list correctly with subscripts
+            indices <- replicate(k,
+                try(as.character(simEval(call, uniquePSUSplit))),
                 simplify=FALSE)
-            
+
         } else {
             # -----------------
             # no stratification
             # -----------------
-            
+
             N <- length(uniquePSU)  # number of PSUs
             # construct function call to 'fun'
             call <- as.call(c(fun, dots))  # initialize call
@@ -568,21 +568,21 @@ setMethod("getSampleIndices",
                 call$prob <- prob1  # add probability weights to function call
             }
             # repeated call to sample PSUs
-            # convert sampled PSUs to character strings so that the SSUs 
-            # can be extracted from the list correctly with subscripts 
-            indices <- replicate(k, try(as.character(uniquePSU[eval(call)])), 
+            # convert sampled PSUs to character strings so that the SSUs
+            # can be extracted from the list correctly with subscripts
+            indices <- replicate(k, try(as.character(uniquePSU[eval(call)])),
                 simplify=FALSE)
         }
-        
+
         # check for try errors and replace errors with empty index vectors
         notOK <- checkError(indices)
         if(all(notOK)) return(replicate(k, integer(), simplify=FALSE))
         else indices[notOK] <- integer()
-        
+
         ## ------------
         ## second stage
         ## ------------
-        
+
         # initializations
         fun <- getFun(control, stage=2)
         nam <- argNames(fun)  # argument names of 'fun' (sampling method)
@@ -599,9 +599,9 @@ setMethod("getSampleIndices",
 #                stop("'prob2' must not specify more than one variable")
 #            }
             useProb <- length(prob2) > 0
-        } else useProb <- !is.null(prob2) 
+        } else useProb <- !is.null(prob2)
         dots <- getDots(control, stage=2)
-        
+
         # get list containing the indices of SSUs in each PSU
         useSSU <- lengthGrouping == 2
         if(useSSU) {
@@ -618,7 +618,7 @@ setMethod("getSampleIndices",
             SSUbyPSU <- split(1:nrow(x), PSU)
         }
         N <- sapply(SSUbyPSU, length)  # population size by PSU
-        
+
         call <- as.call(c(fun, dots))  # initialize call to 'fun'
         if(useX) {
             # split population according to PSUs
@@ -666,9 +666,9 @@ setMethod("getSampleIndices",
                 else try(unlist(lapply(indices, sampleWithinPSU)))
             }
         }
-        # repeated call to function for second stage sampling 
+        # repeated call to function for second stage sampling
         indices <- lapply(indices, secondStage)
-        
+
         # check for try errors and replace errors with empty index vectors
         notOK <- checkError(indices)
         if(all(notOK)) indices <- replicate(k, integer(), simplify=FALSE)
@@ -680,11 +680,11 @@ setMethod("getSampleIndices",
 setMethod("getSampleProb",
     signature(x = "data.frame", control = "TwoStageControl"),
     function(x, control) {
-        
+
         ## -----------
         ## first stage
         ## -----------
-        
+
         # initializations
         cnam <- names(x)
         design <- getCharacter(getDesign(control), cnam)
@@ -704,15 +704,15 @@ setMethod("getSampleProb",
 #                stop("'prob1' must not specify more than one variable")
 #            }
             useProb <- length(prob1) > 0
-        } else useProb <- !is.null(prob1) 
-        
+        } else useProb <- !is.null(prob1)
+
         ## computations
         PSU <- x[, grouping[1]]  # primary sampling units
         if((length(design) > 0) || (useProb && haveNewProb)) {
             iPSU <- !duplicated(PSU)  # indices of unique primary sampling units
             uniquePSU <- PSU[iPSU]  # unique primary sampling units
         } else uniquePSU <- unique(PSU)
-        
+
         if(length(design) > 0) {
             # -------------------
             # stratified sampling
@@ -733,7 +733,7 @@ setMethod("getSampleProb",
                 if(useSize) {
                     probSplit <- lapply(iSplit, function(i) prob1[i])
                     names(probSplit) <- NULL
-                    probSplit <- mapply(inclusionProb, probSplit, size, 
+                    probSplit <- mapply(inclusionProb, probSplit, size,
                         SIMPLIFY=FALSE, USE.NAMES=FALSE)
                     # reconstruct inclustion probabilities for PSUs
                     prob1 <- unsplit(probSplit, xPSU[, design])
@@ -745,7 +745,7 @@ setMethod("getSampleProb",
                 # within the same stratum
                 prob1 <- unsplit(size/N, x[, design])
             }
-            
+
         } else {
             # -----------------
             # no stratification
@@ -767,11 +767,11 @@ setMethod("getSampleProb",
                 prob1 <- rep.int(size/N, nrow(x))
             }
         }
-        
+
         ## ------------
         ## second stage
         ## ------------
-        
+
         # initializations
         size <- getSize(control, stage=2)
         useSize <- !is.null(size)  # use sample size in call to sampling method
@@ -784,8 +784,8 @@ setMethod("getSampleProb",
 #                stop("'prob2' must not specify more than one variable")
 #            }
             useProb <- length(prob2) > 0
-        } else useProb <- !is.null(prob2) 
-        
+        } else useProb <- !is.null(prob2)
+
         # get list containing the indices of SSUs in each PSU
         useSSU <- lengthGrouping == 2
         if(useSSU) {
@@ -802,14 +802,14 @@ setMethod("getSampleProb",
             SSUbyPSU <- split(1:nrow(x), PSU)
         }
         N <- sapply(SSUbyPSU, length)  # population size by PSU
-        
+
         # check sample size
         if(useSize) {
             # number of observations to sample from each selected PSU
             size <- rep(size, length.out=length(N))
             names(size) <- names(SSUbyPSU)
         }
-        
+
         # compute second stage inclusion probabilities
         if(useProb) {
             if(haveNewProb) {
@@ -839,7 +839,7 @@ setMethod("getSampleProb",
             # within the same PSU
             prob2 <- unsplit(size/N, PSU)
         }
-        
+
         # return final inclustion probabilities
         prob1*prob2
     })
