@@ -7,9 +7,9 @@ import(parallel)
 import(methods)
 
 # import specific functions from packages
-importFrom(stats, aggregate)
-importFrom(stats4, plot, summary)
-importFrom(utils, head, tail)
+importFrom(stats, "aggregate", "as.formula", "median", "rnorm", "runif")
+importFrom(stats4, "plot", "summary")
+importFrom(utils, "head", "tail")
 
 # S3 functions
 export(
@@ -23,12 +23,12 @@ export(
     midzuno,
     NAControl,
     runSim,
-    SampleControl, 
+    SampleControl,
     SampleSetup,
     SimControl,
-#    SimResult, 
+#    SimResult,
     SimResults,
-    SummarySampleSetup, 
+    SummarySampleSetup,
     TwoStageControl,
     simSample,
     Strata,
