@@ -23,7 +23,7 @@ The DESCRIPTION file:
 \packageIndices{simFrame}
 }
 \author{
-\packageAuthor{simFrame}
+Andreas Alfons [aut, cre]; C++ implementations of certain sampling algorithms are based on R code by Yves Tille and Alina Matei.
 
 Maintainer: \packageMaintainer{simFrame}
 }
